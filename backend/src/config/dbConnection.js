@@ -1,7 +1,7 @@
 import pg from "pg";
 import env from "dotenv";
 
-env.config();
+env.config({ path: './src/config/.env' });
 
 const db = new pg.Client({
   user: process.env.PG_USER,
@@ -18,3 +18,4 @@ db.connect().then(() => {
 })
 
 export default db 
+
