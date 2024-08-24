@@ -92,7 +92,7 @@ function RegisterForm(){
                             setPeselError("Pesel nie jest poprawny")
                             setPeselStatus("false")
                         }else{
-                            if(sendCheckRequest(pesel,'',setPeselError)){
+                            if(sendCheckRequest(pesel,'http://localhost:5000/check-pesel',setPeselError)){
                                 setNameStatus(true)
                             }else{
                                 setPeselStatus("false")
@@ -113,7 +113,7 @@ function RegisterForm(){
                 }}
                 onBlur={()=>{
                     if(validatePhoneNumber(phoneNumber)){
-                        if(sendCheckRequest(phoneNumber, '',setPhoneNumberError)){
+                        if(sendCheckRequest(phoneNumber, 'http://localhost:5000/check-phone-number',setPhoneNumberError)){
                             setPhoneNumberStatus(true);
                         }else{
                             setPeselStatus("false")
@@ -138,7 +138,7 @@ function RegisterForm(){
                 }}
                 onBlur={()=>{
                     if(validateEmail(email)){
-                        if(sendCheckRequest(email,'',setEmailError)){
+                        if(sendCheckRequest(email,'http://localhost:5000/check-email',setEmailError)){
                             setEmailStatus(true)    
                         }else{
                             setEmailStatus(false)  
