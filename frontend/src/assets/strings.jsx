@@ -1,0 +1,2 @@
+export const phoneNumberErrorText = "Niepoprawny format numeru telefonu. Dozwolone formaty to: XXX XXX XXX, +48 XXX XXX XXX, 0048 XXX XXX XXX"
+export const emailErrorText = "Niepoprawny format adresu email!"

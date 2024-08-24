@@ -1,7 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import App from './App.jsx'
 import LoginForm from './pages/LoginForm.jsx';
+import RegisterForm from './pages/RegisterForm.jsx';
 import {
   createBrowserRouter,
   RouterProvider,
@@ -10,10 +10,15 @@ import {
 
 
 const router = createBrowserRouter([
+  
   {
-    path:'/login',
-    element: <LoginForm/>
+    path: '/register',
+    element: <RegisterForm/>
   },
+  {
+    path: '/login',
+    element: <LoginForm/>
+  }
 ]);
 
 createRoot(document.getElementById('root')).render(

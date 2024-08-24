@@ -1,9 +1,10 @@
 import React, {useState} from 'react'
-import InputField from '../components/InputField';
+import LabelInputParagraph from '../components/labelInputParagraph';
 import Button from '../components/Button';
 import axios from 'axios';
-function LoginForm(){
 
+
+function LoginForm(){
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
     const [loading, setLoading] = useState(false)
@@ -16,7 +17,7 @@ function LoginForm(){
             setError(null);
 
             try{
-                const response = await axios.post('http://localhost:5000/login', {
+                const response = await axios.post('cipciaLalunia', {
                     username,
                     password,
                 });
@@ -34,19 +35,23 @@ function LoginForm(){
     return(
         <div>
             <form onSubmit={handleSubmit}>
-                <InputField
+                <LabelInputParagraph
                     id = "username"
-                    label = "Nazwa użytkownika"
                     type = "text"
                     value = {username}
+                    labelText = "Nazwa użytkownika"
                     onChange={(e) => setUsername(e.target.value)}
+                    onBlur = {console.log("haha")}   
+                    paragraphText= ""
                 />
-                <InputField
+                <LabelInputParagraph
                     id = "password"
-                    label = "Hasło"
                     type = "password"
                     value = {password}
+                    labelText = "Hasło"
                     onChange={(e) => setPassword(e.target.value)}
+                    onBlur = {console.log("haha")}   
+                    paragraphText= ""
                 />
                 <Button
                     type = "submit"
