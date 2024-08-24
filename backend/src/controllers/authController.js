@@ -29,7 +29,7 @@ export const login = async (req, res) => {
   }
 };
 
-export const isUserExistsByPesel = async (req, res) => {
+export const userExistsByPesel = async (req, res) => {
   // console.log(req.body)
   const { data: pesel } = req.body;
   try {
@@ -54,7 +54,7 @@ export const isUserExistsByPesel = async (req, res) => {
   }
 };
 
-export const isUserExistsByPhoneNumber = async (req, res) => {
+export const userExistsByPhoneNumber = async (req, res) => {
   const { data: phoneNumber } = req.body;
   try {
     const user = await findUserByPhoneNumber(phoneNumber);
@@ -85,7 +85,7 @@ export const isUserExistsByPhoneNumber = async (req, res) => {
   }
 };
 
-export const isUserExistsByEmail = async (req, res) => {
+export const userExistsByEmail = async (req, res) => {
   const { data: email } = req.body;
   try {
     const user = await findUserByEmail(email);
