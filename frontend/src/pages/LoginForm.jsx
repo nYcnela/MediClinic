@@ -17,7 +17,7 @@ function LoginForm(){
             setError(null);
 
             try{
-                const response = await axios.post('cipciaLalunia', {
+                const response = await axios.post('http://localhost:5000/login', {
                     username,
                     password,
                 });

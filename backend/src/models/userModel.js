@@ -1,32 +1,93 @@
-import db from "../config/dbConnection.js"
+import db from "../config/dbConnection.js";
 
+export const createNewUser = async (
+  name,
+  surname,
+  pesel,
+  dialingCode,
+  phoneNumber,
+  email,
+  password
+) => {
+  try {
+    const data = [
+      name,
+      surname,
+      pesel,
+      dialingCode,
+      phoneNumber,
+      email,
+      password,
+    ];
+    const query =
+      "INSERT INTO users (name, surname, pesel, dialing_code, phone_number, email, password) VALUES($1, $2, $3, $4, $5, $6, $7)";
+    await db.query(query, data);
+    return 1;
+  } catch (error) {
+    console.log(`Error adding user to database: ${error.message}`);
+    return -1;
+  }
+};
 
-export const findUserByEmail = async (username) => {
-    try{
-        const query = "SELECT username, password FROM users WHERE username = $1";
-        const result = await db.query(query, [username])
-        return result.rows[0]
-    }catch(error){
-        console.log("Error finding user by username: ", error.message);
+export const registerUserTransaction = async (userdata) => {
+  const { name, surname, pesel, email, dialingCode, phoneNumber, password } =
+    userdata;
+
+  try {
+    await db.query("BEGIN");
+
+    const user = await findUserByPesel(pesel);
+    // console.log(user);
+    if (user) {
+      await db.query("ROLLBACK");
+      throw new Error("User with this PESEL already exists");
     }
-}
+
+    const result = createNewUser(
+      name,
+      surname,
+      pesel,
+      dialingCode,
+      phoneNumber,
+      email,
+      password
+    );
+
+    await db.query("COMMIT");
+    return result;
+  } catch (error) {
+    await db.query("ROLLBACK");
+    throw error;
+  }
+};
+
+export const findUserByEmail = async (email) => {
+  try {
+    const query = "SELECT * FROM users WHERE email = $1";
+    const result = await db.query(query, [email]);
+    return result.rows[0];
+  } catch (error) {
+    console.log("Error finding user by username: ", error.message);
+  }
+};
 
 export const findUserByPesel = async (pesel) => {
-    try{
-        const query = "SELECT * FROM users WHERE pesel = $1"
-        const result = await db.query(query, [pesel])
-        return result.rows[0]
-    }catch(error){
-        console.log("Error finding user by pesel: ", error.message)
-    }
-}
+  try {
+    const query = "SELECT * FROM users WHERE pesel = $1";
+    const result = await db.query(query, [pesel]);
+    return result.rows[0];
+  } catch (error) {
+    console.log("Error finding user by pesel: ", error.message);
+  }
+};
 
-export const findUserByPhoneNumber = async (number) => {
-    try{
-        const query = "SELECT * FROM users WHERE phone_number = $1"
-        const result = await db.query(query, [number])
-        return result.rows[0]
-    }catch(error){
-        console.log("Error finding user by phone number: ", error.message);
-    }
-}
+export const findUserByPhoneNumber = async (dialing_code, number) => {
+  try {
+    const query =
+      "SELECT * FROM users WHERE dialing_code = $1 AND phone_number = $2";
+    const result = await db.query(query, [dialing_code, number]);
+    return result.rows[0];
+  } catch (error) {
+    console.log("Error finding user by phone number: ", error.message);
+  }
+};

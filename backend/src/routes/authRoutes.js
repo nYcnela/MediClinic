@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  registerUser,
   login,
   userExistsByPesel,
   userExistsByPhoneNumber,
@@ -8,10 +9,11 @@ import {
 
 const router = express.Router();
 
+router.post("/register", registerUser);
 router.post("/login", login);
 
 router.post("/check-pesel", userExistsByPesel);
-router.post("/check-phone-number", userExistsByPhoneNumber)
-router.post("/check-email", userExistsByEmail)
+router.post("/check-phone-number", userExistsByPhoneNumber);
+router.post("/check-email", userExistsByEmail);
 
 export default router;

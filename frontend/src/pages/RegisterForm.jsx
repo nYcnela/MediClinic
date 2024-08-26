@@ -32,12 +32,30 @@ function RegisterForm(){
     const [passwordError, setPasswordError] = useState("");
     const [passwordStatus, setPasswordStatus] = useState(false);
 
-    
+    //to sobie przekleilem z loginu zebym byl w stanie przesylac requesta
+    async function handleSubmit(event){
+        event.preventDefault();
+
+
+        try{
+            const response = await axios.post('http://localhost:5000/register', {
+                name,
+                surname,
+                pesel,
+                email,
+                phoneNumber,
+                password
+            });
+            console.log("odpowiedz z zserwa: ", response.data);
+        }   catch (error){
+            console.log(error.message);
+            }
+    };
     
     
 
     return(
-        <form >
+        <form onSubmit={handleSubmit}>
             <LabelInputParagraph
                 id = "name"
                 type = "text"
