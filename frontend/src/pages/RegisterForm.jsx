@@ -1,8 +1,8 @@
 import Button from "../components/Button";
 import LabelInputParagraph from "../components/labelInputParagraph";
 import React,{useState} from "react";
-import {validatePesel, validateName, validatePhoneNumber, validateEmail, sendCheckRequest } from "../functions/validations";
-import {phoneNumberErrorText, emailErrorText } from "../assets/strings";
+import {validatePesel, validateName, validatePhoneNumber, validateEmail, sendCheckRequest,validatePassword } from "../functions/validations";
+import {phoneNumberErrorText, emailErrorText, passwordErrorText } from "../assets/strings";
 
 import axios from 'axios';
 
@@ -27,6 +27,10 @@ function RegisterForm(){
     const [phoneNumber, setPhoneNumber] = useState("");
     const [phoneNumberError, setPhoneNumberError] = useState("");
     const [phoneNumberStatus, setPhoneNumberStatus] = useState(false);
+
+    const [password, setPassword] = useState("");
+    const [passwordError, setPasswordError] = useState("");
+    const [passwordStatus, setPasswordStatus] = useState(false);
 
     
     
@@ -150,6 +154,26 @@ function RegisterForm(){
                     } 
                 }}
                 paragraphText={emailError}
+                required 
+            />
+            <LabelInputParagraph   
+                id = "password"
+                type = "password"   
+                value = {password}          
+                labelText = "Hasło: "
+                onChange={(e) => {
+                    setPassword(e.target.value);
+                }}
+                onBlur={()=>{
+                    if(validatePassword(password)){
+                        setPasswordStatus(true)
+                        setPasswordError("")
+                    }else{
+                        setPasswordStatus(false)
+                        setPasswordError(passwordErrorText)
+                    }
+                }}
+                paragraphText={passwordError}
                 required 
             />
 

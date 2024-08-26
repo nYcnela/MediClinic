@@ -1,6 +1,5 @@
 import axios from 'axios';
 
-
 export function validatePesel(pesel){
     
     if (pesel.length !== 11 || !/^\d+$/.test(pesel)) {
@@ -97,4 +96,8 @@ export async function sendCheckRequest(data, endpoint,setErrorMethod){
         }
 };
 
+
+export function validatePassword(password){
+    return password.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/)
+}   
 
