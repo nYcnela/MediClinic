@@ -20,6 +20,8 @@ export async function sendCheckRequest(data, endpoint,setError,setStatus){
 };
 
 const registrationEndpoint = 'https://localhost:5000/register'
+
+
 export async function sendRegistrationData(name,surname, phoneNumber, email, pesel, password){
     event.preventDefault();
         try{
