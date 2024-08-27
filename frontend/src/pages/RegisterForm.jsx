@@ -1,8 +1,8 @@
 import Button from "../components/Button";
 import LabelInputParagraph from "../components/labelInputParagraph";
 import React,{useState} from "react";
-import {validatePesel, validateName, validatePhoneNumber, validateEmail, sendCheckRequest, validatePassword } from "../functions/validations";
-
+import {validatePesel, validateName, validatePhoneNumber, validateEmail, validatePassword } from "../functions/validations";
+import {sendRegistrationData } from "../functions/requests";
 
 import axios from 'axios';
 
@@ -32,22 +32,17 @@ function RegisterForm(){
     const [passwordError, setPasswordError] = useState("");
     const [passwordStatus, setPasswordStatus] = useState(false);
 
-    //to sobie przekleilem z loginu zebym byl w stanie przesylac requesta
     async function handleSubmit(event){
+
         event.preventDefault();
-        try{
-            const response = await axios.post('http://localhost:5000/register', {
-                name,
-                surname,
-                pesel,
-                email,
-                phoneNumber,
-                password
-            });
-            console.log("odpowiedz z serwera: ", response.data);
-        }   catch (error){
-            console.log(error.message);
-            }
+
+        if(nameStatus&&surnameStatus&&peselStatus&&emailStatus&&phoneNumberStatus&&passwordStatus){
+            console.log('wal sie na cycunieczki')
+            sendRegistrationData(name,surname,phoneNumber,email,pesel,password)
+        }else{
+            console.log("wal sie na cyce")
+        }
+
     };
     
     

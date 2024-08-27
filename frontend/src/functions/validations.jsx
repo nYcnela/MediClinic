@@ -1,8 +1,9 @@
 import axios from 'axios';
 import {phoneNumberErrorText, emailErrorText, passwordErrorText } from "../assets/strings";
+import { sendCheckRequest } from './requests';
 
 export function validatePesel(pesel, setError, setStatus, setValue){
-    const endpoint = 'http://localhost:5000/check-pesel'
+    const peselEndpoint = 'http://localhost:5000/check-pesel'
     pesel = pesel.replaceAll(" ","")
     if (pesel.length !== 11 || !/^\d+$/.test(pesel)) {
         setError("Pesel nie jest poprawny")
@@ -25,7 +26,7 @@ export function validatePesel(pesel, setError, setStatus, setValue){
         return
     }
 
-    sendCheckRequest(pesel,endpoint,setError, setStatus)
+    sendCheckRequest(pesel,peselEndpoint,setError, setStatus)
 }
 
 export function validateName(name, setError, setStatus, setValue){
@@ -100,24 +101,6 @@ export function validateEmail(email, setError, setStatus, setValue){
     }
 }
 
-export async function sendCheckRequest(data, endpoint,setError,setStatus){
-        try{
-            const response = await axios.post(endpoint, {
-                data,
-            });
-            if(response.data.exists){
-                setError("Dane są poprawne")
-                setStatus(true);
-            }else{
-                setError("Użytkownik o takim peselu widnieje już w bazie danych!")
-                setStatus(false);
-            }
-            
-        }catch (error){
-            setError(error.response ? error.response.data.message : error.message);
-            setStatus(false);
-        }
-};
 
 export function validatePassword(password,setError,setStatus,setValue){
     if(password.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/)){
