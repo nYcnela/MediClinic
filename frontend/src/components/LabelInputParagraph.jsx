@@ -1,4 +1,4 @@
-function LabelInputParagraph({id, type, value, labelText, onChange, onBlur, paragraphText}){
+function LabelInputParagraph({id, type, value, labelText, paragraphText, validateMethod, setValueMethod, setErrorMethod, setStatusMethod}){
 
     return(
         <div>
@@ -7,8 +7,8 @@ function LabelInputParagraph({id, type, value, labelText, onChange, onBlur, para
                 type = {type}
                 id = {id}
                 value = {value}
-                onChange={onChange}
-                onBlur={onBlur}
+                onChange={(e)=> setValueMethod(e.target.value)}
+                onBlur={()=> validateMethod(value,setErrorMethod,setStatusMethod, setValueMethod)}
                 required
             >
             </input>

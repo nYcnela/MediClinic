@@ -1,8 +1,8 @@
 import Button from "../components/Button";
 import LabelInputParagraph from "../components/labelInputParagraph";
 import React,{useState} from "react";
-import {validatePesel, validateName, validatePhoneNumber, validateEmail, sendCheckRequest,validatePassword } from "../functions/validations";
-import {phoneNumberErrorText, emailErrorText, passwordErrorText } from "../assets/strings";
+import {validatePesel, validateName, validatePhoneNumber, validateEmail, sendCheckRequest, validatePassword } from "../functions/validations";
+
 
 import axios from 'axios';
 
@@ -35,8 +35,6 @@ function RegisterForm(){
     //to sobie przekleilem z loginu zebym byl w stanie przesylac requesta
     async function handleSubmit(event){
         event.preventDefault();
-
-
         try{
             const response = await axios.post('http://localhost:5000/register', {
                 name,
@@ -46,7 +44,7 @@ function RegisterForm(){
                 phoneNumber,
                 password
             });
-            console.log("odpowiedz z zserwa: ", response.data);
+            console.log("odpowiedz z serwera: ", response.data);
         }   catch (error){
             console.log(error.message);
             }
@@ -60,141 +58,69 @@ function RegisterForm(){
                 id = "name"
                 type = "text"
                 value= {name}
-                labelText = "Imię: "
-                onChange={(e) => {
-                    setName(e.target.value);                    
-                }}
-                onBlur = {()=>{
-                    const communicate = validateName(name)
-                    if(communicate !== "ok"){
-                        setNameError(communicate)
-                        setNameStatus(false)
-                    }else{
-                        setNameError("")
-                        setNameStatus(true)
-                        
-                    }
-                }
-                }   
+                labelText = "Imię: "   
                 paragraphText= {nameError}
-                required 
+                validateMethod = {validateName}
+                setValueMethod={setName}
+                setErrorMethod={setNameError}
+                setStatusMethod={setNameStatus}
             />
             <LabelInputParagraph 
                 id = "surname"
                 type = "text" 
                 value = {surname}         
                 labelText = "Nazwisko: "
-                onChange={(e) => {
-                    setSurname(e.target.value);
-                }}
-                onBlur={()=>{
-                    const communicate = validateName(surname);
-                    if(communicate !== "ok"){
-                        setSurnameError(communicate)
-                        setSurnameStatus(false)
-                    }else{
-                        setSurnameError("")
-                        setSurnameStatus(true)
-                    }
-                }
-                }
                 paragraphText= {surnameError}
-                required 
+                validateMethod = {validateName}
+                setValueMethod={setSurname}
+                setErrorMethod={setSurnameError}
+                setStatusMethod={setSurnameStatus}
             />
             <LabelInputParagraph  
                 id = "pesel"
                 type = "text" 
                 value = {pesel}            
                 labelText = "Pesel: "
-                onChange={(e) => {
-                    setPesel(e.target.value)
-                }}
-                onBlur={() => {
-                        if(!validatePesel(pesel)){
-                            setPeselError("Pesel nie jest poprawny")
-                            setPeselStatus("false")
-                        }else{
-                            if(sendCheckRequest(pesel,'http://localhost:5000/check-pesel',setPeselError)){
-                                setNameStatus(true)
-                            }else{
-                                setPeselStatus("false")
-                            }
-                        }
-                    }   
-                }
                 paragraphText={peselError}
-                required 
+                validateMethod = {validatePesel}
+                setValueMethod={setPesel}
+                setErrorMethod={setPeselError}
+                setStatusMethod={setPeselStatus}
             />
             <LabelInputParagraph    
                 id = "phoneNumber"   
                 type = "tel"     
                 value = {phoneNumber}    
                 labelText = "Numer telefonu: "
-                onChange={(e) => {
-                    setPhoneNumber(e.target.value)
-                }}
-                onBlur={()=>{
-                    if(validatePhoneNumber(phoneNumber)){
-                        if(sendCheckRequest(phoneNumber, 'http://localhost:5000/check-phone-number',setPhoneNumberError)){
-                            setPhoneNumberStatus(true);
-                        }else{
-                            setPeselStatus("false")
-                        }
-                        
-                    } else {
-                        setPhoneNumberError(phoneNumberErrorText )
-                        setPhoneNumberStatus(true);
-                    }
-                    
-                }}
                 paragraphText={phoneNumberError}
-                required 
+                validateMethod = {validatePhoneNumber}
+                setValueMethod={setPhoneNumber}
+                setErrorMethod={setPhoneNumberError}
+                setStatusMethod={setPhoneNumberStatus}
             />
+            
             <LabelInputParagraph   
                 id = "emailAddress"
                 type = "email"   
                 value = {email}          
-                labelText = "Email: "
-                onChange={(e) => {
-                    setEmail(e.target.value);
-                }}
-                onBlur={()=>{
-                    if(validateEmail(email)){
-                        if(sendCheckRequest(email,'http://localhost:5000/check-email',setEmailError)){
-                            setEmailStatus(true)    
-                        }else{
-                            setEmailStatus(false)  
-                        }
-                    } 
-                    else{
-                        setEmailError(emailErrorText)
-                        setEmailStatus(true)
-                    } 
-                }}
+                labelText = "Email: "     
                 paragraphText={emailError}
-                required 
+                validateMethod={validateEmail}
+                setValueMethod={setEmail}
+                setErrorMethod={setEmailError}
+                setStatusMethod={setEmailStatus}
             />
             <LabelInputParagraph   
                 id = "password"
                 type = "password"   
                 value = {password}          
                 labelText = "Hasło: "
-                onChange={(e) => {
-                    setPassword(e.target.value);
-                }}
-                onBlur={()=>{
-                    if(validatePassword(password)){
-                        setPasswordStatus(true)
-                        setPasswordError("")
-                    }else{
-                        setPasswordStatus(false)
-                        setPasswordError(passwordErrorText)
-                    }
-                }}
                 paragraphText={passwordError}
-                required 
+                validateMethod={validatePassword}
+                setValueMethod={setPassword}
+                setErrorMethod={setPasswordError}
+                setStatusMethod={setPasswordStatus}
             />
-
             <Button
                 type = "submit"
                 text = "Zarejestruj się"
