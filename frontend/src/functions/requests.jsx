@@ -1,9 +1,10 @@
 import axios from 'axios';
 
-export async function sendCheckRequest(data, endpoint,setError,setStatus){
+export async function sendCheckRequest(data,type,endpoint,setError,setStatus){
     try{
         const response = await axios.post(endpoint, {
             data,
+            type,
         });
         if(response.data.exists){
             setError("Dane są poprawne")

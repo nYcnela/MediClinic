@@ -2,9 +2,7 @@ import express from "express";
 import {
   registerUser,
   login,
-  userExistsByPesel,
-  userExistsByPhoneNumber,
-  userExistsByEmail,
+  checkIfUserExist,
 } from "../controllers/authController.js";
 
 const router = express.Router();
@@ -12,8 +10,7 @@ const router = express.Router();
 router.post("/register", registerUser);
 router.post("/login", login);
 
-router.post("/check-pesel", userExistsByPesel);
-router.post("/check-phone-number", userExistsByPhoneNumber);
-router.post("/check-email", userExistsByEmail);
+router.post("/check-user", checkIfUserExist);
+
 
 export default router;

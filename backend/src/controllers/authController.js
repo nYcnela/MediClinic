@@ -76,91 +76,65 @@ export const login = async (req, res) => {
 };
 
 const formatPhoneNumber = (fullPhoneNumber) => {
-  const phoneNumberWithoutSpaces = fullPhoneNumber.replaceAll(" ", "");
-  const phoneNumber = phoneNumberWithoutSpaces.slice(-9);
-  let dialingCode = phoneNumberWithoutSpaces.slice(0, -9);
-  if (dialingCode === "") dialingCode = "+48";
+  // console.log(fullPhoneNumber);
+  const phoneNumber = fullPhoneNumber.slice(-9);
+  const dialingCode = fullPhoneNumber.slice(0, -9);
   return { dialingCode, phoneNumber };
 };
 
-export const userExistsByPesel = async (req, res) => {
-  // console.log(req.body)
-  const { data: pesel } = req.body;
-  try {
-    const user = await findUserByPesel(pesel);
-    if (user) {
-      console.log(`User with provided pesel ${pesel} already exists`);
-      return res.status(409).json({
-        exists: true,
-        message: "Użytkownik z podanym peselem jest już zarejestrowany",
-      });
-    } else {
-      console.log(`User with provided pesel ${pesel} doesnt exist`);
-      return res.status(200).json({
-        exists: false,
-        message: "Użytkownik z podanym peselem nie istnieje",
-      });
-    }
-  } catch (error) {
-    console.error("Error checking user by PESEL:", error);
-    return res
-      .status(500)
-      .json({ error: "An error occurred while checking user by PESEL" });
-  }
-};
+export const checkIfUserExist = async (req, res) => {
+  console.log(req.body);
+  const { data, type } = req.body;
 
-export const userExistsByPhoneNumber = async (req, res) => {
-  const { dialingCode, phoneNumber } = formatPhoneNumber(req.body.data);
-  // console.log(dialingCode, phoneNumber);
+  let user;
+  let formattedData = data;
+
   try {
-    const user = await findUserByPhoneNumber(dialingCode, phoneNumber);
+    switch (type) {
+      case "pesel":
+        user = findUserByPesel(data);
+        break;
+      case "phoneNumber":
+        const { dialingCode, phoneNumber } = formatPhoneNumber(data);
+        formattedData = phoneNumber;
+        user = findUserByPhoneNumber(dialingCode, phoneNumber);
+        break;
+      case "email":
+        user = findUserByEmail(data);
+        break;
+    }
+
     if (user) {
       console.log(
-        `User with provided phone number ${phoneNumber} already exists`
+        `User with provided ${type}: ${formattedData} already exists`
       );
       return res.status(409).json({
         exists: true,
-        message:
-          "Użytkownik z podanym numerem telefonu jest już zarejestrowany",
+        message: `Użytkownik z podanym ${
+          type === "pesel"
+            ? "peselem"
+            : type === "phoneNumber"
+            ? "numerem telefonu"
+            : "adresem email"
+        } jest już zarejestrowany`,
       });
     } else {
-      console.log(
-        `User with provided phone number ${phoneNumber} doesnt exist`
-      );
+      console.log(`User with provided ${type} ${formattedData} doesn't exist`);
       return res.status(200).json({
         exists: false,
-        message: "Użytkownik z podanym numerem telefonu nie istnieje",
+        message: `Użytkownik z podanym ${
+          type === "pesel"
+            ? "peselem"
+            : type === "phoneNumber"
+            ? "numerem telefonu"
+            : "adresem email"
+        } nie istnieje`,
       });
     }
   } catch (error) {
-    console.error("Error checking user by phone number:", error);
+    console.error(`Error checking user by ${type}:`, error);
     return res.status(500).json({
-      error: "An error occurred while checking user by phone number",
+      error: `An error occurred while checking user by ${type}`,
     });
-  }
-};
-
-export const userExistsByEmail = async (req, res) => {
-  const { data: email } = req.body;
-  try {
-    const user = await findUserByEmail(email);
-    if (user) {
-      console.log(`User with provided email ${email} already exists`);
-      return res.status(409).json({
-        exists: true,
-        message: "Użytkownik z podanym adresem email jest już zarejestrowany",
-      });
-    } else {
-      console.log(`User with provided email ${email} doesnt exist`);
-      return res.status(200).json({
-        exists: false,
-        message: "Użytkownik z podanym adresem email nie istnieje",
-      });
-    }
-  } catch (error) {
-    console.error("Error checking user by email:", error);
-    return res
-      .status(500)
-      .json({ error: "An error occurred while checking user by email" });
   }
 };
