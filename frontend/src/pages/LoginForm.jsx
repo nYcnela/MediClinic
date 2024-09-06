@@ -1,5 +1,6 @@
 import React, {useState} from 'react'
 import LabelInputParagraph from '../components/labelInputParagraph';
+import NavBar from '../components/NavBar';
 import Button from '../components/Button';
 import axios from 'axios';
 
@@ -34,6 +35,7 @@ function LoginForm(){
     
     return(
         <div>
+            <NavBar/>
             <form onSubmit={handleSubmit}>
                 <LabelInputParagraph
                     id = "username"

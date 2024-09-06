@@ -1,8 +1,10 @@
 import axios from 'axios';
 
-export async function sendCheckRequest(data,type,endpoint,setError,setStatus){
+    
+export async function sendCheckRequest(data,type,setError,setStatus){
+    const checkEndpoint = 'http://localhost:5000/check-user'
     try{
-        const response = await axios.post(endpoint, {
+        const response = await axios.post(checkEndpoint, {
             data,
             type,
         });
@@ -20,10 +22,13 @@ export async function sendCheckRequest(data,type,endpoint,setError,setStatus){
     }
 };
 
-const registrationEndpoint = 'https://localhost:5000/register'
+
 
 
 export async function sendRegistrationData(name,surname, phoneNumber, email, pesel, password){
+
+    const registrationEndpoint = 'https://localhost:5000/register'
+
     event.preventDefault();
         try{
             const response = await axios.post(registrationEndpoint, {

@@ -3,7 +3,6 @@ import {phoneNumberErrorText, emailErrorText, passwordErrorText } from "../asset
 import { sendCheckRequest } from './requests';
 
 export function validatePesel(pesel, setError, setStatus, setValue){
-    const peselEndpoint = 'http://localhost:5000/check-user'
     pesel = pesel.replaceAll(" ","")
     if (pesel.length !== 11 || !/^\d+$/.test(pesel)) {
         setError("Pesel nie jest poprawny")
@@ -44,7 +43,6 @@ export function validateName(name, setError, setStatus, setValue){
 }
 
 export function validatePhoneNumber(number, setError, setStatus, setValue){
-    const endpoint = 'http://localhost:5000/check-user'
     const continuousNumber = number.replaceAll(" ","");
     let validNumber = "";
     if(continuousNumber.startsWith("0048") && continuousNumber.length == 13){
@@ -85,16 +83,15 @@ export function validatePhoneNumber(number, setError, setStatus, setValue){
         return;
     }
 
-    sendCheckRequest(validNumber,"phoneNumber",endpoint,setError,setStatus);
+    sendCheckRequest(validNumber,"phoneNumber",setError,setStatus);
 
 }
 
 export function validateEmail(email, setError, setStatus, setValue){
-    const endpoint = 'http://localhost:5000/check-user'
     const lowercasedEmail = String(email).toLowerCase()
     const regexp = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
     if(lowercasedEmail.match(regexp)){
-        sendCheckRequest(lowercasedEmail, "email", endpoint, setError, setStatus)
+        sendCheckRequest(lowercasedEmail, "email", setError, setStatus)
     }else{
         setError(emailErrorText)   
         setStatus(false);
