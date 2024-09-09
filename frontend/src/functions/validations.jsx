@@ -82,7 +82,7 @@ export function validatePhoneNumber(number, setError, setStatus, setValue){
         setStatus(false);
         return;
     }
-
+    setValue(validNumber)
     sendCheckRequest(validNumber,"phoneNumber",setError,setStatus);
 
 }

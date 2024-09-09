@@ -1,11 +1,11 @@
 import Button from "../components/Button";
 import LabelInputParagraph from "./LabelInputParagraph";
 import {validatePesel, validateName, validatePhoneNumber, validateEmail, validatePassword } from "../functions/validations";
-import { doctorDegrees, doctorSpecializations,doctorSpecializations1 } from "../assets/strings";
+import { doctorDegrees, doctorSpecializations } from "../assets/strings";
 import React,{useState} from "react";
-import LabelSelect from "./LabelSelect";
+import LabelSelectParagraph from "./LabelSelectParagraph";
+import LabelRadioParagraph from "./LabelRadioParagraph";
 import NavBar from "./NavBar";
-import Select from 'react-select'
 
 //płeć 
 //specjalizacja
@@ -40,6 +40,9 @@ function DoctorCreateForm(){
     const [degree, setDegree] = useState("");
 
     const [specialization, setSpecialization] = useState([]);
+    
+    const [sex, setSex] = useState("");
+
     
     async function handleSubmit(event){
 
@@ -80,6 +83,14 @@ function DoctorCreateForm(){
                     setErrorMethod={setSurnameError}
                     setStatusMethod={setSurnameStatus}
                 />
+
+                <LabelRadioParagraph   
+                    id = "sex"
+                    options = {["kobieta","mezczyzna"]}      
+                    labelText = "Płeć: "     
+                    paragraphText=""
+                    setValue={setSex}
+                />
                 <LabelInputParagraph  
                     id = "pesel"
                     type = "text" 
@@ -103,33 +114,26 @@ function DoctorCreateForm(){
                     setStatusMethod={setPhoneNumberStatus}
                 />
 
-                <LabelSelect
+                <LabelSelectParagraph
                     id = "degree"
                     options = {doctorDegrees}
-                    labelText="Wykształcenie:"
-                    paragraphText = ""
+                    labelText="Wykształcenie: "
+                    paragraphText=""
                     setValue={setDegree}
-                    value = {degree}
                     isMulti={false}
                 />
 
-                <LabelSelect
-                    id = "specialization"
+                <LabelSelectParagraph
+                    id = "specializations"
                     options = {doctorSpecializations}
-                    labelText="Specjalizacja/Specjalizacje:"
-                    paragraphText = ""
+                    labelText="Specjalizacja/Specjalizacje: "
+                    paragraphText=""
                     setValue={setSpecialization}
-                    value = {specialization}
                     isMulti={true}
                 />
 
-                <Select
-                    options={doctorSpecializations1}
-                    onChange={(elements) => {
-                        elements.forEach((e) => console.log(e.value))
-                    }}
-                    isMulti = {true}
-                />
+
+                
 
                 <LabelInputParagraph   
                     id = "emailAddress"
