@@ -33,8 +33,11 @@ export const createNewUser = async (
   }
 };
 
-//this function handles the registration of a regular user within a database transacion
-export const registerUserTransaction = async (userdata) => {
+export const registerUserTransaction = async (
+  userdata,
+  role,
+  must_change_password
+) => {
   const { name, surname, pesel, email, dialingCode, phoneNumber, password } =
     userdata;
 
@@ -49,7 +52,7 @@ export const registerUserTransaction = async (userdata) => {
     }
 
     const result = createNewUser(
-      "user",
+      role,
       pesel,
       name,
       surname,
@@ -57,7 +60,7 @@ export const registerUserTransaction = async (userdata) => {
       dialingCode,
       phoneNumber,
       password,
-      "false",
+      must_change_password
     );
 
     await db.query("COMMIT");
