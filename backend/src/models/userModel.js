@@ -1,26 +1,30 @@
 import db from "../config/dbConnection.js";
 
 export const createNewUser = async (
+  role,
+  pesel,
   name,
   surname,
-  pesel,
+  email,
   dialingCode,
   phoneNumber,
-  email,
-  password
+  password,
+  mustChangepassword,
 ) => {
   try {
     const data = [
+      role,
+      pesel,
       name,
       surname,
-      pesel,
+      email,
       dialingCode,
       phoneNumber,
-      email,
       password,
+      mustChangepassword,
     ];
     const query =
-      "INSERT INTO users (name, surname, pesel, dialing_code, phone_number, email, password) VALUES($1, $2, $3, $4, $5, $6, $7)";
+      "INSERT INTO users (role, pesel, name, surname, email, dialing_code, phone_number, password, must_change_password) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)";
     await db.query(query, data);
     return 1;
   } catch (error) {
@@ -29,6 +33,7 @@ export const createNewUser = async (
   }
 };
 
+//this function handles the registration of a regular user within a database transacion
 export const registerUserTransaction = async (userdata) => {
   const { name, surname, pesel, email, dialingCode, phoneNumber, password } =
     userdata;
@@ -44,13 +49,15 @@ export const registerUserTransaction = async (userdata) => {
     }
 
     const result = createNewUser(
+      "user",
+      pesel,
       name,
       surname,
-      pesel,
+      email,
       dialingCode,
       phoneNumber,
-      email,
-      password
+      password,
+      "false",
     );
 
     await db.query("COMMIT");
