@@ -1,5 +1,5 @@
-import jwt from "jsonwebtoken"
-import env from "dotenv"
+import jwt from "jsonwebtoken";
+import env from "dotenv";
 import {
   registerUserTransaction,
   findUserByEmail,
@@ -8,14 +8,13 @@ import {
 } from "../models/userModel.js";
 import bycrypt from "bcrypt";
 
-env.config({path: './src/config/.env'})
+env.config({ path: "./src/config/.env" });
 
 const saltRounds = 12;
 
-
 export const generateToken = (user) => {
-    return jwt.sign(user, process.env.JWT_SECRET, {expiresIn: '1h'})
-}
+  return jwt.sign(user, process.env.JWT_SECRET, { expiresIn: "1h" });
+};
 
 export const registerUser = async (req, res) => {
   console.log(req.body);
@@ -29,31 +28,30 @@ export const registerUser = async (req, res) => {
   } = req.body;
   const { dialingCode, phoneNumber } = formatPhoneNumber(fullPhoneNumber);
 
-  bycrypt.hash(password, saltRounds, async (err, hashedPassword) => {
-    // console.log(hashedPassword);
-    if (err) {
-      console.log(`Error hashing password: ${err}`);
-    } else {
-      try {
-        const user = await registerUserTransaction({
-          name,
-          surname,
-          pesel,
-          dialingCode,
-          phoneNumber,
-          email,
-          password: hashedPassword,
-        });
-        console.log(user);
-        res
-          .status(201)
-          .json({ message: "User registered successfully", userId: user.id });
-      } catch (error) {
-        console.log(`Error during user registration: ${error.message}`);
-        res.status(409).json({ error: error.message });
-      }
-    }
-  });
+  try {
+    const hashedPassword = await bycrypt.hash(password, saltRounds);
+
+    const user = await registerUserTransaction(
+      {
+        name,
+        surname,
+        pesel,
+        dialingCode,
+        phoneNumber,
+        email,
+        password: hashedPassword,
+      },
+      "user",
+      "false"
+    );
+    console.log(user);
+    res
+      .status(201)
+      .json({ message: "User registered successfully", userId: user.id });
+  } catch (error) {
+    console.log(`Error during user registration: ${error.message}`);
+    res.status(409).json({ error: error.message });
+  }
 };
 
 export const login = async (req, res) => {
