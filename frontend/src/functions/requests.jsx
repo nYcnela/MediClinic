@@ -8,7 +8,7 @@ export async function sendCheckRequest(data,type,setError,setStatus){
             data,
             type,
         });
-        if(response.data.exists){
+        if(!response.data.exists){
             setError("Dane są poprawne")
             setStatus(true);
         }else{
@@ -27,7 +27,7 @@ export async function sendCheckRequest(data,type,setError,setStatus){
 
 export async function sendRegistrationData(name,surname, phoneNumber, email, pesel, password){
 
-    const registrationEndpoint = 'https://localhost:5000/register'
+    const registrationEndpoint = 'http://localhost:5000/register'
 
     event.preventDefault();
         try{

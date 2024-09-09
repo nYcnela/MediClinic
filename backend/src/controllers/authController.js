@@ -1,4 +1,5 @@
-import { generateToken } from "../middleware/authMiddleware.js";
+import jwt from "jsonwebtoken"
+import env from "dotenv"
 import {
   registerUserTransaction,
   findUserByEmail,
@@ -7,10 +8,17 @@ import {
 } from "../models/userModel.js";
 import bycrypt from "bcrypt";
 
+env.config({path: './src/config/.env'})
+
 const saltRounds = 12;
 
+
+export const generateToken = (user) => {
+    return jwt.sign(user, process.env.JWT_SECRET, {expiresIn: '1h'})
+}
+
 export const registerUser = async (req, res) => {
-  // console.log(req.body);
+  console.log(req.body);
   const {
     name,
     surname,
@@ -92,15 +100,15 @@ export const checkIfUserExist = async (req, res) => {
   try {
     switch (type) {
       case "pesel":
-        user = findUserByPesel(data);
+        user = await findUserByPesel(data);
         break;
       case "phoneNumber":
         const { dialingCode, phoneNumber } = formatPhoneNumber(data);
         formattedData = phoneNumber;
-        user = findUserByPhoneNumber(dialingCode, phoneNumber);
+        user = await findUserByPhoneNumber(dialingCode, phoneNumber);
         break;
       case "email":
-        user = findUserByEmail(data);
+        user = await findUserByEmail(data);
         break;
     }
 

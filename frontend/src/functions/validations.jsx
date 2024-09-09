@@ -25,7 +25,7 @@ export function validatePesel(pesel, setError, setStatus, setValue){
         return
     }
 
-    sendCheckRequest(pesel,"pesel",peselEndpoint,setError, setStatus)
+    sendCheckRequest(pesel,"pesel",setError, setStatus)
 }
 
 export function validateName(name, setError, setStatus, setValue){
