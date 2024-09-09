@@ -1,7 +1,12 @@
+import path from 'path';
+import { fileURLToPath } from 'url';
 import pg from "pg";
 import env from "dotenv";
 
-env.config({ path: './src/config/.env' });
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+env.config({ path: path.resolve(__dirname, './.env') });
 
 const db = new pg.Client({
   user: process.env.PG_USER,
