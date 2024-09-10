@@ -36,10 +36,15 @@ const createAdmin = async (
       email,
       password: hashedPassword,
     };
-    const user = await registerUserTransaction(data, "admin", "true");
-    console.log(user);
+    const user = await registerUserTransaction(data, "admin");
+    // console.log(user);
     
-    console.log("Admin sucessfully created", user);
+    //user is 1 if successful and -1 if not
+    if(user === 1){
+      console.log(`Admin sucessfully created, password: ${password}`);
+    }else{
+      console.log("Error creating admin");
+    }
   } catch (error) {
     console.log("Error adding admin to the database", error);
   }
