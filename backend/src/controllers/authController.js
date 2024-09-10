@@ -41,8 +41,7 @@ export const registerUser = async (req, res) => {
         email,
         password: hashedPassword,
       },
-      "user",
-      "false"
+      "user"
     );
     console.log(user);
     res
@@ -56,14 +55,18 @@ export const registerUser = async (req, res) => {
 
 export const login = async (req, res) => {
   const { username: email, password } = req.body;
-
+  // console.log(req.body);
   try {
-    const user = await findUserByEmail(email);
+    let user = await findUserByEmail(email, 'users');
+
+    if (!user) {
+      user = await findUserByEmail(email, 'admin');
+    }
     // console.log(user);
     const checkPassword = await bycrypt.compare(password, user.password);
 
     if (user && checkPassword) {
-      const token = generateToken({ id: user.id, email: user.email });
+      const token = generateToken({ id: user.id, email: user.email, role: user.role });
       console.log("token: " + token);
       console.log("Login successful");
       return res.status(200).json({

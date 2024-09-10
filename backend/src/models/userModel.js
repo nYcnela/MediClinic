@@ -1,7 +1,6 @@
 import db from "../config/dbConnection.js";
 
 export const createNewUser = async (
-  role,
   pesel,
   name,
   surname,
@@ -9,7 +8,7 @@ export const createNewUser = async (
   dialingCode,
   phoneNumber,
   password,
-  mustChangepassword,
+  role
 ) => {
   try {
     const data = [
@@ -21,10 +20,11 @@ export const createNewUser = async (
       dialingCode,
       phoneNumber,
       password,
-      mustChangepassword,
     ];
-    const query =
-      "INSERT INTO users (role, pesel, name, surname, email, dialing_code, phone_number, password, must_change_password) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)";
+    const tableName = role === "user" ? "users" : "admin";
+    const query = `INSERT INTO ${tableName} (role, pesel, name, surname, email, dialing_code, phone_number, password) VALUES($1, $2, $3, $4, $5, $6, $7, $8)`;
+    // console.log(data);
+    // console.log(query);
     await db.query(query, data);
     return 1;
   } catch (error) {
@@ -33,26 +33,23 @@ export const createNewUser = async (
   }
 };
 
-export const registerUserTransaction = async (
-  userdata,
-  role,
-  must_change_password
-) => {
+export const registerUserTransaction = async (userdata, role) => {
   const { name, surname, pesel, email, dialingCode, phoneNumber, password } =
     userdata;
 
   try {
     await db.query("BEGIN");
 
-    const user = await findUserByPesel(pesel);
-    // console.log(user);
-    if (user) {
-      await db.query("ROLLBACK");
-      throw new Error("User with this PESEL already exists");
+    if (role === "user") {
+      const user = await findUserByPesel(pesel);
+      // console.log(user);
+      if (user) {
+        await db.query("ROLLBACK");
+        throw new Error("User with this PESEL already exists");
+      }
     }
 
     const result = createNewUser(
-      role,
       pesel,
       name,
       surname,
@@ -60,7 +57,7 @@ export const registerUserTransaction = async (
       dialingCode,
       phoneNumber,
       password,
-      must_change_password
+      role
     );
 
     await db.query("COMMIT");
@@ -71,9 +68,12 @@ export const registerUserTransaction = async (
   }
 };
 
-export const findUserByEmail = async (email) => {
+export const findUserByEmail = async (email, role) => {
+  if (role === undefined) role = "users";
+
   try {
-    const query = "SELECT * FROM users WHERE email = $1";
+    const query = `SELECT * FROM ${role} WHERE email = $1`;
+    console.log(query);
     const result = await db.query(query, [email]);
     return result.rows[0];
   } catch (error) {
