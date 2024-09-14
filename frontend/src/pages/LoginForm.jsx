@@ -1,5 +1,5 @@
 import React, {useState} from 'react'
-import LabelInputParagraph from '../components/labelInputParagraph';
+import LabelInputParagraph from '../components/LabelInputParagraph';
 import NavBar from '../components/NavBar';
 import Button from '../components/Button';
 import axios from 'axios';
@@ -42,18 +42,16 @@ function LoginForm(){
                     type = "text"
                     value = {username}
                     labelText = "Nazwa użytkownika"
-                    onChange={(e) => setUsername(e.target.value)}
-                    onBlur = {console.log("haha")}   
                     paragraphText= ""
+                    setValueMethod={setUsername}
                 />
                 <LabelInputParagraph
                     id = "password"
                     type = "password"
                     value = {password}
-                    labelText = "Hasło"
-                    onChange={(e) => setPassword(e.target.value)}
-                    onBlur = {console.log("haha")}   
+                    labelText = "Hasło"   
                     paragraphText= ""
+                    setValueMethod={setPassword}
                 />
                 <Button
                     type = "submit"

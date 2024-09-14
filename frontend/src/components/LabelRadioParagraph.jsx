@@ -1,16 +1,25 @@
-function LabelRadioParagraph({id, options, labelText, paragraphText, setValue}){
+function LabelRadiosParagraph({id, options, labelText, paragraphText, value, setValue, validateMethod,setErrorMethod}){
+    
+    const inlStyle = {display:"inline"}
+
     return(
-        
         <div>
             <label htmlFor={id}>{labelText}</label>
-             {options.map((e, index) => {
-                return(
-                    <>
-                        <input key = {String(index)} type="checkbox" value={e} id={e} name={id} onClick={()=> setValue(e)}/>
-                        <label htmlFor={e}>{e}</label>
-                    </>
+             {options.map((e, index) =>(
+                
+                    <div key = {index} style= {inlStyle}>
+                        <input 
+                        type="radio" 
+                        value={e.value} 
+                        id = {e.value} 
+                        name={id} 
+                        onClick={(e)=> setValue(e.target.value)}
+                        required
+                        />
+                        <label htmlFor={e.value}>{e.label}</label>
+                    </div>
             )
-             })}   
+             )}   
             <p>{paragraphText}</p>
         </div> 
        
@@ -18,7 +27,7 @@ function LabelRadioParagraph({id, options, labelText, paragraphText, setValue}){
     );
 }
 
-export default LabelRadioParagraph;
+export default LabelRadiosParagraph;
 
 
 

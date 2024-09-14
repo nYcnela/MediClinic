@@ -1,17 +1,24 @@
 import Button from "../components/Button";
 import LabelInputParagraph from "./LabelInputParagraph";
-import {validatePesel, validateName, validatePhoneNumber, validateEmail, validatePassword } from "../functions/validations";
-import { doctorDegrees, doctorSpecializations } from "../assets/strings";
-import React,{useState} from "react";
+import {validatePesel, validateName, validatePhoneNumber, validateEmail, validatePassword, validatePwz, validateSex } from "../functions/validations";
+import {doctorDegrees, doctorSpecializations, weekDays, genders } from "../assets/strings";
+import React,{useState, useEffect} from "react";
 import LabelSelectParagraph from "./LabelSelectParagraph";
-import LabelRadioParagraph from "./LabelRadioParagraph";
+import LabelRadiosParagraph from "./LabelRadioParagraph"; 
 import NavBar from "./NavBar";
+import { createHoursWithStep } from "../functions/timeFunctions";
+
+import WorkHoursPicker from "./WorkHoursPicker";
+import RangePicker from "./RangePicker";
+
 
 //płeć 
 //specjalizacja
 // numer pwz
 // 
 function DoctorCreateForm(){
+
+    const hours = createHoursWithStep("8:00", "16:00", 15)
 
     const [name, setName] = useState("");
     const [nameError, setNameError] = useState("");
@@ -24,6 +31,10 @@ function DoctorCreateForm(){
     const [pesel, setPesel] = useState("");
     const [peselError, setPeselError]  = useState("");
     const [peselStatus, setPeselStatus] = useState(false)
+
+    const [pwz, setPwz] = useState("");
+    const [pzwError, setPwzError]  = useState("");
+    const [pwzStatus, setPwzStatus] = useState(false)
 
     const [email, setEmail] = useState("");
     const [emailError, setEmailError] = useState("");
@@ -38,27 +49,51 @@ function DoctorCreateForm(){
     const [passwordStatus, setPasswordStatus] = useState(false);
 
     const [degree, setDegree] = useState("");
+    const [degreeError, setDegreeError] = useState("");
+    const [degreeStatus, setDegreeStatus] = useState(false);
 
     const [specialization, setSpecialization] = useState([]);
+    const [specializationError, setSpecializationError] = useState("");
+    const [specializationStatus, setSpecializationStatus] = useState(false);
+
+
+    const [workDays, setWorkDays] = useState([]);
+    const [workDaysError, setWorkDaysError] = useState("");
+    const [workDaysStatus, setWorkDaysStatus] = useState(false);
     
     const [sex, setSex] = useState("");
+    const [sexError, setSexError] = useState("");
+    const [sexStatus, setSexStatus] = useState(false);
+
+    const [workHours, setWorkHours] = useState({
+        monday: { start: "", end: "" },
+        tuesday: { start: "", end: "" },
+        wednesday: { start: "", end: "" },
+        thursday: { start: "", end: "" },
+        friday: { start: "", end: "" },
+        saturday: { start: "", end: "" },
+        sunday: { start: "", end: "" }
+    })
+
+
+    useEffect(()=>{
+        for (const day in workDays){
+            if (day["end"] == "") console.log("XDDDDDD")
+        }
+    }, [workHours, hoursChanged])
 
     
     async function handleSubmit(event){
 
         event.preventDefault();
-
-        if(nameStatus&&surnameStatus&&peselStatus&&emailStatus&&phoneNumberStatus&&passwordStatus){
-            console.log('wal sie na cycunieczki')
-            sendRegistrationData(name,surname,phoneNumber,email,pesel,password)
-        }else{
-            console.log("wal sie na cyce")
-        }
+        sendDoctorData(name,surname,phoneNumber,email,pesel,password,pwz,sex,degree, specialization,workDays,workHours)
+        
 
     };
     
     return(
         <div>
+            <button onClick={ ()=>  console.log(workHours)}>XDDDDD</button>
             <h1>Dodaj lekarza</h1>
             <form onSubmit={handleSubmit}>
                 <LabelInputParagraph
@@ -84,13 +119,6 @@ function DoctorCreateForm(){
                     setStatusMethod={setSurnameStatus}
                 />
 
-                <LabelRadioParagraph   
-                    id = "sex"
-                    options = {["kobieta","mezczyzna"]}      
-                    labelText = "Płeć: "     
-                    paragraphText=""
-                    setValue={setSex}
-                />
                 <LabelInputParagraph  
                     id = "pesel"
                     type = "text" 
@@ -102,6 +130,32 @@ function DoctorCreateForm(){
                     setErrorMethod={setPeselError}
                     setStatusMethod={setPeselStatus}
                 />
+
+                <LabelInputParagraph  
+                    id = "pwz"
+                    type = "text" 
+                    value = {pwz}            
+                    labelText = "Numer PWZ: "
+                    paragraphText={pzwError}
+                    validateMethod = {validatePwz}
+                    setValueMethod={setPwz}
+                    setErrorMethod={setPwzError}
+                    setStatusMethod={setPwzStatus}
+                />
+
+                <LabelRadiosParagraph   
+                    id = "sex"
+                    options = {genders}      
+                    labelText = "Płeć: "     
+                    paragraphText=""
+                    setValue={setSex}
+                    value = {sex}
+                    validateMethod={validateSex}
+                    setErrorMethod={setSexError}
+                    setValueMethod={setSexError}
+
+                />
+                
                 <LabelInputParagraph    
                     id = "phoneNumber"   
                     type = "tel"     
@@ -113,7 +167,7 @@ function DoctorCreateForm(){
                     setErrorMethod={setPhoneNumberError}
                     setStatusMethod={setPhoneNumberStatus}
                 />
-
+                
                 <LabelSelectParagraph
                     id = "degree"
                     options = {doctorDegrees}
@@ -131,10 +185,41 @@ function DoctorCreateForm(){
                     setValue={setSpecialization}
                     isMulti={true}
                 />
-
-
+                <LabelSelectParagraph
+                    id = "workDays"
+                    options = {weekDays}
+                    labelText="Dni pracy: "
+                    paragraphText=""
+                    setValue={setWorkDays}
+                    isMulti={true}
+                />
                 
-
+                {
+                    workDays.length != 0 ?
+                    <>
+                    <p>Godziny pracy:</p>
+                        {workDays.map(e =>{
+                            return(
+                                <RangePicker
+                                label = {e.label}
+                                field = {e.value}
+                                options = {hours}
+                                labelOne = "Od: "
+                                labelTwo = "Do: "
+                                startRangeField = "start"
+                                endRangeField = "end"
+                                object = {workHours}
+                                setObject = {setWorkHours}
+                            />
+                            );
+                            
+                        })}
+                    </>
+                    
+                    
+                    :
+                    <></>
+                }
                 <LabelInputParagraph   
                     id = "emailAddress"
                     type = "email"   
@@ -149,7 +234,7 @@ function DoctorCreateForm(){
                 
                 <Button
                     type = "submit"
-                    text = "Zarejestruj się"
+                    text = "Dodaj lekarzyne pedała"
                 />
             </form>
         </div>
