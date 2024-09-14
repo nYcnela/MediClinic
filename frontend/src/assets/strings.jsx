@@ -9,6 +9,9 @@ Znak specjalny: Hasło musi zawierać co najmniej jeden znak specjalny (np. !, @
 Przykładowe silne hasło: Passw0rd!
 `
 
+export const pwzErrorText = "Numer PWZ nie jest poprawny.Numer PWZ sklada się z 7 cyfr."
+export const sexErrorText = "Należy wybrać płec."
+
 
 export const doctorDegrees = [
     { value: "dr n. med.", label: "Doktor nauk medycznych" },
@@ -18,9 +21,20 @@ export const doctorDegrees = [
     { value: "lek. dent.", label: "Lekarz dentysta" },
   ];
   
+export const weekDays = [
+  { value: "monday", label: "Poniedziałek" },
+  { value: "tuesday", label: "Wtorek" },
+  { value: "wednesday", label: "Środa" },
+  { value: "thursday", label: "Czwartek" },
+  { value: "friday", label: "Piątek" },
+  { value: "saturday", label: "Sobota" },
+  { value: "sunday", label: "Niedziela" }
+]  
 
-
-
+export const genders = [
+  { value: "man", label: "Mężczyzna" },
+  { value: "woman", label: "Kobieta" }
+]
 
 export const doctorSpecializations = [
     { label: "Kardiolog", value: "kardiolog" },

@@ -44,3 +44,28 @@ export async function sendRegistrationData(name,surname, phoneNumber, email, pes
             console.log(error.message);
             }
 }
+
+export async function sendDoctorData(name,surname,phoneNumber,email,pesel,pwz,sex,degree, specialization,workDays,workHours){
+
+    const endpoint = 'http://localhost:5000/add-doctor'
+
+    event.preventDefault();
+        try{
+            const response = await axios.post(endpoint, {
+                name,
+                surname,
+                pesel,
+                email,
+                phoneNumber,
+                pwz,
+                sex,
+                degree, 
+                specialization,
+                workDays,
+                workHours
+            });
+            console.log("odpowiedz z serwera: ", response.data);
+        }catch (error){
+            console.log(error.message);
+        }
+}
