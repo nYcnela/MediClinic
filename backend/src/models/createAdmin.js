@@ -1,3 +1,4 @@
+import db from "../config/dbConnection.js";
 import bcrypt from "bcrypt";
 import { registerUserTransaction } from "./userModel.js";
 
@@ -24,6 +25,8 @@ const createAdmin = async (
   email
 ) => {
   try {
+    await db.query("BEGIN")
+
     const password = generatePassword(passwordLength);
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
@@ -36,17 +39,25 @@ const createAdmin = async (
       email,
       password: hashedPassword,
     };
-    const user = await registerUserTransaction(data, "admin");
-    // console.log(user);
-    
-    //user is 1 if successful and -1 if not
-    if(user === 1){
-      console.log(`Admin sucessfully created, password: ${password}`);
-    }else{
-      console.log("Error creating admin");
+    const userId = await registerUserTransaction(data, "admin");
+    console.log(userId);
+
+    //userId is > 0 if successful and -1 if not
+    if(userId === -1){
+      throw new error("error creating user(admin) in the users table")
     }
+
+    const query = `INSERT INTO admins (user_id, must_change_password) 
+                        VALUES($1, $2)`;
+    await db.query(query, [userId, true]);
+
+    await db.query("COMMIT")    
+    console.log(`Admin sucessfully created, password: ${password}`);
+    process.exit(0)
   } catch (error) {
+    await db.query("ROLLBACK")
     console.log("Error adding admin to the database", error);
+    process.exit(1)
   }
 };
 

@@ -21,12 +21,11 @@ export const createNewUser = async (
       phoneNumber,
       password,
     ];
-    const tableName = role === "user" ? "users" : "admin";
-    const query = `INSERT INTO ${tableName} (role, pesel, name, surname, email, dialing_code, phone_number, password) VALUES($1, $2, $3, $4, $5, $6, $7, $8)`;
+    const query = `INSERT INTO users (role, pesel, name, surname, email, dialing_code, phone_number, password) VALUES($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`;
     // console.log(data);
     // console.log(query);
-    await db.query(query, data);
-    return 1;
+    const result = await db.query(query, data);
+    return result.rows[0].id;
   } catch (error) {
     console.log(`Error adding user to database: ${error.message}`);
     return -1;
@@ -40,13 +39,11 @@ export const registerUserTransaction = async (userdata, role) => {
   try {
     await db.query("BEGIN");
 
-    if (role === "user") {
-      const user = await findUserByPesel(pesel);
-      // console.log(user);
-      if (user) {
-        await db.query("ROLLBACK");
-        throw new Error("User with this PESEL already exists");
-      }
+    const user = await findUserByPesel(pesel);
+    // console.log(user);
+    if (user) {
+      await db.query("ROLLBACK");
+      throw new Error("User with this PESEL already exists");
     }
 
     const result = createNewUser(
@@ -68,12 +65,10 @@ export const registerUserTransaction = async (userdata, role) => {
   }
 };
 
-export const findUserByEmail = async (email, role) => {
-  if (role === undefined) role = "users";
-
+export const findUserByEmail = async (email) => {
   try {
-    const query = `SELECT * FROM ${role} WHERE email = $1`;
-    console.log(query);
+    const query = `SELECT * FROM users WHERE email = $1`;
+    // console.log(query);
     const result = await db.query(query, [email]);
     return result.rows[0];
   } catch (error) {
