@@ -76,17 +76,12 @@ function DoctorCreateForm(){
     })
 
 
-    useEffect(()=>{
-        for (const day in workDays){
-            if (day["end"] == "") console.log("XDDDDDD")
-        }
-    }, [workHours, hoursChanged])
-
     
     async function handleSubmit(event){
 
         event.preventDefault();
-        sendDoctorData(name,surname,phoneNumber,email,pesel,password,pwz,sex,degree, specialization,workDays,workHours)
+        console.log(name,surname,phoneNumber,email,pesel,pwz,sex,degree, specialization,workDays,workHours)
+        sendDoctorData(name,surname,phoneNumber,email,pesel,pwz,sex,degree, specialization,workDays,workHours)
         
 
     };
