@@ -8,7 +8,7 @@ const __dirname = path.dirname(__filename);
 
 env.config({ path: path.resolve(__dirname, './.env') });
 
-const db = new pg.Client({
+const pool = new pg.Pool({
   user: process.env.PG_USER,
   host: process.env.PG_HOST,
   database: process.env.PG_DATABASE,
@@ -16,11 +16,9 @@ const db = new pg.Client({
   port: process.env.PG_PORT,
 });
 
-db.connect().then(() => {
-    console.log(`Connected to the database on port ${process.env.PG_PORT}`);
-}).catch(err => {
-    console.log(`Connection error: ${err}`);
-})
+pool.on("connect", () => {
+  console.log(`Connected to the database on port ${process.env.PG_PORT}`);
+});
 
-export default db 
+export default pool; 
 
