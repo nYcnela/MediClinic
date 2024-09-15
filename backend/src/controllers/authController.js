@@ -7,15 +7,31 @@ import {
   findUserByPhoneNumber,
 } from "../models/userModel.js";
 import bycrypt from "bcrypt";
+import { formatPhoneNumber } from "../utils/formatters.js";
+import { hashPassword } from "../utils/hashing.js";
 
 env.config({ path: "./src/config/.env" });
-
-const saltRounds = 12;
 
 export const generateToken = (user) => {
   return jwt.sign(user, process.env.JWT_SECRET, { expiresIn: "1h" });
 };
 
+/**
+ * Adds a new user to the system
+ *
+ * This function takes user data from the request, hashes the password, and inserts the data transactionally
+ *
+ * @param {Object} req - the HTTP request object, expected to contain:
+ *   @param {string} req.body.name - user's first name
+ *   @param {string} req.body.surname - user's last name
+ *   @param {string} req.body.pesel - user's PESEL number
+ *   @param {string} req.body.email - user's email address
+ *   @param {string} req.body.phoneNumber - user's full phone number
+ *   @param {string} req.body.password - user's raw password (to be hashed)
+ *
+ * @returns {void} sends a JSON response with a success message on success or an error message on failure
+ *
+ */
 export const registerUser = async (req, res) => {
   console.log(req.body);
   const {
@@ -29,7 +45,7 @@ export const registerUser = async (req, res) => {
   const { dialingCode, phoneNumber } = formatPhoneNumber(fullPhoneNumber);
 
   try {
-    const hashedPassword = await bycrypt.hash(password, saltRounds);
+    const hashedPassword = await hashPassword(password);
 
     const user = await registerUserTransaction(
       {
@@ -46,13 +62,24 @@ export const registerUser = async (req, res) => {
     console.log(user);
     res
       .status(201)
-      .json({ message: "User registered successfully", userId: user.id });
+      .json({ message: "Użytkownik został pomyślnie zarejestrowany" });
   } catch (error) {
     console.log(`Error during user registration: ${error.message}`);
-    res.status(409).json({ error: error.message });
+    res.status(409).json({ message: "Błąd podczas dodawania użytkownika" });
   }
 };
 
+/**
+ * Logs a user into the system by verifying their credentials
+ *
+ * This function checks the user's email and password and if valid, generates a JWT token for the session
+ *
+ * @param {Object} req - the HTTP request object, expected to contain:
+ *  @param {string} req.body.username - user's email adress
+ *  @param {string} req.body.password - user's raw password
+ *
+ * @returns {void} sends a JSON response with a JWT token on success or an error message on failure
+ */
 export const login = async (req, res) => {
   const { username: email, password } = req.body;
   // console.log(req.body);
@@ -70,27 +97,28 @@ export const login = async (req, res) => {
       console.log("token: " + token);
       console.log("Login successful");
       return res.status(200).json({
-        message: "Login successful",
+        message: "Użytkownik został pomyślnie zalogowany",
         token: token,
       });
     } else {
       console.log("Invalid username or password");
-      return res.status(401).json({ message: "Invalid username or password" });
+      return res.status(401).json({ message: "Błędny email lub hasło!" });
     }
   } catch (error) {
-    return res
-      .status(500)
-      .json({ message: "Server error", error: error.message });
+    console.log("Server error: ", error.message);
+    return res.status(500).json({ message: "Błąd serwera" });
   }
 };
 
-const formatPhoneNumber = (fullPhoneNumber) => {
-  // console.log(fullPhoneNumber);
-  const phoneNumber = fullPhoneNumber.slice(-9);
-  const dialingCode = fullPhoneNumber.slice(0, -9);
-  return { dialingCode, phoneNumber };
-};
-
+/**
+ * Check if a user exists in the system by their PESEL, phone number or email
+ * 
+ * @param {Object} req - the HTTP request object, expected to contain:
+ *  @param {string} req.body.data - the value to check (PESEL, phone number or email)
+ *  @param {string} req.body.type - the type of data being checked ("pesel", ...)
+ * 
+ * @returns {void} sends a JSON response indicating whether the user exists or not, along with a success message
+ */
 export const checkIfUserExist = async (req, res) => {
   console.log(req.body);
   const { data, type } = req.body;
