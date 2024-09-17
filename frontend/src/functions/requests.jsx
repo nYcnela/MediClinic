@@ -43,7 +43,7 @@ export async function sendRegistrationData(name,surname, phoneNumber, email, pes
 
 export async function sendDoctorData(name,surname,phoneNumber,email,pesel,pwz,sex,degree, specialization,workDays,workHours){
 
-    const endpoint = 'http://localhost:5000/add-doctor'
+    const endpoint = 'http://localhost:5000/doctor/add'
 
     event.preventDefault();
         try{
