@@ -16,7 +16,10 @@ import RangePicker from "./RangePicker";
 //specjalizacja
 // numer pwz
 // 
+
+
 function DoctorCreateForm(){
+    
 
     const hours = createHoursWithStep("8:00", "16:00", 15)
 
@@ -210,8 +213,6 @@ function DoctorCreateForm(){
                             
                         })}
                     </>
-                    
-                    
                     :
                     <></>
                 }

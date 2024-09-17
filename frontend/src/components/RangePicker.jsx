@@ -1,6 +1,7 @@
 import Select from "react-select";
 import LabelSelectParagraph from "./LabelSelectParagraph";
 import { useEffect, useState } from "react";
+import { validateHoursRange } from "../functions/timeFunctions";
 
 
 function RangePicker({label ,field,  options, labelOne, labelTwo, startRangeField, endRangeField, object, setObject}){
@@ -15,6 +16,9 @@ function RangePicker({label ,field,  options, labelOne, labelTwo, startRangeFiel
             [field] : {[startRangeField]: rangeStart, [endRangeField]: rangeEnd}
         }
         setObject(obj)
+        if(rangeStart != "" && rangeEnd != ""){
+            validateHoursRange(rangeStart,rangeEnd)
+        }
     }, [rangeStart,rangeEnd])
 
     return(

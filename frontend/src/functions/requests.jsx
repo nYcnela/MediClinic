@@ -1,5 +1,4 @@
 import axios from 'axios';
-
     
 export async function sendCheckRequest(data,type,setError,setStatus){
     const checkEndpoint = 'http://localhost:5000/check-user'
@@ -21,9 +20,6 @@ export async function sendCheckRequest(data,type,setError,setStatus){
         setStatus(false);
     }
 };
-
-
-
 
 export async function sendRegistrationData(name,surname, phoneNumber, email, pesel, password){
 

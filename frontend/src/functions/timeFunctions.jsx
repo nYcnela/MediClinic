@@ -33,3 +33,22 @@ export function createHoursWithStep(start,end,step){
     return hours;
    
 }
+
+
+export function validateHoursRange(firtsHour,secondHour,setError,setStatus){
+    let hourOne = firtsHour.split(":")
+    let hourTwo = secondHour.split(":")
+    hourOne = hourOne.map(e => e.at(0) != "0" ? Number(e) : Number(e.slice(1)))
+    hourTwo = hourTwo.map(e => e.at(0) != "0" ? Number(e) : Number(e.slice(1)))
+    console.log(hourOne,hourTwo)    
+    if(hourOne[0]==hourTwo[0]&& hourOne[1] == hourTwo[1]){
+        console.log("Ta sama godzina")
+    }else if(hourOne[0] == hourTwo[0] && hourOne[1] > hourTwo[1]){
+        console.log("Zly zakres.")
+    }else if(hourOne[0] > hourTwo[0]){
+        console.log("Godzina1>godzina2")
+    }else{
+        console.log("jest git :DDD")
+    }
+    
+}
