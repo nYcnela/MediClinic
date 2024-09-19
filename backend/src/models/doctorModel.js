@@ -59,13 +59,14 @@ export const registerDoctorTransaction = async (
     }
 
     const insertSpecializationsQuery =
-      "INSERT INTO doctor_specializations (doctor_id, specialization) VALUES($1, $2)";
+      "INSERT INTO doctor_specializations (doctor_id, specialization_id) VALUES($1, $2)";
 
     for (const specialization of specializations) {
+      // console.log(specialization);
       try {
         await client.query(insertSpecializationsQuery, [
           userId,
-          `${specialization.label}`,
+          `${specialization.value}`,
         ]);
       } catch (error) {
         throw new Error("Failed to insert specialization");
@@ -105,3 +106,17 @@ export const registerDoctorTransaction = async (
     client.release();
   }
 };
+
+export const fetchDoctorSpecializations = async() => {
+  const client = await db.connect()
+  try{
+    const query = "SELECT id, name AS label FROM specializations"
+    const response = await client.query(query)
+    return response.rows
+  }catch(error){
+    console.log("Error geting specializations", error);
+    throw error
+  }finally{
+    client.release()
+  }
+}

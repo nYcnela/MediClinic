@@ -1,4 +1,7 @@
-import { registerDoctorTransaction } from "../models/doctorModel.js";
+import {
+  registerDoctorTransaction,
+  fetchDoctorSpecializations,
+} from "../models/doctorModel.js";
 import { formatPhoneNumber } from "../utils/formatters.js";
 import { generatePassword } from "../utils/generators.js";
 import { hashPassword } from "../utils/hashing.js";
@@ -85,5 +88,24 @@ export const addDoctor = async (req, res) => {
   } catch (error) {
     console.log("Error", error.message);
     res.status(400).json({ message: "Błąd podczas tworzenia konta!" });
+  }
+};
+
+export const fetchAllspecializatons = async (req, res) => {
+  try {
+    const specializations = await fetchDoctorSpecializations();
+    // console.log("2",specializations);
+    if (specializations.length > 0) {
+      res.status(200).json({ specializations: specializations });
+    } else {
+      res.status(404).json({ message: "No specializatons found" });
+    }
+  } catch (error) {
+    res
+      .status(500)
+      .json({
+        message: "Error selecting doctors' specializations",
+        error: error.message,
+      });
   }
 };
