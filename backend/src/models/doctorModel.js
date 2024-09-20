@@ -3,7 +3,7 @@ import { registerUserTransaction } from "./userModel.js";
 
 /**
  * Creates a new doctor entry in the doctors table
- * 
+ *
  * @param {Object} doctorData  Doctor-specific data {userId: number, pwz: string, sex: string, degree: string }
  * @param {Object} client  The database connection client used to execute the query within transaction
  * @returns {Promise<number>} Returns created doctor's ID, returns -1 if an error occurs
@@ -27,14 +27,14 @@ export const createNewDoctor = async (doctorData, client) => {
 
 /**
  * Registers a doctor with all necessary informations in users, doctors, doctor_specializations, and work_time_records tables
- * 
+ *
  * Function to register a doctor transactionally
  * @param {Object} userData - Basic user data for the doctor {name: string, surname: string, pesel: string, email: string, dialingCode: string, phoneNumber: string, password: string}
  * @param {Object} doctorData - Additional doctor-specific data { pwz: string, sex: string, degree: string }
  * @param {Array} specializations - List of doctor's specializations [{ label: string, value: string }, ...]
  * @param {Array} workDays - Days the doctor works [{ value: string, label: string }, ...]
  * @param {Object} workHours - Work hours for each day {tuesday: { start: '08:00', end: '09:00' }, ...}
- * @returns {Promise<number>} Returns created doctor's ID, returns -1 if an error occurs 
+ * @returns {Promise<number>} Returns created doctor's ID, returns -1 if an error occurs
  */
 export const registerDoctorTransaction = async (
   userData,
@@ -107,16 +107,32 @@ export const registerDoctorTransaction = async (
   }
 };
 
-export const fetchDoctorSpecializations = async() => {
-  const client = await db.connect()
-  try{
-    const query = "SELECT id, name AS label FROM specializations"
-    const response = await client.query(query)
-    return response.rows
-  }catch(error){
+/**
+ * Fetches all specliazations or unique speciliazations assigned to doctors
+ *
+ * Depending on the value of the "unique" parameter this function returns either:
+ * -All available specializations in the database when "unique" is "false"
+ * -Unique specializations assigned to doctors when "unique" is "true"
+ *
+ * @param {boolean} [unique = false] - if "true" returns distinct specializations assigned to doctors. if "false" returns all available specializations
+ * @returns {Promise<Array<Object>>} a promise that resolves to an array of specializations, each with "id" and a "label"
+ */
+export const fetchDoctorSpecializations = async (unique = false) => {
+  const client = await db.connect();
+  try {
+    let query;
+    if (unique) {
+      query =
+        "SELECT DISTINCT spec.id, spec.name AS label FROM doctor_specializations AS doctor_s JOIN specializations AS spec ON doctor_s.specialization_id = spec.id";
+    } else {
+      query = "SELECT id, name AS label FROM specializations";
+    }
+    const response = await client.query(query);
+    return response.rows;
+  } catch (error) {
     console.log("Error geting specializations", error);
-    throw error
-  }finally{
-    client.release()
+    throw error;
+  } finally {
+    client.release();
   }
-}
+};

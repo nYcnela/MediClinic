@@ -91,21 +91,25 @@ export const addDoctor = async (req, res) => {
   }
 };
 
-export const fetchAllspecializatons = async (req, res) => {
+/**
+ * Handles the request to fetch specializations
+ *
+ *
+ * @param {Object} req - the HTTP request object, expected to containing query parameter "unique"
+ * @returns {Promise<void>} sends an HTTP response containing the fetched specializations or an error message
+ */
+export const fetchSpecializations = async (req, res) => {
   try {
-    const specializations = await fetchDoctorSpecializations();
-    // console.log("2",specializations);
+    const unique = req.query.unique === "true";
+    const specializations = await fetchDoctorSpecializations(unique);
     if (specializations.length > 0) {
       res.status(200).json({ specializations: specializations });
     } else {
-      res.status(404).json({ message: "No specializatons found" });
+      res.status(200).json({ message: "No specializatons found" });
     }
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        message: "Error selecting doctors' specializations",
-        error: error.message,
-      });
+    res.status(500).json({
+      message: "Error selecting doctors' specializations",
+    });
   }
 };
