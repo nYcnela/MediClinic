@@ -130,7 +130,50 @@ export const fetchDoctorSpecializations = async (unique = false) => {
     const response = await client.query(query);
     return response.rows;
   } catch (error) {
-    console.log("Error geting specializations", error);
+    console.log("Error selecting specializations", error);
+    throw error;
+  } finally {
+    client.release();
+  }
+};
+
+/**
+ * Fetches all doctors
+ *
+ * Each returned doctor includes their user ID, degree, first name, last name
+ * @returns {Promise<Array<Object>>} a promise that resolves to an array of doctors
+ */
+export const fetchAllDoctors = async () => {
+  const client = await db.connect();
+  try {
+    const query =
+      "SELECT d.user_id AS id, d.degree AS label, u.name, u.surname FROM users as u JOIN doctors as d ON u.id = d.user_id WHERE u.role = 'doctor'";
+    const doctors = await client.query(query);
+    return doctors.rows;
+  } catch (error) {
+    console.log("Error selecting all doctors");
+    throw error;
+  } finally {
+    client.release();
+  }
+};
+
+/**
+ * Fetches a specific doctor from the database by their user ID
+ *
+ * the returned doctor includes their user ID, degree, first name, last name
+ * @param {number} doctorId - the unique ID of the doctor
+ * @returns {Promise<Object|null>}
+ */
+export const fetchDoctor = async (doctorId) => {
+  const client = await db.connect();
+  try {
+    const query =
+      "SELECT d.user_id AS id, d.degree AS label, u.name, u.surname FROM users as u JOIN doctors as d ON u.id = d.user_id WHERE u.id = $1";
+    const doctor = await client.query(query, [doctorId]);
+    return doctor.rows[0];
+  } catch (error) {
+    console.log("Error selecting doctor by id: ", error);
     throw error;
   } finally {
     client.release();

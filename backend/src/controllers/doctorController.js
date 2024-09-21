@@ -1,6 +1,8 @@
 import {
   registerDoctorTransaction,
   fetchDoctorSpecializations,
+  fetchAllDoctors,
+  fetchDoctor,
 } from "../models/doctorModel.js";
 import { formatPhoneNumber } from "../utils/formatters.js";
 import { generatePassword } from "../utils/generators.js";
@@ -27,7 +29,7 @@ import chalk from "chalk";
  * @param {Array} req.body.workDays - days the doctor works [{ value: string, label: string }, ...]
  * @param {Object} req.body.workHours - work hours for each day { day: { start: string, end: string }, ... }
  *
- *@returns { void } sends a JSON response with a success message and temporary password on success or an error message on failure
+ *@returns {void} sends a JSON response with a success message and temporary password on success or an error message on failure
  */
 export const addDoctor = async (req, res) => {
   // console.log(req.body);
@@ -94,9 +96,8 @@ export const addDoctor = async (req, res) => {
 /**
  * Handles the request to fetch specializations
  *
- *
  * @param {Object} req - the HTTP request object, expected to containing query parameter "unique"
- * @returns {Promise<void>} sends an HTTP response containing the fetched specializations or an error message
+ * @returns {Promise<void>} sends a JSON response containing the fetched specializations or an error message
  */
 export const fetchSpecializations = async (req, res) => {
   try {
@@ -109,7 +110,49 @@ export const fetchSpecializations = async (req, res) => {
     }
   } catch (error) {
     res.status(500).json({
-      message: "Error selecting doctors' specializations",
+      message: "Error fetching doctors' specializations",
     });
+  }
+};
+
+/**
+ * Handles the request to fetch all doctors
+ *
+ * If doctors are found it return an array of doctors, otherwise it returns a 200 status with a message  and an empty array
+ *
+ * @returns {void} sends a JSON response containing eiher a list of doctors or an empty list
+ */
+export const fetchDoctors = async (req, res) => {
+  try {
+    const doctors = await fetchAllDoctors();
+    if (doctors.length > 0) {
+      res.status(200).json({ doctors: doctors });
+    } else {
+      res.status(200).json({ message: "No doctors found" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching doctors" });
+  }
+};
+
+/**
+ * Handles the request to fetch a doctor by their ID
+ *
+ * ID doctor is found, it returns the doctor's details otherwise it returns a 404 status with a message
+ * @return {void} sends a JSON response containing the doctor's details or an error message
+ */
+export const fetchDoctorById = async (req, res) => {
+  const { id: doctorId } = req.params;
+  try {
+    const doctor = await fetchDoctor(doctorId);
+    if (!!doctor) {
+      res.status(200).json({ doctor: doctor });
+    } else {
+      res
+        .status(404)
+        .json({ message: "Doctor with provided id does not exist" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching doctor" });
   }
 };
