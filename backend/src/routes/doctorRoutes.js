@@ -8,9 +8,9 @@ import {
 
 const router = express.Router();
 
+router.get("/specializations", fetchSpecializations);
 router.get("/list", fetchDoctors);
 router.get("/:id", fetchDoctorById);
-router.get("/specializations", fetchSpecializations);
 router.post("/add", addDoctor);
 
 export default router;
