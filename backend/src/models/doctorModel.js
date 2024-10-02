@@ -80,9 +80,8 @@ export const registerDoctorTransaction = async (
         endTime: workHours[value].end,
       };
     });
-
     const insertDayOfWorkQuery =
-      "INSERT INTO work_time_records (employee_id, work_day, start_time, end_time) VALUES ($1, $2, $3, $4)";
+      "INSERT INTO doctor_work_schedule (doctor_id, work_day, start_time, end_time) VALUES ($1, $2, $3, $4)";
     for (const dayOfWork of workDaysHoursMap) {
       try {
         const { day, startTime, endTime } = dayOfWork;
@@ -174,6 +173,21 @@ export const fetchDoctor = async (doctorId) => {
     return doctor.rows[0];
   } catch (error) {
     console.log("Error selecting doctor by id: ", error);
+    throw error;
+  } finally {
+    client.release();
+  }
+};
+
+export const getWorkSchedule = async (doctorId) => {
+  const client = await db.connect();
+  try {
+    const query =
+      "SELECT doctor_id, work_day, start_time, end_time, appointment_interval FROM doctor_work_schedule WHERE doctor_id = $1";
+    const response = await client.query(query, [doctorId])
+    return response.rows;
+  } catch (error) {
+    console.log("Error selecting schedule informations");
     throw error;
   } finally {
     client.release();

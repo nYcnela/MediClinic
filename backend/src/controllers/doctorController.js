@@ -3,6 +3,7 @@ import {
   fetchDoctorSpecializations,
   fetchAllDoctors,
   fetchDoctor,
+  getWorkSchedule,
 } from "../models/doctorModel.js";
 import { formatPhoneNumber } from "../utils/formatters.js";
 import { generatePassword } from "../utils/generators.js";
@@ -33,19 +34,7 @@ import chalk from "chalk";
  */
 export const addDoctor = async (req, res) => {
   // console.log(req.body);
-  const {
-    name,
-    surname,
-    pesel,
-    email,
-    phoneNumber: fullPhoneNumber,
-    pwz,
-    sex,
-    degree,
-    specialization,
-    workDays,
-    workHours,
-  } = req.body;
+  const { name, surname, pesel, email, phoneNumber: fullPhoneNumber, pwz, sex, degree, specialization, workDays, workHours } = req.body;
   try {
     const { dialingCode, phoneNumber } = formatPhoneNumber(fullPhoneNumber);
 
@@ -70,18 +59,8 @@ export const addDoctor = async (req, res) => {
 
     const specializations = [...specialization];
 
-    const response = await registerDoctorTransaction(
-      userData,
-      doctorData,
-      specializations,
-      workDays,
-      workHours
-    );
-    console.log(
-      `GENERATED TEMPORARY PASSWORD FOR DOCTOR ACCOUNT: ${chalk.yellow(
-        password
-      )}`
-    );
+    const response = await registerDoctorTransaction(userData, doctorData, specializations, workDays, workHours);
+    console.log(`GENERATED TEMPORARY PASSWORD FOR DOCTOR ACCOUNT: ${chalk.yellow(password)}`);
 
     res.status(200).json({
       message: "Konto zostało pomyślnie utworzone",
@@ -102,7 +81,10 @@ export const addDoctor = async (req, res) => {
 export const fetchSpecializations = async (req, res) => {
   try {
     const unique = req.query.unique === "true";
-    const specializations = await fetchDoctorSpecializations(unique);
+    const specializations = (await fetchDoctorSpecializations(unique)).map((specialization) => ({
+      value: specialization.id,
+      label: specialization.label,
+    }));
     if (specializations.length > 0) {
       res.status(200).json({ specializations: specializations });
     } else {
@@ -124,7 +106,10 @@ export const fetchSpecializations = async (req, res) => {
  */
 export const fetchDoctors = async (req, res) => {
   try {
-    const doctors = await fetchAllDoctors();
+    const doctors = (await fetchAllDoctors()).map((doctor) => ({
+      value: doctor.id,
+      label: doctor.label + " " + doctor.name + " " + doctor.surname,
+    }));
     if (doctors.length > 0) {
       res.status(200).json({ doctors: doctors });
     } else {
@@ -144,13 +129,15 @@ export const fetchDoctors = async (req, res) => {
 export const fetchDoctorById = async (req, res) => {
   const { id: doctorId } = req.params;
   try {
-    const doctor = await fetchDoctor(doctorId);
-    if (!!doctor) {
-      res.status(200).json({ doctor: doctor });
+    const { id, label, name, surname } = await fetchDoctor(doctorId);
+    const doctorData = { value: id, label: label + " " + name + " " + surname };
+    const schedule = await getWorkSchedule(doctorId);
+    // console.log(doctorData);
+    // console.log(schedule);
+    if (!!doctorData) {
+      res.status(200).json({ doctor: doctorData });
     } else {
-      res
-        .status(404)
-        .json({ message: "Doctor with provided id does not exist" });
+      res.status(404).json({ message: "Doctor with provided id does not exist" });
     }
   } catch (error) {
     res.status(500).json({ message: "Error fetching doctor" });

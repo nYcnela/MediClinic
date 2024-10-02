@@ -50,6 +50,11 @@ CREATE TABLE doctors (
     CONSTRAINT unique_user_id UNIQUE (user_id)
 );
 
+CREATE TABLE specializations (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) UNIQUE NOT NULL
+);
+
 -- 'doctor_specializations' table with the following fields:
 -- - 'id': A unique identifier for each specialization (primary key), automatically incremented
 -- - 'doctor_id': A reference to the doctor associated with this specialization (foreign key from 'doctors'), which will cascade on delete
@@ -58,9 +63,35 @@ CREATE TABLE doctors (
 CREATE TABLE doctor_specializations (
     id SERIAL PRIMARY KEY,
     doctor_id INT REFERENCES doctors(user_id) ON DELETE CASCADE,
-    specialization VARCHAR(255) NOT NULL,
-    CONSTRAINT unique_doctor_specialization UNIQUE (doctor_id, specialization)
+    specialization_id INT REFERENCES specializations(id) ON DELETE CASCADE,
+    CONSTRAINT unique_doctor_specialization UNIQUE (doctor_id, specialization_id)
 );
+
+
+INSERT INTO specializations (name) VALUES
+    ('Kardiolog'),
+    ('Pediatra'),
+    ('Dermatolog'),
+    ('Endokrynolog'),
+    ('Neurolog'),
+    ('Psychiatra'),
+    ('Chirurg'),
+    ('Ortopeda'),
+    ('Onkolog'),
+    ('Laryngolog'),
+    ('Okulista'),
+    ('Ginekolog'),
+    ('Urolog'),
+    ('Pulmonolog'),
+    ('Gastrolog'),
+    ('Alergolog'),
+    ('Diabetolog'),
+    ('Reumatolog'),
+    ('Radiolog'),
+    ('Anestezjolog'),
+    ('Hematolog'),
+    ('Lekarz rodzinny'),
+    ('Nefrolog');
 
 -- 'work_time_records' table with the following fields:
 -- - 'id': A unique identifier for each work time record (primary key), automatically incremented
@@ -69,11 +100,39 @@ CREATE TABLE doctor_specializations (
 -- - 'start_time': The start time of the employee's work day, which cannot be null
 -- - 'end_time': The end time of the employee's work day, which cannot be null
 -- - 'unique_employee_workday': A constraint ensuring that an employee cannot have multiple work records for the same day
-CREATE TABLE work_time_records (
+--work_time_records
+CREATE TABLE doctor_work_schedule (
     id SERIAL PRIMARY KEY,
-    employee_id INT REFERENCES users(id) ON DELETE CASCADE, 
+    doctor_id INT REFERENCES users(id) ON DELETE CASCADE, 
     work_day VARCHAR(9) NOT NULL, 
     start_time TIME NOT NULL,  
     end_time TIME NOT NULL,  
-    CONSTRAINT unique_employee_workday UNIQUE (employee_id, work_day)  
+    appointment_interval INT DEFAULT 15,
+    CONSTRAINT unique_employee_workday UNIQUE (doctor_id, work_day)  
 );
+
+CREATE TABLE work_days_exceptions (
+    id SERIAL PRIMARY KEY,
+    schedule_id INT REFERENCES doctor_work_schedule(id) ON DELETE CASCADE, 
+    exception_date DATE NOT NULL,
+    start_time TIME,  
+    end_time TIME,  
+    CONSTRAINT unique_schedule_exception UNIQUE (schedule_id, exception_date)
+);
+
+CREATE TABLE appointments (
+    id SERIAL PRIMARY KEY,
+    doctor_id INT REFERENCES doctors(user_id) ON DELETE CASCADE,
+    user_id INT REFERENCES users(id) ON DELETE CASCADE,
+    appointment_time TIMESTAMP NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT unique_appointment UNIQUE (doctor_id, appointment_time)
+);
+
+CREATE INDEX idx_appointment_time ON appointments(appointment_time);
+
+
+SELECT u.id, d.degree AS label, u.name, u.surname
+FROM users as u 
+JOIN doctors as d ON u.id = d.user_id
+WHERE u.role = 'doctor';
