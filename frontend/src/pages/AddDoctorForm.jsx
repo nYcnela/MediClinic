@@ -1,27 +1,21 @@
 import Button from "../components/Button";
-import LabelInputParagraph from "./LabelInputParagraph";
+import LabelInputParagraph from "../components/LabelInputParagraph";
 import {validatePesel, validateName, validatePhoneNumber, validateEmail, validatePassword, validatePwz, validateSex } from "../functions/validations";
 import {doctorDegrees, doctorSpecializations, weekDays, genders } from "../assets/strings";
 import React,{useState, useEffect} from "react";
-import LabelSelectParagraph from "./LabelSelectParagraph";
-import LabelRadiosParagraph from "./LabelRadioParagraph"; 
-import NavBar from "./NavBar";
+import LabelSelectParagraph from "../components/LabelSelectParagraph";
+import LabelRadiosParagraph from "../components/LabelRadioParagraph"; 
+import NavBar from "../components/NavBar";
 import { createHoursWithStep } from "../functions/timeFunctions";
 
-import WorkHoursPicker from "./WorkHoursPicker";
-import RangePicker from "./RangePicker";
+import WorkHoursPicker from "../components/WorkHoursPicker";
+import RangePicker from "../components/RangePicker";
 
 
-//płeć 
-//specjalizacja
-// numer pwz
-// 
-
-
-function DoctorCreateForm(){
+function AddDoctorForm(){
     
 
-    const hours = createHoursWithStep("8:00", "16:00", 15)
+    const hours = createHoursWithStep(8, 0, 16, 0, 15)
 
     const [name, setName] = useState("");
     const [nameError, setNameError] = useState("");
@@ -77,6 +71,8 @@ function DoctorCreateForm(){
         saturday: { start: "", end: "" },
         sunday: { start: "", end: "" }
     })
+    
+    const [workHoursStatus, setWorkHoursStatus] = useState(false)
 
 
     
@@ -208,6 +204,7 @@ function DoctorCreateForm(){
                                 endRangeField = "end"
                                 object = {workHours}
                                 setObject = {setWorkHours}
+                                setStatus={setWorkHoursStatus} 
                             />
                             );
                             
@@ -238,4 +235,4 @@ function DoctorCreateForm(){
 }
 
 
-export default DoctorCreateForm;
+export default AddDoctorForm;

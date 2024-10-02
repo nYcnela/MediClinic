@@ -1,33 +1,41 @@
 export function calculateHour(start_h, start_min, offset){
+
     let hours = start_h + Math.floor((start_min + offset) / 60)   
     let minutes = (start_min + offset) % 60
     
     return [(hours) % 24, minutes]
 }
 
-export function createHoursWithStep(start,end,step){
+function convertNumsToHour(hour,mins){
+    if(hour<10){
+        if(mins < 10){
+            return {label: `${"0"+hour+":0"+mins}`,value: `${"0"+hour+":0"+mins}`}
+        }else{
+            return {label:`${"0"+hour+":"+mins}` ,value:`${"0"+hour+":"+mins}`} 
+        }
+    }else{
+        if(mins < 10){
+            return  {label:`${hour+":0"+mins}` ,value:`${hour+":0"+mins}`}
+        }else{
+            return {label:`${hour+":"+mins}` ,value:`${hour+":"+mins}`}
+        }
+    }
+}
 
-    const [st_h, st_min] = start.split(":").map(e => Number(e))
-    const [end_h, end_min]= end.split(":").map(e => Number(e))
+export function createHoursWithStep(h1_hour, h1_min, h2_hour,h2_min, step){
 
-
-    const hours = []
     let finished = false
-    hours.push({label: start, value: st_h+""+st_min})
-
-
-    let [temp_h, temp_min] = [st_h, st_min]
+    const hours = []
+    
+    hours.push(convertNumsToHour(h1_hour,h1_min))
+    
+    let [temp_h, temp_min] = [h1_hour, h1_min]
 
     while(!finished){
         [temp_h,temp_min] = calculateHour(temp_h,temp_min,step)
-        if(temp_h > end_h || (temp_h == end_h && temp_min > end_min)) finished = true
+        if(temp_h > h2_hour || (temp_h == h2_hour && temp_min > h2_min)) finished = true
         else{
-            if(temp_h >= 10){
-                hours.push(temp_min >= 10? {label: temp_h+":"+temp_min, value:temp_h+":"+temp_min} : {label: temp_h+":0"+temp_min, value: temp_h+":0"+temp_min})
-            }else{
-                hours.push(temp_min >= 10? {label: "0"+temp_h+":"+temp_min, value: "0"+temp_h+":"+temp_min} : {label: "0"+temp_h+":0"+temp_min, value: "0"+temp_h+":0"+temp_min})
-            }
-            
+            hours.push(convertNumsToHour(temp_h,temp_min))
         }
     }
     return hours;
@@ -35,20 +43,24 @@ export function createHoursWithStep(start,end,step){
 }
 
 
-export function validateHoursRange(firtsHour,secondHour,setError,setStatus){
+export function validateHoursRange(firtsHour,secondHour,setStatus, setError){
     let hourOne = firtsHour.split(":")
     let hourTwo = secondHour.split(":")
     hourOne = hourOne.map(e => e.at(0) != "0" ? Number(e) : Number(e.slice(1)))
     hourTwo = hourTwo.map(e => e.at(0) != "0" ? Number(e) : Number(e.slice(1)))
-    console.log(hourOne,hourTwo)    
     if(hourOne[0]==hourTwo[0]&& hourOne[1] == hourTwo[1]){
-        console.log("Ta sama godzina")
+        setError("Ta sama godzina")
+        setStatus(false)
+        return; 
     }else if(hourOne[0] == hourTwo[0] && hourOne[1] > hourTwo[1]){
-        console.log("Zly zakres.")
+        setError("Blędny zakres")
+        setStatus(false)
+        return;
     }else if(hourOne[0] > hourTwo[0]){
-        console.log("Godzina1>godzina2")
-    }else{
-        console.log("jest git :DDD")
+        setError("Blędny zakres")
+        setStatus(false)
+        return;
     }
-    
+    setError("")
+    setStatus(true)
 }

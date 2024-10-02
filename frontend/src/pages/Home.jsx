@@ -1,12 +1,14 @@
 import React,{useState} from "react";
 import NavBar from "../components/NavBar";
-import DoctorCreateForm from "../components/DoctorCreateForm";
+import AddDoctorForm from "./AddDoctorForm";
+import AppointmentForm from "./AppointmentForm";
+import ItemCategorySearchBar from "./ItemCategorySearchBar";
 
 function Home(){
     return(
         <>     
-            <NavBar/>
-            <DoctorCreateForm/>
+        <NavBar></NavBar>
+        <h1>Home strona gowno tzw</h1>
         </>
     );
 }

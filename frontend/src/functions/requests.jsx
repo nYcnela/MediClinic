@@ -65,3 +65,15 @@ export async function sendDoctorData(name,surname,phoneNumber,email,pesel,pwz,se
             console.log(error.message);
         }
 }
+
+export async function filterItemsByCategory(category){
+    const endpoint = 'endpoint'
+    try{
+        const response = await axios.post(endpoint, {
+            category
+        });
+        return response.doctors
+    }catch (error){
+        console.log(error.response ? error.response.data.message : error.message);
+    }
+}

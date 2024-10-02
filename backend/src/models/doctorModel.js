@@ -3,7 +3,7 @@ import { registerUserTransaction } from "./userModel.js";
 
 /**
  * Creates a new doctor entry in the doctors table
- * 
+ *
  * @param {Object} doctorData  Doctor-specific data {userId: number, pwz: string, sex: string, degree: string }
  * @param {Object} client  The database connection client used to execute the query within transaction
  * @returns {Promise<number>} Returns created doctor's ID, returns -1 if an error occurs
@@ -27,14 +27,14 @@ export const createNewDoctor = async (doctorData, client) => {
 
 /**
  * Registers a doctor with all necessary informations in users, doctors, doctor_specializations, and work_time_records tables
- * 
+ *
  * Function to register a doctor transactionally
  * @param {Object} userData - Basic user data for the doctor {name: string, surname: string, pesel: string, email: string, dialingCode: string, phoneNumber: string, password: string}
  * @param {Object} doctorData - Additional doctor-specific data { pwz: string, sex: string, degree: string }
  * @param {Array} specializations - List of doctor's specializations [{ label: string, value: string }, ...]
  * @param {Array} workDays - Days the doctor works [{ value: string, label: string }, ...]
  * @param {Object} workHours - Work hours for each day {tuesday: { start: '08:00', end: '09:00' }, ...}
- * @returns {Promise<number>} Returns created doctor's ID, returns -1 if an error occurs 
+ * @returns {Promise<number>} Returns created doctor's ID, returns -1 if an error occurs
  */
 export const registerDoctorTransaction = async (
   userData,
@@ -59,13 +59,14 @@ export const registerDoctorTransaction = async (
     }
 
     const insertSpecializationsQuery =
-      "INSERT INTO doctor_specializations (doctor_id, specialization) VALUES($1, $2)";
+      "INSERT INTO doctor_specializations (doctor_id, specialization_id) VALUES($1, $2)";
 
     for (const specialization of specializations) {
+      // console.log(specialization);
       try {
         await client.query(insertSpecializationsQuery, [
           userId,
-          `${specialization.label}`,
+          `${specialization.value}`,
         ]);
       } catch (error) {
         throw new Error("Failed to insert specialization");
@@ -100,6 +101,79 @@ export const registerDoctorTransaction = async (
     return userId;
   } catch (error) {
     await client.query("ROLLBACK");
+    throw error;
+  } finally {
+    client.release();
+  }
+};
+
+/**
+ * Fetches all specliazations or unique speciliazations assigned to doctors
+ *
+ * Depending on the value of the "unique" parameter this function returns either:
+ * -All available specializations in the database when "unique" is "false"
+ * -Unique specializations assigned to doctors when "unique" is "true"
+ *
+ * @param {boolean} [unique = false] - if "true" returns distinct specializations assigned to doctors. if "false" returns all available specializations
+ * @returns {Promise<Array<Object>>} a promise that resolves to an array of specializations, each with "id" and a "label"
+ */
+export const fetchDoctorSpecializations = async (unique = false) => {
+  const client = await db.connect();
+  try {
+    let query;
+    if (unique) {
+      query =
+        "SELECT DISTINCT spec.id, spec.name AS label FROM doctor_specializations AS doctor_s JOIN specializations AS spec ON doctor_s.specialization_id = spec.id";
+    } else {
+      query = "SELECT id, name AS label FROM specializations";
+    }
+    const response = await client.query(query);
+    return response.rows;
+  } catch (error) {
+    console.log("Error selecting specializations", error);
+    throw error;
+  } finally {
+    client.release();
+  }
+};
+
+/**
+ * Fetches all doctors
+ *
+ * Each returned doctor includes their user ID, degree, first name, last name
+ * @returns {Promise<Array<Object>>} a promise that resolves to an array of doctors
+ */
+export const fetchAllDoctors = async () => {
+  const client = await db.connect();
+  try {
+    const query =
+      "SELECT d.user_id AS id, d.degree AS label, u.name, u.surname FROM users as u JOIN doctors as d ON u.id = d.user_id WHERE u.role = 'doctor'";
+    const doctors = await client.query(query);
+    return doctors.rows;
+  } catch (error) {
+    console.log("Error selecting all doctors");
+    throw error;
+  } finally {
+    client.release();
+  }
+};
+
+/**
+ * Fetches a specific doctor from the database by their user ID
+ *
+ * the returned doctor includes their user ID, degree, first name, last name
+ * @param {number} doctorId - the unique ID of the doctor
+ * @returns {Promise<Object|null>}
+ */
+export const fetchDoctor = async (doctorId) => {
+  const client = await db.connect();
+  try {
+    const query =
+      "SELECT d.user_id AS id, d.degree AS label, u.name, u.surname FROM users as u JOIN doctors as d ON u.id = d.user_id WHERE u.id = $1";
+    const doctor = await client.query(query, [doctorId]);
+    return doctor.rows[0];
+  } catch (error) {
+    console.log("Error selecting doctor by id: ", error);
     throw error;
   } finally {
     client.release();

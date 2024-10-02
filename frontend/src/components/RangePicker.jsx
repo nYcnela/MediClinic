@@ -4,12 +4,12 @@ import { useEffect, useState } from "react";
 import { validateHoursRange } from "../functions/timeFunctions";
 
 
-function RangePicker({label ,field,  options, labelOne, labelTwo, startRangeField, endRangeField, object, setObject}){
+function RangePicker({label ,field,  options, labelOne, labelTwo, startRangeField, endRangeField, object, setObject, setStatus}){
 
     const [rangeStart, setRangeStart] = useState("")
     const [rangeEnd, setRangeEnd] = useState("")
 
-    
+    const [rangeErrorText, setRangeErrorText] = useState("")
     useEffect(()=>{
         const obj = {
             ...object,
@@ -17,7 +17,7 @@ function RangePicker({label ,field,  options, labelOne, labelTwo, startRangeFiel
         }
         setObject(obj)
         if(rangeStart != "" && rangeEnd != ""){
-            validateHoursRange(rangeStart,rangeEnd)
+            validateHoursRange(rangeStart,rangeEnd, setStatus, setRangeErrorText)
         }
     }, [rangeStart,rangeEnd])
 
@@ -41,7 +41,7 @@ function RangePicker({label ,field,  options, labelOne, labelTwo, startRangeFiel
                 value = {rangeEnd}
                 isMulti={false}
             />
-                
+            <p>{rangeErrorText}</p>
         </>
     );
     

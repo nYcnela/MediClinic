@@ -61,4 +61,10 @@ export const doctorSpecializations = [
     { label: "Lekarz rodzinny", value: "rodzinny" },
     { label: "Nefrolog", value: "nefrolog" },
   ];
+
+
+  export const doctors = [
+    {label : "Adam Nawalka", value :1},
+    {label : "Adam Srałka", value :2}
+  ]
   

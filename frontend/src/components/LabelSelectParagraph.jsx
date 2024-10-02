@@ -1,15 +1,6 @@
 import Select from "react-select";
 
-function LabelSelectParagraph({
-  id,
-  options,
-  labelText,
-  paragraphText,
-  setValue,
-  value,
-  isMulti,
-  styles,
-}) {
+function LabelSelectParagraph({id,options,labelText,paragraphText,setValue,value,isMulti,styles,}) {
   function onChangeMulti(values) {
     const arr = [];
     values.forEach((element) => arr.push(element));
@@ -26,6 +17,7 @@ function LabelSelectParagraph({
   return isMulti ? (
     <div style={styles}>
       <label htmlFor={id}>{labelText}</label>
+    
       <Select
         id={id}
         options={options}
@@ -37,6 +29,7 @@ function LabelSelectParagraph({
         }}
         required
       />
+
       <p>{paragraphText}</p>
     </div>
   ) : (
