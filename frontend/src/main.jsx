@@ -11,6 +11,8 @@ import {
 } from "react-router-dom";
 import AppointmentForm from './pages/AppointmentForm.jsx';
 import AppointmentConfirmation from './pages/AppointmentConfirmation.jsx';
+import PacientProfilePage from './pages/PacientProfilePage.jsx';
+import DoctorProfilePage from './pages/DoctorProfilePage.jsx';
 
 
 
@@ -39,6 +41,14 @@ const router = createBrowserRouter([
   {
     path: '/confirm-appointment/:id',
     element: <AppointmentConfirmation/>
+  },
+  {
+    path: '/profile',
+    element: <PacientProfilePage/>
+  },
+  {
+    path: '/doctor-profile',
+    element: <DoctorProfilePage/>
   }
 ]);
 

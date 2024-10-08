@@ -1,49 +1,56 @@
 import React, { useEffect, useState } from 'react';
-import Select from 'react-select'; // Z react-select
-import { filterItemsByCategory } from '../functions/requests';
-function ItemCategorySearchBar({items, categories, categoryField, setItem, setCategory}){
+import Select from 'react-select';
+import axios from 'axios';
+
+function ItemCategorySearchBar({getItemsLink, getCategoriesLink, getItemsByCategoryLink, getItemCategoriesByItemIdLink, itemsField, categoriesField, setItem, setCategory}){
+
+  const [items, setItems] = useState(null)
+  const [categories, setCategories] = useState(null)
 
   const [selectedItem, setSelectedItem] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(null);
-  const [filteredItems, setFilteredItems] = useState(items);
+
   const [isCategoryDisabled, setIsCategoryDisabled] = useState(false);
 
-  let cats = categories;
 
-  function filterItemsByCategory(items, field, selectedCategory) {
-    return items.filter(item => item[field] === selectedCategory)
-                .map(item => ({ value: item.value, label: item.label })); 
-  }
+  useEffect(()=>{
+    const fetchData = async (link, field, setData, ID = null) => {
+      try {
+          const response = id === null ? await axios.get(link) : await axios.get(link, {
+            params:{
+              id: ID
+            }
+          });
 
-  
+          setData(response.data[field])
+          console.log(response.data[field])
+      } catch (err) {
+          console.log(err)
+      } 
+    };
 
+    //setItem(selectedItem)
+    //setCategory(selectedCategory)
 
-useEffect(() => {
-  setItem(selectedItem);
-  setCategory(selectedCategory);
-
-  if (selectedCategory !== null && selectedItem === null) {
-    setFilteredItems(filterItemsByCategory(items, categoryField, selectedCategory));
-    setIsCategoryDisabled(false);
-  } else if(selectedCategory === null && selectedItem !== null){
-    setIsCategoryDisabled(true);
-  } 
-  else {
-    setFilteredItems(items); // Reset do wszystkich elementów
-    setIsCategoryDisabled(false);
-  }
-}, [selectedItem, selectedCategory, items]);
-
-  
-
- 
+    if(selectedCategory !== null && selectedItem === null) {
+      fetchData(getItemsByCategoryLink, itemsField, setItems)
+      setIsCategoryDisabled(false);
+    } else if(selectedCategory === null && selectedItem !== null){
+      setIsCategoryDisabled(true);
+    } else {
+      fetchData(getItemsLink,itemsField,setItems);
+      fetchData(getCategoriesLink,categoriesField,setCategories);
+      setIsCategoryDisabled(false);
+    }
+},
+[selectedCategory, selectedItem])
 
   return (
     <div>
         <Select
             value={selectedItem}
             onChange={setSelectedItem}
-            options={filteredItems}
+            options={items}
             placeholder="Wybierz lekarza"
             isClearable
             styles={customSelectStyles}
@@ -51,7 +58,7 @@ useEffect(() => {
         <Select
             value={selectedCategory}
             onChange={setSelectedCategory}
-            options={cats}
+            options={categories}
             placeholder="Wszystkie specjalizacje"
             isClearable
             styles={customSelectStyles}

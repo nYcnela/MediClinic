@@ -77,3 +77,15 @@ export async function filterItemsByCategory(category){
         console.log(error.response ? error.response.data.message : error.message);
     }
 }
+export async function getAppointmentsBySpecAndDate(spec, date){
+    const endpoint = 'endpoint'
+    try{
+        const response = await axios.post(endpoint, {
+            spec,
+            date
+        });
+        return response.doctors
+    }catch (error){
+        console.log(error.response ? error.response.data.message : error.message);
+    }
+}
