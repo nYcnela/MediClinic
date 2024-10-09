@@ -12,15 +12,11 @@ export const createNewDoctor = async (doctorData, client) => {
   const { userId, pwz, sex, degree } = doctorData;
   try {
     const values = [userId, pwz, sex, degree];
-    const query =
-      "INSERT INTO doctors (user_id, pwz, sex, degree) VALUES ($1, $2, $3, $4) RETURNING id";
+    const query = "INSERT INTO doctors (user_id, pwz, sex, degree) VALUES ($1, $2, $3, $4) RETURNING id";
     const result = await client.query(query, values);
     return result.rows[0].id;
   } catch (error) {
-    console.log(
-      "Error while adding values to the doctors table",
-      error.message
-    );
+    console.log("Error while adding values to the doctors table", error.message);
     return -1;
   }
 };
@@ -36,13 +32,7 @@ export const createNewDoctor = async (doctorData, client) => {
  * @param {Object} workHours - Work hours for each day {tuesday: { start: '08:00', end: '09:00' }, ...}
  * @returns {Promise<number>} Returns created doctor's ID, returns -1 if an error occurs
  */
-export const registerDoctorTransaction = async (
-  userData,
-  doctorData,
-  specializations,
-  workDays,
-  workHours
-) => {
+export const registerDoctorTransaction = async (userData, doctorData, specializations, workDays, workHours) => {
   const client = await db.connect();
   try {
     await client.query("BEGIN");
@@ -58,16 +48,12 @@ export const registerDoctorTransaction = async (
       throw new Error("Doctor creation failed (registerDoctorTransaction)");
     }
 
-    const insertSpecializationsQuery =
-      "INSERT INTO doctor_specializations (doctor_id, specialization_id) VALUES($1, $2)";
+    const insertSpecializationsQuery = "INSERT INTO doctor_specializations (doctor_id, specialization_id) VALUES($1, $2)";
 
     for (const specialization of specializations) {
       // console.log(specialization);
       try {
-        await client.query(insertSpecializationsQuery, [
-          userId,
-          `${specialization.value}`,
-        ]);
+        await client.query(insertSpecializationsQuery, [userId, `${specialization.value}`]);
       } catch (error) {
         throw new Error("Failed to insert specialization");
       }
@@ -80,17 +66,11 @@ export const registerDoctorTransaction = async (
         endTime: workHours[value].end,
       };
     });
-    const insertDayOfWorkQuery =
-      "INSERT INTO doctor_work_schedule (doctor_id, work_day, start_time, end_time) VALUES ($1, $2, $3, $4)";
+    const insertDayOfWorkQuery = "INSERT INTO doctor_work_schedule (doctor_id, work_day, start_time, end_time) VALUES ($1, $2, $3, $4)";
     for (const dayOfWork of workDaysHoursMap) {
       try {
         const { day, startTime, endTime } = dayOfWork;
-        await client.query(insertDayOfWorkQuery, [
-          userId,
-          day,
-          startTime,
-          endTime,
-        ]);
+        await client.query(insertDayOfWorkQuery, [userId, day, startTime, endTime]);
       } catch (error) {
         throw new Error("Failed to insert work day");
       }
@@ -136,6 +116,21 @@ export const fetchDoctorSpecializations = async (unique = false) => {
   }
 };
 
+export const fetchDoctorBySpecializations = async (specialization) => {
+  const client = await db.connect();
+  try {
+    const query =
+      "SELECT u.id, d.degree, u.name, u.surname FROM users AS u JOIN doctors AS d ON u.id = d.user_id JOIN doctor_specializations AS ds ON ds.doctor_id = d.user_id JOIN specializations AS sp ON sp.id = ds.specialization_id WHERE sp.name = $1";
+    const response = await client.query(query, [specialization]);
+    return response.rows;
+  } catch (error) {
+    console.log("Errror selecting doctor by specialization", error);
+    throw error;
+  } finally {
+    client.release();
+  }
+};
+
 /**
  * Fetches all doctors
  *
@@ -164,30 +159,23 @@ export const fetchAllDoctors = async () => {
  * @param {number} doctorId - the unique ID of the doctor
  * @returns {Promise<Object|null>}
  */
-export const fetchDoctor = async (doctorId) => {
+export const fetchDoctor = async (doctorId, getSpecializations) => {
   const client = await db.connect();
   try {
-    const query =
+    let response;
+    const doctorQuery =
       "SELECT d.user_id AS id, d.degree AS label, u.name, u.surname FROM users as u JOIN doctors as d ON u.id = d.user_id WHERE u.id = $1";
-    const doctor = await client.query(query, [doctorId]);
-    return doctor.rows[0];
+    const doctor = await client.query(doctorQuery, [doctorId]);
+    response = { ...doctor.rows[0] };
+    if (getSpecializations) {
+      const specializationsQuery =
+        "SELECT s.name FROM specializations AS s JOIN doctor_specializations AS ds ON s.id = ds.specialization_id WHERE ds.doctor_id = $1";
+      const doctorSpeciazlizations = await client.query(specializationsQuery, [doctorId]);
+      response = { ...response, specializations: doctorSpeciazlizations.rows };
+    }
+    return response;
   } catch (error) {
     console.log("Error selecting doctor by id: ", error);
-    throw error;
-  } finally {
-    client.release();
-  }
-};
-
-export const getWorkSchedule = async (doctorId) => {
-  const client = await db.connect();
-  try {
-    const query =
-      "SELECT doctor_id, work_day, start_time, end_time, appointment_interval FROM doctor_work_schedule WHERE doctor_id = $1";
-    const response = await client.query(query, [doctorId])
-    return response.rows;
-  } catch (error) {
-    console.log("Error selecting schedule informations");
     throw error;
   } finally {
     client.release();

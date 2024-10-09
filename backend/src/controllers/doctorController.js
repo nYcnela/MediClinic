@@ -1,9 +1,9 @@
 import {
   registerDoctorTransaction,
   fetchDoctorSpecializations,
+  fetchDoctorBySpecializations,
   fetchAllDoctors,
   fetchDoctor,
-  getWorkSchedule,
 } from "../models/doctorModel.js";
 import { formatPhoneNumber } from "../utils/formatters.js";
 import { generatePassword } from "../utils/generators.js";
@@ -97,6 +97,19 @@ export const fetchSpecializations = async (req, res) => {
   }
 };
 
+export const getDoctorBySpecializations = async (req, res) => {
+  try {
+    const { specializationName: specialization } = req.params;
+    const doctors = (await fetchDoctorBySpecializations(specialization)).map(doctor => ({value: doctor.id, label : doctor.degree + " " + doctor.name + " " + doctor.surname}));
+    if (!doctors) {
+      res.status(404).json({ message: "Doctors with provided specializations do not exist" });
+    }
+    res.status(200).json({ doctors: doctors });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching doctors by specialization" });
+  }
+};
+
 /**
  * Handles the request to fetch all doctors
  *
@@ -128,10 +141,12 @@ export const fetchDoctors = async (req, res) => {
  */
 export const fetchDoctorById = async (req, res) => {
   const { id: doctorId } = req.params;
+  const fetchSpecializations = req.query.specializations ? true : false;
+
   try {
-    const { id, label, name, surname } = await fetchDoctor(doctorId);
-    const doctorData = { value: id, label: label + " " + name + " " + surname };
-    const schedule = await getWorkSchedule(doctorId);
+    const { id, label, name, surname, specializations } = await fetchDoctor(doctorId, fetchSpecializations);
+    let doctorData = { value: id, label: label + " " + name + " " + surname };
+    if (!!specializations) doctorData = { ...doctorData, specializations: specializations };
     // console.log(doctorData);
     // console.log(schedule);
     if (!!doctorData) {
