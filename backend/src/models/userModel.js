@@ -14,28 +14,9 @@ import db from "../config/dbConnection.js";
  * @param {Object} client - the database connection client used to execute the query
  * @returns {Promise<number>} - Returns created user's ID, returns -1 if an error occurs
  */
-export const createNewUser = async (
-  pesel,
-  name,
-  surname,
-  email,
-  dialingCode,
-  phoneNumber,
-  password,
-  role,
-  client
-) => {
+export const createNewUser = async (pesel, name, surname, email, dialingCode, phoneNumber, password, role, client) => {
   try {
-    const data = [
-      role,
-      pesel,
-      name,
-      surname,
-      email,
-      dialingCode,
-      phoneNumber,
-      password,
-    ];
+    const data = [role, pesel, name, surname, email, dialingCode, phoneNumber, password];
     const query = `INSERT INTO users (role, pesel, name, surname, email, dialing_code, phone_number, password) VALUES($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`;
     // console.log(data);
     // console.log(query);
@@ -57,13 +38,8 @@ export const createNewUser = async (
  * @param {Object|null} externalClient - optional, database client used to manage the transaction
  * @returns {Promise<number>}  Returns created user's ID, returns -1 if an error occurs
  */
-export const registerUserTransaction = async (
-  userdata,
-  role,
-  externalClient = null
-) => {
-  const { name, surname, pesel, email, dialingCode, phoneNumber, password } =
-    userdata;
+export const registerUserTransaction = async (userdata, role, externalClient = null) => {
+  const { name, surname, pesel, email, dialingCode, phoneNumber, password } = userdata;
   let client = externalClient;
 
   try {
@@ -77,17 +53,7 @@ export const registerUserTransaction = async (
       throw new Error("User with this PESEL already exists");
     }
 
-    const result = await createNewUser(
-      pesel,
-      name,
-      surname,
-      email,
-      dialingCode,
-      phoneNumber,
-      password,
-      role,
-      client
-    );
+    const result = await createNewUser(pesel, name, surname, email, dialingCode, phoneNumber, password, role, client);
 
     if (!externalClient) {
       await client.query("COMMIT");
@@ -103,6 +69,20 @@ export const registerUserTransaction = async (
     if (!externalClient && client) {
       client.release();
     }
+  }
+};
+
+export const fetchUser = async (userId) => {
+  const client = await db.connect();
+  try {
+    const query = "SELECT id, name, surname FROM users WHERE id = $1";
+    const user = await client.query(query, [userId]);
+    return user.rows[0];
+  } catch (error) {
+    console.log("Error selecting user by id: ", error);
+    throw error;
+  } finally {
+    client.release();
   }
 };
 
@@ -146,14 +126,9 @@ export const findUserByPesel = async (pesel, client = db) => {
  * @param {Object} [client = db] - the data base connection client used to execute the query. defaults to the global 'db' client
  * @returns {Promise<Object>|null} return user's data if found
  */
-export const findUserByPhoneNumber = async (
-  dialing_code,
-  number,
-  client = db
-) => {
+export const findUserByPhoneNumber = async (dialing_code, number, client = db) => {
   try {
-    const query =
-      "SELECT * FROM users WHERE dialing_code = $1 AND phone_number = $2";
+    const query = "SELECT * FROM users WHERE dialing_code = $1 AND phone_number = $2";
     const result = await client.query(query, [dialing_code, number]);
     return result.rows[0];
   } catch (error) {
