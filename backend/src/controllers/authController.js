@@ -47,7 +47,7 @@ export const registerUser = async (req, res) => {
   try {
     const hashedPassword = await hashPassword(password);
 
-    const user = await registerUserTransaction(
+    const userId = await registerUserTransaction(
       {
         name,
         surname,
@@ -59,10 +59,10 @@ export const registerUser = async (req, res) => {
       },
       "user"
     );
-    console.log(user);
+    console.log(userId);
     res
       .status(201)
-      .json({ message: "Użytkownik został pomyślnie zarejestrowany" });
+      .json({ message: `Użytkownik został pomyślnie zarejestrowany. id: ${userId}` });
   } catch (error) {
     console.log(`Error during user registration: ${error.message}`);
     res.status(409).json({ message: "Błąd podczas dodawania użytkownika" });

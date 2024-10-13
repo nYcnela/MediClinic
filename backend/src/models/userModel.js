@@ -135,3 +135,17 @@ export const findUserByPhoneNumber = async (dialing_code, number, client = db) =
     console.log("Error finding user by phone number: ", error.message);
   }
 };
+
+export const deleteUser = async (userId) => {
+  const client = await db.connect();
+  try {
+    const query = "DELETE FROM users WHERE id = $1";
+    const response = await client.query(query, [userId]);
+    return response.rowCount;
+  } catch (error) {
+    console.log("Error deleting user", error.message);
+    throw error;
+  } finally {
+    client.release();
+  }
+};
