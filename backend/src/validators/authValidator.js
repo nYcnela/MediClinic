@@ -58,15 +58,29 @@ export const validateRegister = [
       return true;
     }),
 
+  check("email")
+    .notEmpty()
+    .withMessage("Nie wprowadzono email'a!")
+    .matches(
+      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+    )
+    .withMessage("Wprowadzony email nie jest poprawny!"),
+
   check("phoneNumber")
     .notEmpty()
     .withMessage("Wprowadz numer telefonu!")
     .isLength({ min: 9, max: 13 })
     .withMessage("Wprowadzony numer telefonu nie jest poprawny!"),
 
+  check("password")
+    .notEmpty()
+    .withMessage("Nie wprowadzono hasla!")
+    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/)
+    .withMessage("Wprowadzone hasło nie jest poprawne!"),
+
   (req, res, next) => {
     const errors = validationResult(req);
-    // console.log(errors);
+    console.log(errors);
     if (!errors.isEmpty()) {
       return res.status(400).json({ message: "Wprowadz poprawne dane aby sie zarejestrowac!" });
     }
