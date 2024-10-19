@@ -12,7 +12,7 @@ export const createNewDoctor = async (doctorData, client) => {
   const { userId, pwz, sex, degree } = doctorData;
   try {
     const values = [userId, pwz, sex, degree];
-    const query = "INSERT INTO doctors (user_id, pwz, sex, degree) VALUES ($1, $2, $3, $4) RETURNING id";
+    const query = "INSERT INTO doctors (user_id, pwz, sex, degree_id) VALUES ($1, $2, $3, $4) RETURNING id";
     const result = await client.query(query, values);
     return result.rows[0].id;
   } catch (error) {
@@ -53,6 +53,7 @@ export const registerDoctorTransaction = async (userData, doctorData, specializa
     for (const specialization of specializations) {
       // console.log(specialization);
       try {
+        console.log(userId, specialization.value);
         await client.query(insertSpecializationsQuery, [userId, `${specialization.value}`]);
       } catch (error) {
         throw new Error("Failed to insert specialization");
@@ -120,7 +121,7 @@ export const fetchDoctorBySpecializations = async (specialization) => {
   const client = await db.connect();
   try {
     const query =
-      "SELECT u.id, d.degree, u.name, u.surname FROM users AS u JOIN doctors AS d ON u.id = d.user_id JOIN doctor_specializations AS ds ON ds.doctor_id = d.user_id JOIN specializations AS sp ON sp.id = ds.specialization_id WHERE sp.name = $1";
+      "SELECT u.id, d.degree_id, u.name, u.surname FROM users AS u JOIN doctors AS d ON u.id = d.user_id JOIN doctor_specializations AS ds ON ds.doctor_id = d.user_id JOIN specializations AS sp ON sp.id = ds.specialization_id WHERE sp.name = $1";
     const response = await client.query(query, [specialization]);
     return response.rows;
   } catch (error) {
@@ -140,9 +141,10 @@ export const fetchDoctorBySpecializations = async (specialization) => {
 export const fetchAllDoctors = async () => {
   const client = await db.connect();
   try {
+    // "SELECT d.user_id AS id, d.degree AS label, u.name, u.surname FROM users as u JOIN doctors as d ON u.id = d.user_id WHERE u.role = 'doctor'";
     const query =
-      "SELECT d.user_id AS id, d.degree AS label, u.name, u.surname FROM users as u JOIN doctors as d ON u.id = d.user_id WHERE u.role = 'doctor'";
-    const doctors = await client.query(query);
+      "SELECT d.user_id AS id, d.degree_id, u.name, u.surname FROM users as u JOIN doctors as d ON u.id = d.user_id WHERE u.role = 'doctor'";
+      const doctors = await client.query(query);
     return doctors.rows;
   } catch (error) {
     console.log("Error selecting all doctors");
@@ -164,7 +166,7 @@ export const fetchDoctor = async (doctorId, getSpecializations) => {
   try {
     let response;
     const doctorQuery =
-      "SELECT d.user_id AS id, d.degree AS label, u.name, u.surname FROM users as u JOIN doctors as d ON u.id = d.user_id WHERE u.id = $1";
+      "SELECT d.user_id AS id, d.degree_id, u.name, u.surname FROM users as u JOIN doctors as d ON u.id = d.user_id WHERE u.id = $1";
     const doctor = await client.query(doctorQuery, [doctorId]);
     response = { ...doctor.rows[0] };
     if (getSpecializations) {
@@ -187,7 +189,7 @@ export const fetchDoctorDegree = async () => {
   try {
     const query = "SELECT * FROM doctor_degree";
     const response = await client.query(query);
-    console.log(response.rows);
+    // console.log(response.rows);
     return response.rows;
   } catch (error) {
     console.log("Error fetching doctors' degree");

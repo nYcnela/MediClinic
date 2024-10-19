@@ -63,13 +63,13 @@ export const addDoctor = async (req, res) => {
     const response = await registerDoctorTransaction(userData, doctorData, specializations, workDays, workHours);
     console.log(`GENERATED TEMPORARY PASSWORD FOR DOCTOR ACCOUNT: ${chalk.yellow(password)}`);
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "Konto zostało pomyślnie utworzone",
       temporaryPassword: `Tymczasowe hasło do konta: ${password}`,
     });
   } catch (error) {
     console.log("Error", error.message);
-    res.status(400).json({ message: "Błąd podczas tworzenia konta!" });
+    return res.status(400).json({ message: "Błąd podczas tworzenia konta!" });
   }
 };
 
@@ -87,12 +87,12 @@ export const fetchSpecializations = async (req, res) => {
       label: specialization.label,
     }));
     if (specializations.length > 0) {
-      res.status(200).json({ specializations: specializations });
+      return res.status(200).json({ specializations: specializations });
     } else {
-      res.status(200).json({ message: "No specializatons found" });
+      return res.status(200).json({ message: "No specializatons found" });
     }
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       message: "Error fetching doctors' specializations",
     });
   }
@@ -101,16 +101,17 @@ export const fetchSpecializations = async (req, res) => {
 export const getDoctorBySpecializations = async (req, res) => {
   try {
     const { specializationName: specialization } = req.params;
+    const allDegrees = await fetchDoctorDegree();
     const doctors = (await fetchDoctorBySpecializations(specialization)).map((doctor) => ({
       value: doctor.id,
-      label: doctor.degree + " " + doctor.name + " " + doctor.surname,
+      label: allDegrees.find((degree) => degree.id === doctor.degree_id).value + " " + doctor.name + " " + doctor.surname,
     }));
     if (!doctors) {
-      res.status(404).json({ message: "Doctors with provided specializations do not exist" });
+      return res.status(404).json({ message: "Doctors with provided specializations do not exist" });
     }
-    res.status(200).json({ doctors: doctors });
+    return res.status(200).json({ doctors: doctors });
   } catch (error) {
-    res.status(500).json({ message: "Error fetching doctors by specialization" });
+    return res.status(500).json({ message: "Error fetching doctors by specialization" });
   }
 };
 
@@ -123,17 +124,18 @@ export const getDoctorBySpecializations = async (req, res) => {
  */
 export const fetchDoctors = async (req, res) => {
   try {
+    const allDegrees = await fetchDoctorDegree();
     const doctors = (await fetchAllDoctors()).map((doctor) => ({
       value: doctor.id,
-      label: doctor.label + " " + doctor.name + " " + doctor.surname,
+      label: allDegrees.find((degree) => degree.id === doctor.degree_id).value + " " + doctor.name + " " + doctor.surname,
     }));
     if (doctors.length > 0) {
-      res.status(200).json({ doctors: doctors });
+      return res.status(200).json({ doctors: doctors });
     } else {
-      res.status(200).json({ message: "No doctors found" });
+      return res.status(200).json({ message: "No doctors found" });
     }
   } catch (error) {
-    res.status(500).json({ message: "Error fetching doctors" });
+    return res.status(500).json({ message: "Error fetching doctors" });
   }
 };
 
@@ -146,20 +148,20 @@ export const fetchDoctors = async (req, res) => {
 export const fetchDoctorById = async (req, res) => {
   const { id: doctorId } = req.params;
   const fetchSpecializations = req.query.specializations ? true : false;
-
+  const allDegrees = await fetchDoctorDegree();
   try {
-    const { id, label, name, surname, specializations } = await fetchDoctor(doctorId, fetchSpecializations);
-    let doctorData = { value: id, label: label + " " + name + " " + surname };
+    const { id, degree_id, name, surname, specializations } = await fetchDoctor(doctorId, fetchSpecializations);
+    let doctorData = { value: id, label: allDegrees.find((degree) => degree.id === degree_id).value + " " + name + " " + surname };
     if (!!specializations) doctorData = { ...doctorData, specializations: specializations };
     // console.log(doctorData);
     // console.log(schedule);
     if (!!doctorData) {
-      res.status(200).json({ doctor: doctorData });
+      return res.status(200).json({ doctor: doctorData });
     } else {
-      res.status(404).json({ message: "Doctor with provided id does not exist" });
+      return res.status(404).json({ message: "Doctor with provided id does not exist" });
     }
   } catch (error) {
-    res.status(500).json({ message: "Error fetching doctor" });
+    return res.status(500).json({ message: "Error fetching doctor" });
   }
 };
 
