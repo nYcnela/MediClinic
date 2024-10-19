@@ -4,6 +4,7 @@ import {
   fetchDoctorBySpecializations,
   fetchAllDoctors,
   fetchDoctor,
+  fetchDoctorDegree,
 } from "../models/doctorModel.js";
 import { formatPhoneNumber } from "../utils/formatters.js";
 import { generatePassword } from "../utils/generators.js";
@@ -100,7 +101,10 @@ export const fetchSpecializations = async (req, res) => {
 export const getDoctorBySpecializations = async (req, res) => {
   try {
     const { specializationName: specialization } = req.params;
-    const doctors = (await fetchDoctorBySpecializations(specialization)).map(doctor => ({value: doctor.id, label : doctor.degree + " " + doctor.name + " " + doctor.surname}));
+    const doctors = (await fetchDoctorBySpecializations(specialization)).map((doctor) => ({
+      value: doctor.id,
+      label: doctor.degree + " " + doctor.name + " " + doctor.surname,
+    }));
     if (!doctors) {
       res.status(404).json({ message: "Doctors with provided specializations do not exist" });
     }
@@ -156,5 +160,15 @@ export const fetchDoctorById = async (req, res) => {
     }
   } catch (error) {
     res.status(500).json({ message: "Error fetching doctor" });
+  }
+};
+
+export const getDoctorDegree = async (req, res) => {
+  try {
+    const degrees = await fetchDoctorDegree();
+    return res.status(200).json({ degrees: degrees });
+  } catch {
+    console.log("Error getting doctors' degree");
+    return res.status(500).json({ message: "Error getting doctors' degree" });
   }
 };

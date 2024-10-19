@@ -181,3 +181,18 @@ export const fetchDoctor = async (doctorId, getSpecializations) => {
     client.release();
   }
 };
+
+export const fetchDoctorDegree = async () => {
+  const client = await db.connect();
+  try {
+    const query = "SELECT * FROM doctor_degree";
+    const response = await client.query(query);
+    console.log(response.rows);
+    return response.rows;
+  } catch (error) {
+    console.log("Error fetching doctors' degree");
+    throw error;
+  } finally {
+    client.release();
+  }
+};
