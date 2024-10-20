@@ -6,7 +6,7 @@ import {
   fetchAppointmentById,
   deleteAppointmentById,
 } from "../models/appointmentModel.js";
-import { fetchDoctor } from "../models/doctorModel.js";
+import { fetchDoctor, fetchDoctorDegree } from "../models/doctorModel.js";
 import { fetchUser } from "../models/userModel.js";
 
 export const fetchAvailableAppointments = async (req, res) => {
@@ -64,11 +64,12 @@ export const fetchBookedAppointments = async (req, res) => {
       ).map(async (appointment) => {
         const doctor = await fetchDoctor(doctorId);
         const user = await fetchUser(appointment.user_id);
+        const allDegrees = await fetchDoctorDegree();
         const { day, month, year, hour, minutes } = getFormattedDate(appointment.appointment_time);
 
         return {
           id: appointment.id,
-          doctor: { value: doctor.id, label: doctor.name + " " + doctor.surname },
+          doctor: { value: doctor.id, label: allDegrees.find((degree) => degree.id === doctor.degree_id).value + " " + doctor.name + " " + doctor.surname },
           user: { value: user.id, label: user.name + " " + user.surname },
           appointmentTime: `${year}-${month}-${day} ${hour}:${minutes}`,
         };
@@ -87,6 +88,7 @@ export const fetchBookedAppointments = async (req, res) => {
 
 export const getAppointment = async (req, res) => {
   const { id: appointmentId } = req.params;
+  const allDegrees = await fetchDoctorDegree();
   try {
     const appointment = await Promise.all(
       (
@@ -98,7 +100,7 @@ export const getAppointment = async (req, res) => {
 
         return {
           id: appointment.id,
-          doctor: { value: doctor.id, label: doctor.name + " " + doctor.surname },
+          doctor: { value: doctor.id, label: allDegrees.find((degree) => degree.id === doctor.degree_id).value + " " + doctor.name + " " + doctor.surname },
           user: { value: user.id, label: user.name + " " + user.surname },
           appointmentTime: `${year}-${month}-${day} ${hour}:${minutes}`,
         };
