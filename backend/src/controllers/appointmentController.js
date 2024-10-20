@@ -12,11 +12,12 @@ import { fetchUser } from "../models/userModel.js";
 export const fetchAvailableAppointments = async (req, res) => {
   try {
     const { id: doctorId } = req.params;
+    let { date } = req.body;
     const doctorSchedule = await fetchWorkSchedule(doctorId);
 
     const daysOfWeek = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
 
-    let date = new Date("Wed Oct 09 2024 08:16:54");
+    date = new Date(date);
 
     const day = date.getDay();
     const dayOfMonth = date.getDate();
@@ -52,15 +53,16 @@ export const fetchAvailableAppointments = async (req, res) => {
 export const fetchBookedAppointments = async (req, res) => {
   try {
     const { id: doctorId } = req.params;
-
-    let date = new Date("Wed Oct 09 2024 08:16:54");
-    let date1 = "2024-10-09 08:00:00";
-    let date2 = "2024-10-09 15:29:53";
-    let date3 = "2024-12-09 14:30:00";
+    const { startDate, endDate } = req.body;
+    // console.log(startDate, endDate);
+    // let date = new Date("Wed Oct 09 2024 08:16:54");
+    // let date1 = "2024-10-09 08:00:00";
+    // let date2 = "2024-10-09 15:29:53";
+    // let date3 = "2024-12-09 14:30:00";
 
     const appointments = await Promise.all(
       (
-        await fetchAppointment(doctorId, date1, date2)
+        await fetchAppointment(doctorId, startDate, endDate)
       ).map(async (appointment) => {
         const doctor = await fetchDoctor(doctorId);
         const user = await fetchUser(appointment.user_id);
@@ -69,7 +71,10 @@ export const fetchBookedAppointments = async (req, res) => {
 
         return {
           id: appointment.id,
-          doctor: { value: doctor.id, label: allDegrees.find((degree) => degree.id === doctor.degree_id).value + " " + doctor.name + " " + doctor.surname },
+          doctor: {
+            value: doctor.id,
+            label: allDegrees.find((degree) => degree.id === doctor.degree_id).value + " " + doctor.name + " " + doctor.surname,
+          },
           user: { value: user.id, label: user.name + " " + user.surname },
           appointmentTime: `${year}-${month}-${day} ${hour}:${minutes}`,
         };
@@ -100,7 +105,10 @@ export const getAppointment = async (req, res) => {
 
         return {
           id: appointment.id,
-          doctor: { value: doctor.id, label: allDegrees.find((degree) => degree.id === doctor.degree_id).value + " " + doctor.name + " " + doctor.surname },
+          doctor: {
+            value: doctor.id,
+            label: allDegrees.find((degree) => degree.id === doctor.degree_id).value + " " + doctor.name + " " + doctor.surname,
+          },
           user: { value: user.id, label: user.name + " " + user.surname },
           appointmentTime: `${year}-${month}-${day} ${hour}:${minutes}`,
         };
@@ -116,10 +124,11 @@ export const getAppointment = async (req, res) => {
 };
 
 export const createNewAppointment = async (req, res) => {
+  const { doctorId, userId, appointmentTime } = req.body;
   // const {doctorId, userId, appointmentTime} = req.body
-  const doctorId = 2,
-    userId = 1,
-    appointmentTime = "2024-10-09 10:00:00";
+  // const doctorId = 2,
+  //   userId = 1,
+  //   appointmentTime = "2024-10-09 10:00:00";
   try {
     const appointmentId = await createAppointmentTransaction(doctorId, userId, appointmentTime);
     // console.log(response); //appointment id
@@ -133,34 +142,33 @@ export const createNewAppointment = async (req, res) => {
 export const deleteAppointment = async (req, res) => {
   const { id: appointmentId } = req.params;
   try {
-    const response = await deleteAppointmentById(appointmentId)
-    if(response !== 1) return res.status(404).json({message: "Wizyta z podanym id nie istnieje"})
-    return res.status(200).json({message: "Wizyta została pomyślnie usunięta"})
+    const response = await deleteAppointmentById(appointmentId);
+    if (response !== 1) return res.status(404).json({ message: "Wizyta z podanym id nie istnieje" });
+    return res.status(200).json({ message: "Wizyta została pomyślnie usunięta" });
   } catch (error) {
     console.log("Error deleting appointment");
     return res.status(500).json({ message: "Error deleting appointment" });
   }
 };
 
-export const generateWorkSchedule = async (
-  id,
-  searchMinutes,
-  searchHour,
-  day,
-  month,
-  year,
-  startWorkTime,
-  endWorkTime,
-  appointmentInterval
-) => {
+const generateWorkSchedule = async (id, searchMinutes, searchHour, day, month, year, startWorkTime, endWorkTime, appointmentInterval) => {
   const [startWorkHour, startWorkMinute] = startWorkTime.split(":").map(Number);
   const [endWorkHour, endWorkMinute] = endWorkTime.split(":").map(Number);
 
   //================
-  let date1 = "2024-10-09 08:29:53";
-  let date2 = "2024-10-09 15:29:53";
-  let date3 = "2024-12-09 14:30:00";
-  const reservedAppointments = reservedAppointmentsSchedule(await fetchAppointment(id, date1, date2)).map((date) => date.getTime());
+  // let date1 = "2024-10-09 08:29:53";
+  // let date2 = "2024-10-09 15:29:53";
+  // let date3 = "2024-12-09 14:30:00";
+  const startReservedAppointmentsDate = `${year}-${month + 1}-${day.toString().padStart(2, "0")} 
+  ${searchHour.toString().padStart(2, "0")}:${searchMinutes.toString().padStart(2, "0")}`;
+
+  const endReservedAppointmentsDate = `${year}-${month + 1}-${day.toString().padStart(2, "0")} 
+  ${endWorkHour.toString().padStart(2, "0")}:${endWorkMinute.toString().padStart(2, "0")}`;
+  // console.log("DATA: ", date);
+  const reservedAppointments = reservedAppointmentsSchedule(
+    await fetchAppointment(id, startReservedAppointmentsDate, endReservedAppointmentsDate)
+  ).map((date) => date.getTime());
+  // console.log(reservedAppointments);
   // console.log("glowna funkcja", reservedAppointments);
   // const testWybranychWIzyt = reservedAppointmentsSchedule(await fetchAppointment(date1, date3));
   // console.log("wybrane wizyty ", testWybranychWIzyt);
