@@ -1,4 +1,14 @@
-import { fetchUser, deleteUser } from "../models/userModel.js";
+import {
+  fetchUser,
+  deleteUser,
+  updateUserProfile,
+  findUserByEmail,
+  findUserByPhoneNumber,
+  updateUserPassword,
+  findUserById,
+} from "../models/userModel.js";
+
+import { hashPassword } from "../utils/hashing.js";
 
 export const fetchUserById = async (req, res) => {
   const { id: userId } = req.params;
@@ -27,5 +37,30 @@ export const deleteUserById = async (req, res) => {
     return res.status(200).json({ message: "Uzytkownik zostal pomyslnie usuniety" });
   } catch (error) {
     return res.status(500).json({ message: "Error deleting user" });
+  }
+};
+
+export const updateProfile = async (req, res) => {
+  const { id: userId } = req.params;
+  let { email, phoneNumber } = req.body;
+
+  const userByEmail = await findUserByEmail(email);
+  const userByPhoneNumber = await findUserByPhoneNumber("+48", phoneNumber);
+
+  if (userByEmail !== undefined && userByPhoneNumber !== undefined && userByEmail.id === userByPhoneNumber.id) {
+    return res.status(400).json({ message: "Uzytkownik z podanym email'em i nr telefonu juz istnieje" });
+  } else if (userByEmail !== undefined && userByEmail.id != userId) {
+    return res.status(400).json({ message: "Podany email jest juz zajety przez innego uzytkownika" });
+  } else if (userByPhoneNumber !== undefined && userByPhoneNumber.id != userId) {
+    return res.status(400).json({ message: "Podany numer telefonu jest juz zajety przez innego uzytkownika" });
+  }
+
+  try {
+    const updatedProfile = await updateUserProfile(userId, email, phoneNumber);
+    if (!updatedProfile) return res.status(204).json({ message: "Dane nie zostaly zmieonione" });
+    return res.status(200).json({ message: "Dane uzytkownika zostaly zedytowane" });
+  } catch (error) {
+    console.log("Error updating profile", error.message);
+    return res.status(500).json({ message: "Blad podczas aktualizowania profilu" });
   }
 };
