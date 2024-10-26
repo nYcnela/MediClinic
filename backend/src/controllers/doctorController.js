@@ -5,7 +5,12 @@ import {
   fetchAllDoctors,
   fetchDoctor,
   fetchDoctorDegree,
+  fetchWorkDays,
+  addWorkDay,
+  updateWorkDay,
+  deleteWorkDay,
 } from "../models/doctorModel.js";
+import { findUserById } from "../models/userModel.js";
 import { formatPhoneNumber } from "../utils/formatters.js";
 import { generatePassword } from "../utils/generators.js";
 import { hashPassword } from "../utils/hashing.js";
@@ -93,7 +98,7 @@ export const fetchSpecializations = async (req, res) => {
     }
   } catch (error) {
     return res.status(500).json({
-      message: "Error fetching doctors' specializations",
+      message: "Blad podczas pobierania specjalizacji lekrzy",
     });
   }
 };
@@ -107,11 +112,11 @@ export const getDoctorBySpecializations = async (req, res) => {
       label: allDegrees.find((degree) => degree.id === doctor.degree_id).value + " " + doctor.name + " " + doctor.surname,
     }));
     if (!doctors) {
-      return res.status(404).json({ message: "Doctors with provided specializations do not exist" });
+      return res.status(404).json({ message: "Doktorzy z podana specjalizacja nie istnieja" });
     }
     return res.status(200).json({ doctors: doctors });
   } catch (error) {
-    return res.status(500).json({ message: "Error fetching doctors by specialization" });
+    return res.status(500).json({ message: "Blad podczas pobierania doktorow wyszukujac po specjalizacji" });
   }
 };
 
@@ -132,10 +137,10 @@ export const fetchDoctors = async (req, res) => {
     if (doctors.length > 0) {
       return res.status(200).json({ doctors: doctors });
     } else {
-      return res.status(200).json({ message: "No doctors found" });
+      return res.status(200).json({ message: "Nie znaleziono doktorow" });
     }
   } catch (error) {
-    return res.status(500).json({ message: "Error fetching doctors" });
+    return res.status(500).json({ message: "Blad podczas pobierania doktorow" });
   }
 };
 
@@ -158,10 +163,10 @@ export const fetchDoctorById = async (req, res) => {
     if (!!doctorData) {
       return res.status(200).json({ doctor: doctorData });
     } else {
-      return res.status(404).json({ message: "Doctor with provided id does not exist" });
+      return res.status(404).json({ message: "Doktor z podanym id nie istnieje" });
     }
   } catch (error) {
-    return res.status(500).json({ message: "Error fetching doctor" });
+    return res.status(500).json({ message: "Blad podczas pobierania doktora" });
   }
 };
 
@@ -171,6 +176,46 @@ export const getDoctorDegree = async (req, res) => {
     return res.status(200).json({ degrees: degrees });
   } catch {
     console.log("Error getting doctors' degree");
-    return res.status(500).json({ message: "Error getting doctors' degree" });
+    return res.status(500).json({ message: "Blad podczas pobierania tytulow doktorow" });
+  }
+};
+
+export const updateWorkHours = async (req, res) => {
+  try {
+    const { id: doctorId } = req.params;
+    const { workDays, workHours } = req.body;
+
+    const user = await findUserById(doctorId);
+    if (user === undefined) return res.status(404).json({ message: "Nie znaleziono uzytkownika!" });
+    else if (user.role !== "doctor") return res.status(404).json({ message: "Podany uzytkownik nie moze miec zmienionych godzin pracy" });
+
+    const oldWorkDays = (await fetchWorkDays(doctorId)).map((day) => day.work_day);
+    const newWorkDays = workDays.map((day) => day.value);
+    // console.log("stare dni pracy doktora: ", oldWorkDays);
+    // console.log("nowe dni pracy doktora: ", newWorkDays);
+
+    for (const day of oldWorkDays) {
+      if (!newWorkDays.includes(day)) {
+        // console.log("usuwany dzien: ", day);
+        const deleted = await deleteWorkDay(doctorId, day);
+      }
+    }
+
+    for (const day of newWorkDays) {
+      // console.log(chalk.yellow(day));
+      if (oldWorkDays.includes(day)) {
+        const { start: startTime, end: endTime } = workHours[day];
+        // console.log("dane do update'u", doctorId, day, startTime, endTime);
+        const updated = await updateWorkDay(doctorId, day, startTime, endTime);
+      } else {
+        const { start: startTime, end: endTime } = workHours[day];
+        // console.log("dane do dodanie", doctorId, day, startTime, endTime);
+        const added = await addWorkDay(doctorId, day, startTime, endTime);
+      }
+    }
+    return res.status(200).json({ message: "Harmonogram zostal zmieniony" });
+  } catch (error) {
+    console.log("Error updating doctor's work hours", error.message);
+    return res.status(500).json({ message: "Blad podczas aktualizowania godzin pracy doktora" });
   }
 };

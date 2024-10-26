@@ -28,6 +28,10 @@ export const fetchUserById = async (req, res) => {
 
 export const deleteUserById = async (req, res) => {
   const { id: userId } = req.params;
+
+  const user = await findUserById(userId);
+  if (user === undefined) return res.status(404).json({ message: "Nie znaleziono uzytkownika!" });
+
   try {
     const deleted = await deleteUser(userId);
     // console.log("usuniety: ", deleted);
@@ -46,6 +50,9 @@ export const updateProfile = async (req, res) => {
 
   const userByEmail = await findUserByEmail(email);
   const userByPhoneNumber = await findUserByPhoneNumber("+48", phoneNumber);
+
+  const user = await findUserById(userId);
+  if (user === undefined) return res.status(404).json({ message: "Nie znaleziono uzytkownika!" });
 
   if (userByEmail !== undefined && userByPhoneNumber !== undefined && userByEmail.id === userByPhoneNumber.id) {
     return res.status(400).json({ message: "Uzytkownik z podanym email'em i nr telefonu juz istnieje" });
@@ -69,9 +76,9 @@ export const updatePassword = async (req, res) => {
   try {
     const { id: userId } = req.params;
     const { password } = req.body;
-    const user = await findUserById(userId);
 
-    if (user === undefined) return res.status(400).json({ message: "Podany uzytkownik nie istnieje!" });
+    const user = await findUserById(userId);
+    if (user === undefined) return res.status(404).json({ message: "Podany uzytkownik nie istnieje!" });
 
     const hashedPassword = await hashPassword(password);
     const updated = updateUserPassword(userId, hashedPassword);
