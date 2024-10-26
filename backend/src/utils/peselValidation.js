@@ -1,4 +1,4 @@
-export const isValidPesel = (pesel) => {
+export const isPeselValid = (pesel) => {
   const weights = [1, 3, 7, 9, 1, 3, 7, 9, 1, 3];
   let sum = 0;
 

@@ -7,6 +7,7 @@ import {
   fetchDoctorById,
   getDoctorDegree,
 } from "../controllers/doctorController.js";
+import { validateDoctorForm } from "../validators/doctorValidator.js";
 
 const router = express.Router();
 
@@ -15,6 +16,6 @@ router.get("/specializations", fetchSpecializations);
 router.get("/specializations/:specializationName", getDoctorBySpecializations);
 router.get("/list", fetchDoctors);
 router.get("/:id", fetchDoctorById);
-router.post("/add", addDoctor);
+router.post("/add", validateDoctorForm, addDoctor);
 
 export default router;

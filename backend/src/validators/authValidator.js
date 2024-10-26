@@ -1,5 +1,5 @@
 import { check, validationResult } from "express-validator";
-import { isValidPesel } from "../utils/peselValidation.js";
+import { isPeselValid } from "../utils/peselValidation.js";
 
 export const validateLogin = [
   //email to username
@@ -52,7 +52,7 @@ export const validateRegister = [
     .matches(/^\d+$/)
     .withMessage("Wprowadzony pesel zawiera inne znaki niż cyfry!")
     .custom((pesel) => {
-      if (!isValidPesel(pesel)) {
+      if (!isPeselValid(pesel)) {
         throw new Error("Wprowadzony pesel nie jest poprawny!");
       }
       return true;
@@ -80,7 +80,7 @@ export const validateRegister = [
 
   (req, res, next) => {
     const errors = validationResult(req);
-    console.log(errors);
+    // console.log(errors);
     if (!errors.isEmpty()) {
       return res.status(400).json({ message: "Wprowadz poprawne dane aby sie zarejestrowac!" });
     }

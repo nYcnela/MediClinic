@@ -53,7 +53,7 @@ export const registerDoctorTransaction = async (userData, doctorData, specializa
     for (const specialization of specializations) {
       // console.log(specialization);
       try {
-        console.log(userId, specialization.value);
+        console.log("Doctor:" + userId, "specialization id: ", specialization.value);
         await client.query(insertSpecializationsQuery, [userId, `${specialization.value}`]);
       } catch (error) {
         throw new Error("Failed to insert specialization");
@@ -144,7 +144,7 @@ export const fetchAllDoctors = async () => {
     // "SELECT d.user_id AS id, d.degree AS label, u.name, u.surname FROM users as u JOIN doctors as d ON u.id = d.user_id WHERE u.role = 'doctor'";
     const query =
       "SELECT d.user_id AS id, d.degree_id, u.name, u.surname FROM users as u JOIN doctors as d ON u.id = d.user_id WHERE u.role = 'doctor'";
-      const doctors = await client.query(query);
+    const doctors = await client.query(query);
     return doctors.rows;
   } catch (error) {
     console.log("Error selecting all doctors");
