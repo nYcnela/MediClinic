@@ -174,3 +174,18 @@ export const updateUserProfile = async (userId, email, phoneNumber) => {
     client.release();
   }
 };
+
+export const updateUserPassword = async (userId, password) => {
+  const client = await db.connect();
+  try {
+    const query = "UPDATE users SET password = $1 WHERE id = $2";
+    const response = await client.query(query, [password, userId]);
+    
+    return response.rowCount;
+  } catch (error) {
+    console.log("Error updating user password", error.message);
+    throw error;
+  } finally {
+    client.release();
+  }
+};

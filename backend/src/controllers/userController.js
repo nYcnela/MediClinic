@@ -64,3 +64,22 @@ export const updateProfile = async (req, res) => {
     return res.status(500).json({ message: "Blad podczas aktualizowania profilu" });
   }
 };
+
+export const updatePassword = async (req, res) => {
+  try {
+    const { id: userId } = req.params;
+    const { password } = req.body;
+    const user = await findUserById(userId);
+
+    if (user === undefined) return res.status(400).json({ message: "Podany uzytkownik nie istnieje!" });
+
+    const hashedPassword = await hashPassword(password);
+    const updated = updateUserPassword(userId, hashedPassword);
+    if (!updated) return res.status(204).json({ message: "Haslo nie zostalo zmienione" });
+
+    return res.status(200).json({ message: "Haslo zostalo pomyslnie zmienione" });
+  } catch (error) {
+    console.log("Error updating password", error.message);
+    return res.status(500).json({ message: "Blad podczas aktualizacji hasla" });
+  }
+};
