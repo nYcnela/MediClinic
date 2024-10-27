@@ -75,7 +75,7 @@ export const registerUserTransaction = async (userdata, role, externalClient = n
 export const fetchUser = async (userId) => {
   const client = await db.connect();
   try {
-    const query = "SELECT id, name, surname FROM users WHERE id = $1";
+    const query = "SELECT id, name, surname, email, phone_number AS phoneNumber FROM users WHERE id = $1";
     const user = await client.query(query, [userId]);
     return user.rows[0];
   } catch (error) {
@@ -90,7 +90,7 @@ export const fetchUser = async (userId) => {
  *
  * @param {string} email - user's email adress
  * @param {Object} [client = db] - the data base connection client used to execute the query. defaults to the global 'db' client
- * @returns {Promise<Object>|null} return user's data if found
+ * @returns {Promise<Object>|undefined} return user's data if found
  */
 export const findUserByEmail = async (email, client = db) => {
   try {
@@ -107,7 +107,7 @@ export const findUserByEmail = async (email, client = db) => {
  *
  * @param {string} pesel - user's PESEL
  * @param {Object} [client = db] - the data base connection client used to execute the query. defaults to the global 'db' client
- * @returns {Promise<Object>|null} return user's data if found
+ * @returns {Promise<Object>|undefined} return user's data if found
  */
 export const findUserByPesel = async (pesel, client = db) => {
   try {
@@ -124,7 +124,7 @@ export const findUserByPesel = async (pesel, client = db) => {
  * @param {string} dialing_code - user's dialing code
  * @param {string} number - user's phone number
  * @param {Object} [client = db] - the data base connection client used to execute the query. defaults to the global 'db' client
- * @returns {Promise<Object>|null} return user's data if found
+ * @returns {Promise<Object>|undefined} return user's data if found
  */
 export const findUserByPhoneNumber = async (dialing_code, number, client = db) => {
   try {
@@ -136,6 +136,17 @@ export const findUserByPhoneNumber = async (dialing_code, number, client = db) =
   }
 };
 
+export const findUserById = async (id, client = db) => {
+  try {
+    const query = "SELECT * FROM users WHERE id = $1";
+    const result = await client.query(query, [id]);
+    return result.rows[0];
+  } catch (error) {
+    console.log("Error finding user by id", error.message);
+    throw error;
+  }
+};
+
 export const deleteUser = async (userId) => {
   const client = await db.connect();
   try {
@@ -144,6 +155,35 @@ export const deleteUser = async (userId) => {
     return response.rowCount;
   } catch (error) {
     console.log("Error deleting user", error.message);
+    throw error;
+  } finally {
+    client.release();
+  }
+};
+
+export const updateUserProfile = async (userId, email, phoneNumber) => {
+  const client = await db.connect();
+  try {
+    const query = "UPDATE users SET email = $1, phone_number = $2 WHERE id = $3";
+    const response = await client.query(query, [email, phoneNumber, userId]);
+    return response.rowCount;
+  } catch (error) {
+    console.log("Error updating user profile", error.message);
+    throw error;
+  } finally {
+    client.release();
+  }
+};
+
+export const updateUserPassword = async (userId, password) => {
+  const client = await db.connect();
+  try {
+    const query = "UPDATE users SET password = $1 WHERE id = $2";
+    const response = await client.query(query, [password, userId]);
+    
+    return response.rowCount;
+  } catch (error) {
+    console.log("Error updating user password", error.message);
     throw error;
   } finally {
     client.release();

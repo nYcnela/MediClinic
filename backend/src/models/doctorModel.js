@@ -12,7 +12,7 @@ export const createNewDoctor = async (doctorData, client) => {
   const { userId, pwz, sex, degree } = doctorData;
   try {
     const values = [userId, pwz, sex, degree];
-    const query = "INSERT INTO doctors (user_id, pwz, sex, degree) VALUES ($1, $2, $3, $4) RETURNING id";
+    const query = "INSERT INTO doctors (user_id, pwz, sex, degree_id) VALUES ($1, $2, $3, $4) RETURNING id";
     const result = await client.query(query, values);
     return result.rows[0].id;
   } catch (error) {
@@ -53,6 +53,7 @@ export const registerDoctorTransaction = async (userData, doctorData, specializa
     for (const specialization of specializations) {
       // console.log(specialization);
       try {
+        console.log("Doctor:" + userId, "specialization id: ", specialization.value);
         await client.query(insertSpecializationsQuery, [userId, `${specialization.value}`]);
       } catch (error) {
         throw new Error("Failed to insert specialization");
@@ -66,11 +67,13 @@ export const registerDoctorTransaction = async (userData, doctorData, specializa
         endTime: workHours[value].end,
       };
     });
-    const insertDayOfWorkQuery = "INSERT INTO doctor_work_schedule (doctor_id, work_day, start_time, end_time) VALUES ($1, $2, $3, $4)";
+    //todo
+    // const insertDayOfWorkQuery = "INSERT INTO doctor_work_schedule (doctor_id, work_day, start_time, end_time) VALUES ($1, $2, $3, $4)";
     for (const dayOfWork of workDaysHoursMap) {
       try {
         const { day, startTime, endTime } = dayOfWork;
-        await client.query(insertDayOfWorkQuery, [userId, day, startTime, endTime]);
+        await addWorkDay(userId, day, startTime, endTime, client);
+        // await client.query(insertDayOfWorkQuery, [userId, day, startTime, endTime]);
       } catch (error) {
         throw new Error("Failed to insert work day");
       }
@@ -120,7 +123,7 @@ export const fetchDoctorBySpecializations = async (specialization) => {
   const client = await db.connect();
   try {
     const query =
-      "SELECT u.id, d.degree, u.name, u.surname FROM users AS u JOIN doctors AS d ON u.id = d.user_id JOIN doctor_specializations AS ds ON ds.doctor_id = d.user_id JOIN specializations AS sp ON sp.id = ds.specialization_id WHERE sp.name = $1";
+      "SELECT u.id, d.degree_id, u.name, u.surname FROM users AS u JOIN doctors AS d ON u.id = d.user_id JOIN doctor_specializations AS ds ON ds.doctor_id = d.user_id JOIN specializations AS sp ON sp.id = ds.specialization_id WHERE sp.name = $1";
     const response = await client.query(query, [specialization]);
     return response.rows;
   } catch (error) {
@@ -140,8 +143,9 @@ export const fetchDoctorBySpecializations = async (specialization) => {
 export const fetchAllDoctors = async () => {
   const client = await db.connect();
   try {
+    // "SELECT d.user_id AS id, d.degree AS label, u.name, u.surname FROM users as u JOIN doctors as d ON u.id = d.user_id WHERE u.role = 'doctor'";
     const query =
-      "SELECT d.user_id AS id, d.degree AS label, u.name, u.surname FROM users as u JOIN doctors as d ON u.id = d.user_id WHERE u.role = 'doctor'";
+      "SELECT d.user_id AS id, d.degree_id, u.name, u.surname FROM users as u JOIN doctors as d ON u.id = d.user_id WHERE u.role = 'doctor'";
     const doctors = await client.query(query);
     return doctors.rows;
   } catch (error) {
@@ -164,7 +168,7 @@ export const fetchDoctor = async (doctorId, getSpecializations) => {
   try {
     let response;
     const doctorQuery =
-      "SELECT d.user_id AS id, d.degree AS label, u.name, u.surname FROM users as u JOIN doctors as d ON u.id = d.user_id WHERE u.id = $1";
+      "SELECT d.user_id AS id, d.degree_id, u.name, u.surname FROM users as u JOIN doctors as d ON u.id = d.user_id WHERE u.id = $1";
     const doctor = await client.query(doctorQuery, [doctorId]);
     response = { ...doctor.rows[0] };
     if (getSpecializations) {
@@ -176,6 +180,74 @@ export const fetchDoctor = async (doctorId, getSpecializations) => {
     return response;
   } catch (error) {
     console.log("Error selecting doctor by id: ", error);
+    throw error;
+  } finally {
+    client.release();
+  }
+};
+
+export const fetchDoctorDegree = async () => {
+  const client = await db.connect();
+  try {
+    const query = "SELECT * FROM doctor_degree";
+    const response = await client.query(query);
+    // console.log(response.rows);
+    return response.rows;
+  } catch (error) {
+    console.log("Error fetching doctors' degree");
+    throw error;
+  } finally {
+    client.release();
+  }
+};
+
+export const fetchWorkDays = async (doctorId) => {
+  const client = await db.connect();
+  try {
+    const query = "SELECT work_day FROM doctor_work_schedule WHERE doctor_id = $1";
+    const response = await client.query(query, [doctorId]);
+    return response.rows;
+  } catch (error) {
+    console.log("Error fetching doctor's work day", error.message);
+    throw error;
+  } finally {
+    client.release();
+  }
+};
+
+export const addWorkDay = async (doctorId, workDay, startTime, endTime, client = db) => {
+  try {
+    const query = "INSERT INTO doctor_work_schedule (doctor_id, work_day, start_time, end_time) VALUES ($1, $2, $3, $4)";
+    const response = await client.query(query, [doctorId, workDay, startTime, endTime]);
+    return response.rowCount;
+  } catch (error) {
+    console.log("Error adding doctor's work day", error.message);
+    throw error;
+  }
+};
+
+export const updateWorkDay = async (doctorId, workDay, startTime, endTime) => {
+  const client = await db.connect();
+  try {
+    const query = "UPDATE doctor_work_schedule SET start_time = $3, end_time = $4 WHERE doctor_id = $1 AND work_day = $2";
+    const response = await client.query(query, [doctorId, workDay, startTime, endTime]);
+    return response.rowCount;
+  } catch (error) {
+    console.log("Error updating doctor's work day", error.message);
+    throw error;
+  } finally {
+    client.release();
+  }
+};
+
+export const deleteWorkDay = async (doctorId, workDay) => {
+  const client = await db.connect();
+  try {
+    const query = "DELETE FROM doctor_work_schedule WHERE doctor_id = $1 AND work_day = $2";
+    const response = await client.query(query, [doctorId, workDay]);
+    return response.rowCount;
+  } catch (error) {
+    console.log("Error deleting doctor's work day", error.message);
     throw error;
   } finally {
     client.release();
