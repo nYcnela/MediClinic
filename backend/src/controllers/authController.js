@@ -82,7 +82,7 @@ export const registerUser = async (req, res) => {
  */
 export const login = async (req, res) => {
   const { username: email, password } = req.body;
-  // console.log(req.body);
+   console.log(req.body);
   try {
     let user = await findUserByEmail(email);
     // console.log(user);

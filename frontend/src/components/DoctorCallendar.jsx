@@ -5,6 +5,8 @@ import interactionPlugin from "@fullcalendar/interaction"; // Interakcje użytko
 import { calendarViews } from "../assets/calendarSettings";
 import { useState } from "react";
 import DeleteAppointmentModal from "./DeleteAppointmentModal";
+
+
 const DoctorCallendar = () => {
   const [isModalOpen,setIsModalOpen] = useState(false);
   const [events, setEvents] = useState([
@@ -25,6 +27,7 @@ const DoctorCallendar = () => {
       setEvents([...events, { title: newEventTitle, date: arg.dateStr }]);
     }
   };
+  
   function handleEventClick(clickInfo) {
     setIsModalOpen(true);
   }
