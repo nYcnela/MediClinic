@@ -11,6 +11,7 @@ import AppointmentConfirmation from "./pages/AppointmentConfirmation.jsx";
 import PacientProfilePage from "./pages/PacientProfilePage.jsx";
 import DoctorProfilePage from "./pages/DoctorProfilePage.jsx";
 import Login from "./pages/Login.jsx";
+import RequireAuth from "./components/RequireAuth.jsx";
 
 const ROLES = {
   User: 2001,
@@ -66,6 +67,11 @@ function App() {
         <Route path="/" element={<Home/>} />
         <Route path="/unauthorized" element={<Unauthorized/>} />
 
+
+
+        <Route element={<RequireAuth allowedRoles={[ROLES.User]} />}>
+          <Route path="/profile" element={<PacientProfilePage />} />
+        </Route>
         {/* we want to protect these routes 
             
         <Route element={<RequireAuth allowedRoles={[ROLES.User]} />}>
