@@ -45,10 +45,23 @@ CREATE TABLE doctors (
     user_id INT REFERENCES users(id) ON DELETE CASCADE,
     pwz VARCHAR(7) NOT NULL,
     sex VARCHAR(5) NOT NULL,
-    degree VARCHAR(100) NOT NULL,
+    degree_id INT REFERENCES doctor_degree(id) ON DELETE NULL,
     must_change_password BOOLEAN NOT NULL DEFAULT 'true',
     CONSTRAINT unique_user_id UNIQUE (user_id)
 );
+
+CREATE TABLE doctor_degree(
+	id SERIAL PRIMARY KEY,
+	value VARCHAR(70) UNIQUE NOT NULL,
+	label VARCHAR (100) UNIQUE NOT NULL
+);
+
+INSERT INTO doctor_degree (value, label) VALUES 
+	('dr n. med.', 'Doktor nauk medycznych'),
+	('dr hab. n. med.', 'Doktor habilitowany nauk medycznych'),
+	('prof. dr hab. n. med.', 'Profesor doktor habilitowany nauk medycznych'),
+	('lek.', 'Lekarz'),
+	('lek. dent.', 'Lekarz dentysta');
 
 CREATE TABLE specializations (
     id SERIAL PRIMARY KEY,
@@ -120,6 +133,7 @@ CREATE TABLE work_days_exceptions (
     CONSTRAINT unique_schedule_exception UNIQUE (schedule_id, exception_date)
 );
 
+--tutaj jeszcze nalozyc ogarniczenie ze doctor_id i user_id sa unikanle bo doktor ma id w bazie user zeby sam nie do siebie na wizyte nie mgol umowuc
 CREATE TABLE appointments (
     id SERIAL PRIMARY KEY,
     doctor_id INT REFERENCES doctors(user_id) ON DELETE CASCADE,
@@ -136,3 +150,9 @@ SELECT u.id, d.degree AS label, u.name, u.surname
 FROM users as u 
 JOIN doctors as d ON u.id = d.user_id
 WHERE u.role = 'doctor';
+
+SELECT d.degree, u.name, u.surname FROM users AS u
+JOIN doctors AS d ON u.id = d.user_id
+JOIN doctor_specializations AS ds ON ds.doctor_id = d.user_id
+JOIN specializations AS sp ON sp.id = ds.specialization_id
+WHERE sp.name = 'Chirurg';

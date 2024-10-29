@@ -1,4 +1,6 @@
 import { check, validationResult } from "express-validator";
+import { validatePhoneNumber } from "../utils/phoneNumberValidator.js"
+
 
 export const validateEmailAndPhoneNumber = [
   check("email")
@@ -12,8 +14,7 @@ export const validateEmailAndPhoneNumber = [
   check("phoneNumber")
     .notEmpty()
     .withMessage("Wprowadz numer telefonu!")
-    .isLength({ min: 9, max: 13 })
-    .withMessage("Wprowadzony numer telefonu nie jest poprawny!"),
+    .custom((fullPhoneNumber) => validatePhoneNumber(fullPhoneNumber)),
 
   (req, res, next) => {
     const errors = validationResult(req);

@@ -7,7 +7,7 @@ import {
   updateUserPassword,
   findUserById,
 } from "../models/userModel.js";
-
+import { formatPhoneNumber } from "../utils/formatters.js"
 import { hashPassword } from "../utils/hashing.js";
 
 export const fetchUserById = async (req, res) => {
@@ -46,10 +46,12 @@ export const deleteUserById = async (req, res) => {
 
 export const updateProfile = async (req, res) => {
   const { id: userId } = req.params;
-  let { email, phoneNumber } = req.body;
+  let { email, phoneNumber : fullPhoneNumber } = req.body;
 
+  const { dialingCode, phoneNumber } = await formatPhoneNumber(fullPhoneNumber);
+  // console.log(dialingCode, " i ", phoneNumber);
   const userByEmail = await findUserByEmail(email);
-  const userByPhoneNumber = await findUserByPhoneNumber("+48", phoneNumber);
+  const userByPhoneNumber = await findUserByPhoneNumber(dialingCode, phoneNumber);
 
   const user = await findUserById(userId);
   if (user === undefined) return res.status(404).json({ message: "Nie znaleziono uzytkownika!" });
@@ -63,7 +65,7 @@ export const updateProfile = async (req, res) => {
   }
 
   try {
-    const updatedProfile = await updateUserProfile(userId, email, phoneNumber);
+    const updatedProfile = await updateUserProfile(userId, email, dialingCode, phoneNumber);
     if (!updatedProfile) return res.status(204).json({ message: "Dane nie zostaly zmieonione" });
     return res.status(200).json({ message: "Dane uzytkownika zostaly zedytowane" });
   } catch (error) {

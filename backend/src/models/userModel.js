@@ -161,11 +161,11 @@ export const deleteUser = async (userId) => {
   }
 };
 
-export const updateUserProfile = async (userId, email, phoneNumber) => {
+export const updateUserProfile = async (userId, email, dialingCode, phoneNumber) => {
   const client = await db.connect();
   try {
-    const query = "UPDATE users SET email = $1, phone_number = $2 WHERE id = $3";
-    const response = await client.query(query, [email, phoneNumber, userId]);
+    const query = "UPDATE users SET email = $1, dialing_code = $2, phone_number = $3 WHERE id = $4";
+    const response = await client.query(query, [email, dialingCode, phoneNumber, userId]);
     return response.rowCount;
   } catch (error) {
     console.log("Error updating user profile", error.message);
