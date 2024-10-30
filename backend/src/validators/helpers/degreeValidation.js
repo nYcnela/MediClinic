@@ -1,4 +1,4 @@
-import { fetchDoctorDegree } from "../models/doctorModel.js";
+import { fetchDoctorDegree } from "../../models/doctorModel.js";
 
 export const isDegreeValid = async (degreeId) => {
   try {

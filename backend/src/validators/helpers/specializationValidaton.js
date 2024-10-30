@@ -1,4 +1,4 @@
-import { fetchDoctorSpecializations } from "../models/doctorModel.js";
+import { fetchDoctorSpecializations } from "../../models/doctorModel.js";
 
 export const isSpecializationValid = async (specializationId) => {
   try {

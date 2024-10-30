@@ -1,5 +1,5 @@
 import { check, validationResult } from "express-validator";
-import { validatePhoneNumber } from "../utils/phoneNumberValidator.js"
+import { validatePhoneNumber } from "../validators/helpers/phoneNumberValidator.js"
 
 
 export const validateEmailAndPhoneNumber = [

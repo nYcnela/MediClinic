@@ -1,6 +1,6 @@
 import { check, validationResult } from "express-validator";
-import { isPeselValid } from "../utils/peselValidation.js";
-import { validatePhoneNumber } from "../utils/phoneNumberValidator.js"
+import { isPeselValid } from "../validators/helpers/peselValidation.js";
+import { validatePhoneNumber } from "../validators/helpers/phoneNumberValidator.js"
 
 export const validateLogin = [
   //email to username

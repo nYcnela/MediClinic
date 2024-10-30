@@ -1,8 +1,8 @@
 import { check, validationResult } from "express-validator";
-import { isPeselValid } from "../utils/peselValidation.js";
-import { isSpecializationValid } from "../utils/specializationValidaton.js";
-import { isDegreeValid } from "../utils/degreeValidation.js";
-import { validatePhoneNumber } from "../utils/phoneNumberValidator.js";
+import { isPeselValid } from "../validators/helpers/peselValidation.js";
+import { isSpecializationValid } from "../validators/helpers/specializationValidaton.js";
+import { isDegreeValid } from "../validators/helpers/degreeValidation.js";
+import { validatePhoneNumber } from "../validators/helpers/phoneNumberValidator.js";
 
 export const validateDoctorForm = [
   check("name")
