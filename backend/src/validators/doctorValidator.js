@@ -1,52 +1,23 @@
 import { check, validationResult } from "express-validator";
-import { isPeselValid } from "../validators/helpers/peselValidation.js";
-import { isSpecializationValid } from "../validators/helpers/specializationValidaton.js";
-import { isDegreeValid } from "../validators/helpers/degreeValidation.js";
-import { validatePhoneNumber } from "../validators/helpers/phoneNumberValidator.js";
+import emailValidator from "./helpers/emailValidation.js";
+import peselValidator from "./helpers/peselValidation.js";
+import phoneNumberValidator from "./helpers/phoneNumberValidator.js";
+import workDaysValidator from "./helpers/workDaysValidation.js";
+import workHoursValidator from "./helpers/workHoursValidation.js";
+import degreeValidator from "../validators/helpers/degreeValidation.js";
+import specializationValidator from "../validators/helpers/specializationValidaton.js";
+import { nameValidator, surnameValidator } from "./helpers/nameValidators.js";
 
 export const validateDoctorForm = [
-  check("name")
-    .notEmpty()
-    .withMessage("Wprowadz imie!")
-    .matches(/^[a-zA-ZąćęłńóśźżĄĆĘŁŃÓŚŹŻ]+$/)
-    .withMessage("Pole moze zawierac tylko litery!")
-    .isLength({ min: 2 })
-    .withMessage("Imie musi skladac sie z wiecej niz jednej litery!"),
+  nameValidator(),
 
-  check("surname")
-    .notEmpty()
-    .withMessage("Wprowadz nazwisko!")
-    .matches(/^[a-zA-ZąćęłńóśźżĄĆĘŁŃÓŚŹŻ]+$/)
-    .withMessage("Pole moze zawierac tylko litery!")
-    .isLength({ min: 2 })
-    .withMessage("Nazwisko musi skladac sie z wiecej niz jednej litery!"),
+  surnameValidator(),
 
-  check("pesel")
-    .notEmpty()
-    .withMessage("Wprowadz pesel!")
-    .isLength({ min: 11, max: 11 })
-    .withMessage("Wprowadzony pesel nie jest poprawny!")
-    .matches(/^\d+$/)
-    .withMessage("Wprowadzony pesel zawiera inne znaki niż cyfry!")
-    .custom((pesel) => {
-      if (!isPeselValid(pesel)) {
-        throw new Error("Wprowadzony pesel nie jest poprawny!");
-      }
-      return true;
-    }),
+  peselValidator(),
 
-  check("email")
-    .notEmpty()
-    .withMessage("Nie wprowadzono email'a!")
-    .matches(
-      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-    )
-    .withMessage("Wprowadzony email nie jest poprawny!"),
+  emailValidator("email"),
 
-  check("phoneNumber")
-    .notEmpty()
-    .withMessage("Wprowadz numer telefonu!")
-    .custom((fullPhoneNumber) => validatePhoneNumber(fullPhoneNumber)),
+  phoneNumberValidator(),
 
   check("pwz")
     .notEmpty()
@@ -56,45 +27,13 @@ export const validateDoctorForm = [
     .isNumeric()
     .withMessage("Numer pwz moze zawierac tylko cyfry!"),
 
-  check("degree")
-    .custom(async (degree) => {
-      const isValid = await isDegreeValid(degree);
-      if (!isValid) {
-        throw new Error("Wprowadzono niepoprawny stopien naukowy!");
-      }
-      return true;
-    })
-    .withMessage("Wprowadzono niepoprawny stopien naukowy!"),
+  degreeValidator(),
 
-  check("specialization")
-    .custom(async (specializationsArr) => {
-      for (const specialization of specializationsArr) {
-        const isValid = await isSpecializationValid(specialization.value);
-        if (!isValid) {
-          throw new Error("Podano niepoprawna specjalizacje!");
-        }
-      }
-      return true;
-    })
-    .withMessage("Podano niepoprawna specjalizacje!"),
+  specializationValidator(),
 
-  check("workDays")
-    .custom((workDays) => {
-      const validDays = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
-      return workDays.every((day) => validDays.includes(day.value));
-    })
-    .withMessage("Nie wprowadzono poprawnego dnia pracy"),
+  workDaysValidator(),
 
-  check("workHours")
-    .custom((workHours) => {
-      for (const day in workHours) {
-        const { start, end } = workHours[day];
-        if (start && !/^\d{2}:\d{2}$/.test(start)) return false;
-        if (end && !/^\d{2}:\d{2}$/.test(end)) return false;
-      }
-      return true;
-    })
-    .withMessage("Niepoprawny format wprowadzonych godzin pracy"),
+  workHoursValidator(),
 
   (req, res, next) => {
     const errors = validationResult(req);

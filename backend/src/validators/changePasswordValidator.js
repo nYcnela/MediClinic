@@ -1,11 +1,9 @@
 import { check, validationResult } from "express-validator";
+import passwordValidator from "./helpers/passwordValidation.js";
+
 
 export const validatePassword = [
-  check("password")
-    .notEmpty()
-    .withMessage("Nie wprowadzono hasla!")
-    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/)
-    .withMessage("Wprowadzone hasło nie jest poprawne!"),
+  passwordValidator(),
 
   (req, res, next) => {
     const errors = validationResult(req);

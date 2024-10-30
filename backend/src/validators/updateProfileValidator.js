@@ -1,20 +1,12 @@
 import { check, validationResult } from "express-validator";
-import { validatePhoneNumber } from "../validators/helpers/phoneNumberValidator.js"
+import emailValidator from "./helpers/emailValidation.js";
+import phoneNumberValidator from "./helpers/phoneNumberValidator.js";
 
 
 export const validateEmailAndPhoneNumber = [
-  check("email")
-    .notEmpty()
-    .withMessage("Nie wprowadzono email'a!")
-    .matches(
-      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-    )
-    .withMessage("Wprowadzony email nie jest poprawny!"),
+  emailValidator("email"),
 
-  check("phoneNumber")
-    .notEmpty()
-    .withMessage("Wprowadz numer telefonu!")
-    .custom((fullPhoneNumber) => validatePhoneNumber(fullPhoneNumber)),
+  phoneNumberValidator(),
 
   (req, res, next) => {
     const errors = validationResult(req);

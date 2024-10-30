@@ -1,23 +1,11 @@
 import { check, validationResult } from "express-validator";
+import workDaysValidator from "./helpers/workDaysValidation.js";
+import workHoursValidator from "./helpers/workHoursValidation.js";
 
 export const validateWorkHours = [
-  check("workDays")
-    .custom((workDays) => {
-      const validDays = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
-      return workDays.every((day) => validDays.includes(day.value));
-    })
-    .withMessage("Nie wprowadzono poprawnego dnia pracy"),
+  workDaysValidator(),
 
-  check("workHours")
-    .custom((workHours) => {
-      for (const day in workHours) {
-        const { start, end } = workHours[day];
-        if (start && !/^\d{2}:\d{2}$/.test(start)) return false;
-        if (end && !/^\d{2}:\d{2}$/.test(end)) return false;
-      }
-      return true;
-    })
-    .withMessage("Niepoprawny format wprowadzonych godzin pracy"),
+  workHoursValidator(),
 
   (req, res, next) => {
     const errors = validationResult(req);

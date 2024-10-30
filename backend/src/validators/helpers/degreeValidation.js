@@ -1,12 +1,13 @@
+import { check } from "express-validator";
 import { fetchDoctorDegree } from "../../models/doctorModel.js";
 
-export const isDegreeValid = async (degreeId) => {
-  try {
-    const degrees = await fetchDoctorDegree();
-    if (!degrees.some((degree) => degree.id === degreeId)) return false;
-    return true;
-  } catch (error) {
-    console.log("Error getting doctors' degree", error.message);
-    throw error;
-  }
+const degreeValidator = (fieldName = "degree") => {
+  return check(fieldName)
+    .custom(async (degree) => {
+      const degrees = await fetchDoctorDegree();
+      return degrees.some((deg) => deg.id === degree);
+    })
+    .withMessage("Wprowadzono niepoprawny stopien naukowy!");
 };
+
+export default degreeValidator;
