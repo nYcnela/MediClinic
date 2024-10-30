@@ -14,6 +14,7 @@ import { findUserById } from "../models/userModel.js";
 import { formatPhoneNumber } from "../utils/formatters.js";
 import { generatePassword } from "../utils/generators.js";
 import { hashPassword } from "../utils/hashing.js";
+import { getBirthDateFromPESEL, getGenderFromPESEL } from "../utils/peselUtils.js";
 import chalk from "chalk";
 
 /**
@@ -44,6 +45,9 @@ export const addDoctor = async (req, res) => {
   try {
     const { dialingCode, phoneNumber } = formatPhoneNumber(fullPhoneNumber);
 
+    const birthDay = getBirthDateFromPESEL(pesel);
+    const sex = getGenderFromPESEL(pesel)
+
     const password = generatePassword();
     const hashedPassword = await hashPassword(password);
 
@@ -54,12 +58,13 @@ export const addDoctor = async (req, res) => {
       email,
       dialingCode,
       phoneNumber,
+      sex,
+      birthDay,
       password: hashedPassword,
     };
 
     const doctorData = {
       pwz,
-      sex,
       degree,
     };
 

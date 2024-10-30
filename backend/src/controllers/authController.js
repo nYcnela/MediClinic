@@ -4,6 +4,7 @@ import { registerUserTransaction, findUserByEmail, findUserByPesel, findUserByPh
 import bycrypt from "bcrypt";
 import { formatPhoneNumber } from "../utils/formatters.js";
 import { hashPassword } from "../utils/hashing.js";
+import { getBirthDateFromPESEL, getGenderFromPESEL } from "../utils/peselUtils.js";
 
 env.config({ path: "./src/config/.env" });
 
@@ -30,6 +31,10 @@ export const generateToken = (user) => {
 export const registerUser = async (req, res) => {
   console.log(req.body);
   const { name, surname, pesel, email, phoneNumber: fullPhoneNumber, password } = req.body;
+
+  const birthDay = getBirthDateFromPESEL(pesel);
+  const sex = getGenderFromPESEL(pesel)
+
   const { dialingCode, phoneNumber } = formatPhoneNumber(fullPhoneNumber);
 
   try {
@@ -43,6 +48,8 @@ export const registerUser = async (req, res) => {
         dialingCode,
         phoneNumber,
         email,
+        sex,
+        birthDay,
         password: hashedPassword,
       },
       "user"
@@ -68,7 +75,7 @@ export const registerUser = async (req, res) => {
  */
 export const login = async (req, res) => {
   const { username: email, password } = req.body;
-   console.log(req.body);
+  //  console.log(req.body);
   try {
     let user = await findUserByEmail(email);
     if (user === undefined) return res.status(404).json({ message: "Wprowadzony uzytkownik nie jest zarejestrowany" });
@@ -78,9 +85,13 @@ export const login = async (req, res) => {
     if (user && checkPassword) {
       const token = generateToken({
         id: user.id,
+        name: user.name,
+        surname: user.surname,
         email: user.email,
+        birthDay: user.birth_date.toISOString().split('T')[0],
         role: user.role,
       });
+
       console.log("token: " + token);
       console.log("Login successful");
       return res.status(200).json({

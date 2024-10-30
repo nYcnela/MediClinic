@@ -14,17 +14,18 @@ import db from "../config/dbConnection.js";
  * @param {Object} client - the database connection client used to execute the query
  * @returns {Promise<number>} - Returns created user's ID, returns -1 if an error occurs
  */
-export const createNewUser = async (pesel, name, surname, email, dialingCode, phoneNumber, password, role, client) => {
+export const createNewUser = async (pesel, name, surname, email, sex, birthDay, dialingCode, phoneNumber, password, role, client) => {
   try {
-    const data = [role, pesel, name, surname, email, dialingCode, phoneNumber, password];
-    const query = `INSERT INTO users (role, pesel, name, surname, email, dialing_code, phone_number, password) VALUES($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`;
+    const data = [role, pesel, name, surname, email, sex, birthDay, dialingCode, phoneNumber, password];
+    const query = `INSERT INTO users (role, pesel, name, surname, email, sex, birth_date, dialing_code, phone_number, password) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id`;
     // console.log(data);
     // console.log(query);
     const result = await client.query(query, data);
     return result.rows[0].id;
   } catch (error) {
     console.log(`Error adding user to database: ${error.message}`);
-    return -1;
+    throw error
+    // return -1;
   }
 };
 
@@ -39,7 +40,7 @@ export const createNewUser = async (pesel, name, surname, email, dialingCode, ph
  * @returns {Promise<number>}  Returns created user's ID, returns -1 if an error occurs
  */
 export const registerUserTransaction = async (userdata, role, externalClient = null) => {
-  const { name, surname, pesel, email, dialingCode, phoneNumber, password } = userdata;
+  const { name, surname, pesel, dialingCode, phoneNumber, email, sex, birthDay, password } = userdata;
   let client = externalClient;
 
   try {
@@ -53,7 +54,7 @@ export const registerUserTransaction = async (userdata, role, externalClient = n
       throw new Error("User with this PESEL already exists");
     }
 
-    const result = await createNewUser(pesel, name, surname, email, dialingCode, phoneNumber, password, role, client);
+    const result = await createNewUser(pesel, name, surname, email, sex, birthDay, dialingCode, phoneNumber, password, role, client);
 
     if (!externalClient) {
       await client.query("COMMIT");

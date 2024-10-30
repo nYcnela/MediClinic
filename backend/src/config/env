@@ -1,7 +1,0 @@
-JWT_SECRET = "%7MzBe&ZeK1bJ7F4b"
-PG_USER="postgres"
-PG_HOST="localhost"
-PG_DATABASE="MediClinic"
-PG_PASSWORD="admin"
-PG_PORT="5432"
-

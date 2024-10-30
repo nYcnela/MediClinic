@@ -16,6 +16,8 @@ CREATE TABLE users (
     name VARCHAR(255) NOT NULL,
     surname VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
+    sex VARCHAR(5),
+    birth_date DATE,
     dialing_code VARCHAR(5) NOT NULL,
     phone_number VARCHAR(15) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
@@ -44,11 +46,11 @@ CREATE TABLE doctors (
     id SERIAL PRIMARY KEY,
     user_id INT REFERENCES users(id) ON DELETE CASCADE,
     pwz VARCHAR(7) NOT NULL,
-    sex VARCHAR(5) NOT NULL,
-    degree_id INT REFERENCES doctor_degree(id) ON DELETE NULL,
+    degree_id INT REFERENCES doctor_degree(id) ON DELETE SET NULL,
     must_change_password BOOLEAN NOT NULL DEFAULT 'true',
     CONSTRAINT unique_user_id UNIQUE (user_id)
 );
+
 
 CREATE TABLE doctor_degree(
 	id SERIAL PRIMARY KEY,

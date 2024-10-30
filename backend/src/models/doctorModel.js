@@ -11,8 +11,8 @@ import { registerUserTransaction } from "./userModel.js";
 export const createNewDoctor = async (doctorData, client) => {
   const { userId, pwz, sex, degree } = doctorData;
   try {
-    const values = [userId, pwz, sex, degree];
-    const query = "INSERT INTO doctors (user_id, pwz, sex, degree_id) VALUES ($1, $2, $3, $4) RETURNING id";
+    const values = [userId, pwz, degree];
+    const query = "INSERT INTO doctors (user_id, pwz, degree_id) VALUES ($1, $2, $3) RETURNING id";
     const result = await client.query(query, values);
     return result.rows[0].id;
   } catch (error) {
