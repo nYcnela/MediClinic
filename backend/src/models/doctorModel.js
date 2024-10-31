@@ -215,6 +215,20 @@ export const fetchWorkDays = async (doctorId) => {
   }
 };
 
+export const fetchWorkHours = async(doctorId) => {
+  const client = await db.connect();
+  try {
+    const query = "SELECT work_day, start_time, end_time FROM doctor_work_schedule WHERE doctor_id = $1";
+    const response = await client.query(query, [doctorId]);
+    return response.rows;
+  } catch (error) {
+    console.log("Error fetching doctor's work hours", error.message);
+    throw error;
+  } finally {
+    client.release();
+  }
+}
+
 export const addWorkDay = async (doctorId, workDay, startTime, endTime, client = db) => {
   try {
     const query = "INSERT INTO doctor_work_schedule (doctor_id, work_day, start_time, end_time) VALUES ($1, $2, $3, $4)";

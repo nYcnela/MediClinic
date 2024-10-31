@@ -9,12 +9,14 @@ import {
   addWorkDay,
   updateWorkDay,
   deleteWorkDay,
+  fetchWorkHours,
 } from "../models/doctorModel.js";
 import { findUserById } from "../models/userModel.js";
 import { formatPhoneNumber } from "../utils/formatters.js";
 import { generatePassword } from "../utils/generators.js";
 import { hashPassword } from "../utils/hashing.js";
 import { getBirthDateFromPESEL, getGenderFromPESEL } from "../utils/peselUtils.js";
+import { transformWorkDays, transformWorkHours } from "../utils/transformWorkDays.js";
 import { findUserByPesel } from "../models/userModel.js";
 import chalk from "chalk";
 
@@ -232,3 +234,17 @@ export const updateWorkHours = async (req, res) => {
     return res.status(500).json({ message: "Blad podczas aktualizowania godzin pracy doktora" });
   }
 };
+
+export const getDoctorWorkHours = async (req, res) => {
+  const { id: doctorId } = req.params;
+  try{
+    const workDays = await fetchWorkDays(doctorId);
+    const formattedWorkDays = transformWorkDays(workDays)
+    let daysHours = await fetchWorkHours(doctorId)
+    daysHours = transformWorkHours(daysHours)
+    return res.status(200).json({workDays: formattedWorkDays, workHours: daysHours})
+  }catch(error){
+    console.log("Error getting doctor's work hours", error.message);
+    return res.status(500).json({ message: "Blad podczas pobierania godzin pracy doktora" });
+  }
+}
