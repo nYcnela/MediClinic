@@ -5,6 +5,7 @@ import {
   createAppointmentTransaction,
   fetchAppointmentById,
   deleteAppointmentById,
+  fetchAppointmentByDate,
 } from "../models/appointmentModel.js";
 import { fetchDoctor, fetchDoctorDegree } from "../models/doctorModel.js";
 import { fetchUser } from "../models/userModel.js";
@@ -18,6 +19,11 @@ export const fetchAvailableAppointments = async (req, res) => {
     const daysOfWeek = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
 
     date = new Date(date);
+    const now = new Date();
+
+    if (date <= now) {
+      return res.status(400).json({ message: "Wizyta nie moze byc umowiona na przeszla date lub godzine!" });
+    }
 
     const day = date.getDay();
     const dayOfMonth = date.getDate();
@@ -27,6 +33,8 @@ export const fetchAvailableAppointments = async (req, res) => {
     const searchMinutes = date.getMinutes();
 
     const selectedDaySchedule = doctorSchedule.find((schedule) => schedule.work_day === daysOfWeek[day]);
+    if(selectedDaySchedule === undefined) return res.status(404).json({ message: "Wybrany specjalista nie pracuje w wybranym dniu" });
+    
     const { start_time, end_time, appointment_interval } = selectedDaySchedule;
     const schedule = await generateWorkSchedule(
       doctorId,
@@ -41,12 +49,12 @@ export const fetchAvailableAppointments = async (req, res) => {
     );
     // console.log(selectedDaySchedule);
     if (schedule.length === 0) {
-      return res.status(200).json({ message: "W wybrany dzień nie ma wolnych wizyt" });
+      return res.status(200).json({ message: "W wybrany dzien o wybranej godzinie badz pozniej nie ma wolnych wizyt!" });
     }
     return res.status(200).json({ availableAppointments: schedule });
   } catch (error) {
     console.log("Error fetching doctor's schedule", error.message);
-    return res.status(500).json({ message: "Error fetching doctor's schedule" });
+    return res.status(500).json({ message: "Blad podczas pobierania grafiku doktora" });
   }
 };
 
@@ -54,6 +62,9 @@ export const fetchBookedAppointments = async (req, res) => {
   try {
     const { id: doctorId } = req.params;
     const { startDate, endDate } = req.body;
+
+    const doctor = await fetchDoctor(doctorId);
+    if(Object.keys(doctor).length === 0 && doctor.constructor === Object) return res.status(404).json({message: "Nie znaleziono wybranego specjalisty!"})
     // console.log(startDate, endDate);
     // let date = new Date("Wed Oct 09 2024 08:16:54");
     // let date1 = "2024-10-09 08:00:00";
@@ -82,12 +93,12 @@ export const fetchBookedAppointments = async (req, res) => {
     );
     // console.log(appointments);
     if (appointments.length === 0) {
-      return res.status(200).json({ message: "W wybrany dzień nie ma umówionych wizyt" });
+      return res.status(200).json({ message: "W wybrany dzien nie ma umowionych wizyt" });
     }
     return res.status(200).json({ appointments: appointments });
   } catch (error) {
     console.log("Error fetching booked appointments", error.message);
-    return res.status(500).json({ message: "Error fetching booked appointments" });
+    return res.status(500).json({ message: "Blad podczas pobierania umowionych wizyt" });
   }
 };
 
@@ -115,11 +126,11 @@ export const getAppointment = async (req, res) => {
       })
     );
     // console.log(appointment);
-    if (!appointment) return res.status(404).json({ message: "Appointment with provided id does not exist" });
+    if (appointment.length === 0) return res.status(404).json({ message: "Wizyta z podanym id nie istnieje" });
     return res.status(200).json({ appointment: appointment });
   } catch (error) {
     console.log("Error fetching appointment by id");
-    return res.status(500).json({ message: "Error fetching appointment by id" });
+    return res.status(500).json({ message: "Blad podczas pobierania wizyty po id" });
   }
 };
 
@@ -130,12 +141,14 @@ export const createNewAppointment = async (req, res) => {
   //   userId = 1,
   //   appointmentTime = "2024-10-09 10:00:00";
   try {
+    const appointment = await fetchAppointmentByDate(appointmentTime, doctorId);
+    if(appointment.length !== 0) return res.status(400).json({message: "Wybrany termin jest juz zajety"})
     const appointmentId = await createAppointmentTransaction(doctorId, userId, appointmentTime);
     // console.log(response); //appointment id
-    return res.status(200).json({ message: "Wizyta została pomyślnie umówiona", appointmentId });
+    return res.status(200).json({ message: "Wizyta została pomyslnie umowiona", appointmentId });
   } catch (error) {
     console.log("Error creating new appointment");
-    return res.status(500).json({ message: "Error creating new appointment" });
+    return res.status(500).json({ message: "Blad podczas tworzenia wizyty" });
   }
 };
 
@@ -147,7 +160,7 @@ export const deleteAppointment = async (req, res) => {
     return res.status(200).json({ message: "Wizyta została pomyślnie usunięta" });
   } catch (error) {
     console.log("Error deleting appointment");
-    return res.status(500).json({ message: "Error deleting appointment" });
+    return res.status(500).json({ message: "Blad podczas usuwania wizyty" });
   }
 };
 

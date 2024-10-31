@@ -6,10 +6,11 @@ import {
   getAppointment,
   deleteAppointment,
 } from "../controllers/appointmentController.js";
+import validateNewAppointment from "../validators/newAppointmentValidator.js"
 
 const router = express.Router();
 
-router.post("/create", createNewAppointment);
+router.post("/create", validateNewAppointment, createNewAppointment);
 router.get("/schedule/:id", fetchAvailableAppointments);
 router.get("/booked/:id", fetchBookedAppointments);
 router.get("/:id", getAppointment);

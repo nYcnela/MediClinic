@@ -81,6 +81,27 @@ export const fetchAppointmentById = async (appointmentId) => {
   }
 };
 
+export const fetchAppointmentByDate = async (appointment_time, docotrId = null) => {
+  const client = await db.connect();
+  try {
+    let query;
+    let response;
+    if(!!docotrId){
+      query = "SELECT id, doctor_id, user_id, appointment_time from appointments WHERE appointment_time = $1 AND doctor_id = $2";
+      response = await client.query(query, [appointment_time, docotrId]);
+    }else{
+      query = "SELECT id, doctor_id, user_id, appointment_time from appointments WHERE appointment_time = $1";
+      response = await client.query(query, [appointment_time]);
+    }
+    // console.log("z bazki: ", response.rows);
+    return response.rows;
+  } catch (error) {
+    console.log("Error selecting appointment by appointment time");
+  } finally {
+    client.release();
+  }
+}
+
 export const deleteAppointmentById = async (appointmentId) => {
   const client = await db.connect()
   try{

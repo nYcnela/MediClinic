@@ -15,6 +15,7 @@ import { formatPhoneNumber } from "../utils/formatters.js";
 import { generatePassword } from "../utils/generators.js";
 import { hashPassword } from "../utils/hashing.js";
 import { getBirthDateFromPESEL, getGenderFromPESEL } from "../utils/peselUtils.js";
+import { findUserByPesel } from "../models/userModel.js";
 import chalk from "chalk";
 
 /**
@@ -41,7 +42,11 @@ import chalk from "chalk";
  */
 export const addDoctor = async (req, res) => {
   // console.log(req.body);
-  const { name, surname, pesel, email, phoneNumber: fullPhoneNumber, pwz, sex, degree, specialization, workDays, workHours } = req.body;
+  const { name, surname, pesel, email, phoneNumber: fullPhoneNumber, pwz, degree, specialization, workDays, workHours } = req.body;
+
+  const user = await findUserByPesel(pesel);
+  if(user !== undefined) return res.status(400).json({message: "Podany uzytkownik juz istnieje"})
+
   try {
     const { dialingCode, phoneNumber } = formatPhoneNumber(fullPhoneNumber);
 
@@ -116,7 +121,7 @@ export const getDoctorBySpecializations = async (req, res) => {
       value: doctor.id,
       label: allDegrees.find((degree) => degree.id === doctor.degree_id).value + " " + doctor.name + " " + doctor.surname,
     }));
-    if (!doctors) {
+    if (doctors.length === 0) {
       return res.status(404).json({ message: "Doktorzy z podana specjalizacja nie istnieja" });
     }
     return res.status(200).json({ doctors: doctors });
@@ -157,10 +162,13 @@ export const fetchDoctors = async (req, res) => {
  */
 export const fetchDoctorById = async (req, res) => {
   const { id: doctorId } = req.params;
-  const fetchSpecializations = req.query.specializations ? true : false;
-  const allDegrees = await fetchDoctorDegree();
   try {
+    const fetchSpecializations = req.query.specializations ? true : false;
+    const allDegrees = await fetchDoctorDegree();
+    
     const { id, degree_id, name, surname, specializations } = await fetchDoctor(doctorId, fetchSpecializations);
+    if(id === undefined) return res.status(404).json({message: "Specjalista z takim id nie istnieje!"})
+
     let doctorData = { value: id, label: allDegrees.find((degree) => degree.id === degree_id).value + " " + name + " " + surname };
     if (!!specializations) doctorData = { ...doctorData, specializations: specializations };
     // console.log(doctorData);

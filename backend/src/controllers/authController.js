@@ -29,8 +29,10 @@ export const generateToken = (user) => {
  *
  */
 export const registerUser = async (req, res) => {
-  console.log(req.body);
+  // console.log(req.body);
   const { name, surname, pesel, email, phoneNumber: fullPhoneNumber, password } = req.body;
+  const user = await findUserByPesel(pesel);
+  if(user !== undefined) return res.status(400).json({message: "Podany uzytkownik juz istnieje"})
 
   const birthDay = getBirthDateFromPESEL(pesel);
   const sex = getGenderFromPESEL(pesel)
