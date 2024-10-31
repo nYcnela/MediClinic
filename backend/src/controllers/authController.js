@@ -6,7 +6,12 @@ import { formatPhoneNumber } from "../utils/formatters.js";
 import { hashPassword } from "../utils/hashing.js";
 import { getBirthDateFromPESEL, getGenderFromPESEL } from "../utils/peselUtils.js";
 
-env.config({ path: "./src/config/.env" });
+import path from 'path';
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+env.config({ path: path.resolve(__dirname, './.env') });
 
 export const generateToken = (user) => {
   return jwt.sign(user, process.env.JWT_SECRET, { expiresIn: "1h" });
@@ -109,6 +114,21 @@ export const login = async (req, res) => {
     return res.status(500).json({ message: "Błąd serwera" });
   }
 };
+
+export const extendToken = (req, res) => {
+  const user = req.user;
+  const newToken = generateToken({
+    id: user.id,
+    name: user.name,
+    surname: user.surname,
+    email: user.email,
+    birthDay: user.birth_date,
+    role: user.role,
+  });
+
+  console.log("nowy token: " + newToken);
+  res.status(200).json({ token: newToken });
+}
 
 /**
  * Check if a user exists in the system by their PESEL, phone number or email

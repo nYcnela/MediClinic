@@ -14,7 +14,7 @@ app.use(cors())
 app.use(bodyParser.json())
 
 
-app.use("/", authRoutes) 
+app.use("/auth", authRoutes) 
 app.use("/doctor", doctorRoutes)
 app.use("/user", userRoutes)
 app.use("/appointment", appointmentRoutes)
