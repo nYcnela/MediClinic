@@ -5,17 +5,15 @@ import bycrypt from "bcrypt";
 import { formatPhoneNumber } from "../utils/formatters.js";
 import { hashPassword } from "../utils/hashing.js";
 import { getBirthDateFromPESEL, getGenderFromPESEL } from "../utils/peselUtils.js";
+import { generateToken } from "../utils/generators.js";
 
-import path from 'path';
-import { fileURLToPath } from 'url';
+import path from "path";
+import { fileURLToPath } from "url";
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-env.config({ path: path.resolve(__dirname, './.env') });
-
-export const generateToken = (user) => {
-  return jwt.sign(user, process.env.JWT_SECRET, { expiresIn: "1h" });
-};
+env.config({ path: path.resolve(__dirname, "./.env") });
 
 /**
  * Adds a new user to the system
@@ -37,10 +35,10 @@ export const registerUser = async (req, res) => {
   // console.log(req.body);
   const { name, surname, pesel, email, phoneNumber: fullPhoneNumber, password } = req.body;
   const user = await findUserByPesel(pesel);
-  if(user !== undefined) return res.status(400).json({message: "Podany uzytkownik juz istnieje"})
+  if (user !== undefined) return res.status(400).json({ message: "Podany uzytkownik juz istnieje" });
 
   const birthDay = getBirthDateFromPESEL(pesel);
-  const sex = getGenderFromPESEL(pesel)
+  const sex = getGenderFromPESEL(pesel);
 
   const { dialingCode, phoneNumber } = formatPhoneNumber(fullPhoneNumber);
 
@@ -90,16 +88,39 @@ export const login = async (req, res) => {
     const checkPassword = await bycrypt.compare(password, user.password);
 
     if (user && checkPassword) {
-      const token = generateToken({
-        id: user.id,
-        name: user.name,
-        surname: user.surname,
-        email: user.email,
-        birthDay: user.birth_date.toISOString().split('T')[0],
-        role: user.role,
+      const token = generateToken(
+        {
+          id: user.id,
+          name: user.name,
+          surname: user.surname,
+          email: user.email,
+          birthDay: user.birth_date.toISOString().split("T")[0],
+          role: user.role,
+        },
+        process.env.ACCESS_TOKEN_SECRET,
+        "1h"
+      );
+
+      const refreshToken = generateToken(
+        {
+          id: user.id,
+          name: user.name,
+          surname: user.surname,
+          email: user.email,
+          birthDay: user.birth_date.toISOString().split("T")[0],
+          role: user.role,
+        },
+        process.env.REFRESH_TOKEN_SECRET,
+        "24h"
+      );
+
+      res.cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        sameSite: "None",
+        maxAge: 24 * 60 * 60 * 1000,
       });
 
-      console.log("token: " + token);
+      // console.log("token: " + token);
       console.log("Login successful");
       return res.status(200).json({
         message: "Użytkownik został pomyślnie zalogowany",
@@ -115,20 +136,37 @@ export const login = async (req, res) => {
   }
 };
 
-export const extendToken = (req, res) => {
-  const user = req.user;
-  const newToken = generateToken({
-    id: user.id,
-    name: user.name,
-    surname: user.surname,
-    email: user.email,
-    birthDay: user.birth_date,
-    role: user.role,
-  });
+export const refreshToken = (req, res) => {
+  const refreshToken = req.cookies?.refreshToken;
 
-  console.log("nowy token: " + newToken);
-  res.status(200).json({ token: newToken });
-}
+  if (!refreshToken) {
+    return res.status(401).json({
+      message: "token nie istnieje lub jest niepoprawny",
+    });
+  }
+
+  try {
+    const verifiedRefreshToken = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+
+    const accessToken = jwt.sign(
+      {
+        id: verifiedRefreshToken.id,
+        name: verifiedRefreshToken.name,
+        surname: verifiedRefreshToken.surname,
+        email: verifiedRefreshToken.email,
+        birthDay: verifiedRefreshToken.birthDay,
+        role: verifiedRefreshToken.role,
+      },
+      process.env.ACCESS_TOKEN_SECRET,
+      { expiresIn: "1h" }
+    );
+
+    return res.status(200).json({ token: accessToken });
+  } catch (error) {
+    console.log("Error verifying refresh token: ", error.message);
+    return res.status(403).json({ message: "Refresh token jest niewazny" });
+  }
+};
 
 /**
  * Check if a user exists in the system by their PESEL, phone number or email

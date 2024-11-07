@@ -1,17 +1,24 @@
 import express from "express"
 import bodyParser from "body-parser";
+import cookieParser from "cookie-parser";
 import cors from "cors"
 import authRoutes from "./src/routes/authRoutes.js"
 import doctorRoutes from "./src/routes/doctorRoutes.js"
 import userRoutes from "./src/routes/userRoutes.js"
 import appointmentRoutes from "./src/routes/appointmentRoutes.js"
-import { jwtMiddleware, verifyAdmin } from "./src/middleware/authMiddleware.js"
+import { verifyAccessToken, verifyAdmin } from "./src/middleware/authMiddleware.js"
 
 const app = express()
 const port = 5000
 
-app.use(cors())
+app.use(
+    cors({
+      origin: "http://127.0.0.1:5173",
+      credentials: true,
+    })
+);
 app.use(bodyParser.json())
+app.use(cookieParser());
 
 
 app.use("/auth", authRoutes) 
