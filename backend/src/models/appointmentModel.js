@@ -86,10 +86,10 @@ export const fetchAppointmentByDate = async (appointment_time, docotrId = null) 
   try {
     let query;
     let response;
-    if(!!docotrId){
+    if (!!docotrId) {
       query = "SELECT id, doctor_id, user_id, appointment_time from appointments WHERE appointment_time = $1 AND doctor_id = $2";
       response = await client.query(query, [appointment_time, docotrId]);
-    }else{
+    } else {
       query = "SELECT id, doctor_id, user_id, appointment_time from appointments WHERE appointment_time = $1";
       response = await client.query(query, [appointment_time]);
     }
@@ -100,18 +100,46 @@ export const fetchAppointmentByDate = async (appointment_time, docotrId = null) 
   } finally {
     client.release();
   }
-}
+};
 
 export const deleteAppointmentById = async (appointmentId) => {
-  const client = await db.connect()
-  try{
-    const query = "DELETE FROM appointments WHERE id = $1"
-    const response = await client.query(query, [appointmentId])
-    return response.rowCount
-  }catch(error){
+  const client = await db.connect();
+  try {
+    const query = "DELETE FROM appointments WHERE id = $1";
+    const response = await client.query(query, [appointmentId]);
+    return response.rowCount;
+  } catch (error) {
     console.log("Error deleting appointment with provided id", error.message);
-    throw error
-  }finally{
-    client.release()
+    throw error;
+  } finally {
+    client.release();
   }
-}
+};
+
+export const fetchCompletedAppointments = async (date, userId) => {
+  const client = await db.connect();
+  try {
+    const query = "SELECT id, doctor_id, user_id, appointment_time FROM appointments WHERE appointment_time < $1 AND user_id = $2";
+    const response = await client.query(query, [date, userId]);
+    return response.rows;
+  } catch (error) {
+    console.log("Error selecting completed appointments with provided date and user id", error.message);
+    throw error;
+  } finally {
+    client.release();
+  }
+};
+
+export const fetchFutureAppointments = async (date, userId) => {
+  const client = await db.connect();
+  try {
+    const query = "SELECT id, doctor_id, user_id, appointment_time FROM appointments WHERE appointment_time >= $1 AND user_id = $2";
+    const response = await client.query(query, [date, userId]);
+    return response.rows;
+  } catch (error) {
+    console.log("Error selecting future appointments with provided date and user id", error.message);
+    throw error;
+  } finally {
+    client.release();
+  }
+};
