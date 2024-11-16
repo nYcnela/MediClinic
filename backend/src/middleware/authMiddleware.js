@@ -33,3 +33,16 @@ export const verifyAdmin = (req, res, next) => {
   }
   next();
 };
+
+export const authorizeUserOrAdmin = (req, res, next) => {
+  const { id: userIdFromToken, role: userRole } = req.user; 
+  const userIdFromUrl = parseInt(req.params.id, 10); 
+
+  if (userIdFromToken === userIdFromUrl || userRole === 'admin') {
+    return next(); 
+  }
+
+  return res.status(403).json({ message: 'Brak dostępu do tego zasobu' });
+};
+
+
