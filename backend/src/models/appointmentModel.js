@@ -116,28 +116,16 @@ export const deleteAppointmentById = async (appointmentId) => {
   }
 };
 
-export const fetchCompletedAppointments = async (date, userId) => {
+export const fetchUserAppointments = async (date, userId, time) => {
   const client = await db.connect();
   try {
-    const query = "SELECT id, doctor_id, user_id, appointment_time FROM appointments WHERE appointment_time < $1 AND user_id = $2";
-    const response = await client.query(query, [date, userId]);
+    const operator = time === "future" ? ">=" : "<";
+    const query = `SELECT a.id AS appointment_id, a.appointment_time, u.id AS user_id, u.name AS user_name, u.surname AS user_surname, d.id AS doctor_id, d.user_id AS doctor_user_id, du.name AS doctor_name, du.surname AS doctor_surname, d.pwz AS doctor_pwz, dd.value AS doctor_degree FROM appointments a JOIN doctors d ON a.doctor_id = d.user_id JOIN users u ON a.user_id = u.id JOIN users du ON d.user_id = du.id LEFT JOIN doctor_degree dd ON d.degree_id = dd.id WHERE a.user_id = $1 AND a.appointment_time ${operator} $2;`;
+    const response = await client.query(query, [userId, date]);
+    // console.log(response.rows);
     return response.rows;
   } catch (error) {
-    console.log("Error selecting completed appointments with provided date and user id", error.message);
-    throw error;
-  } finally {
-    client.release();
-  }
-};
-
-export const fetchFutureAppointments = async (date, userId) => {
-  const client = await db.connect();
-  try {
-    const query = "SELECT id, doctor_id, user_id, appointment_time FROM appointments WHERE appointment_time >= $1 AND user_id = $2";
-    const response = await client.query(query, [date, userId]);
-    return response.rows;
-  } catch (error) {
-    console.log("Error selecting future appointments with provided date and user id", error.message);
+    console.log(`Error selecting ${time === "future" ? "future" : "past"} appointments with provided date and user id`, error.message);
     throw error;
   } finally {
     client.release();
