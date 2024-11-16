@@ -26,7 +26,7 @@ export const verifyAccessToken = (req, res, next) => {
   }
 };
 
-export const verifyAdmin = (req, res, next) => {
+export const authorizeAdmin = (req, res, next) => {
   const userRole = req.user.role;
   if (userRole != "admin") {
     return res.status(403).json({ message: "Brak uprawnien do tego zasobu" });
@@ -45,4 +45,14 @@ export const authorizeUserOrAdmin = (req, res, next) => {
   return res.status(403).json({ message: 'Brak dostępu do tego zasobu' });
 };
 
+export const authorizeDoctorOrAdmin = (req, res, next) => {
+  const { id: doctorIdFromToken, role: userRole } = req.user; 
+  const doctorIdFromUrl = parseInt(req.params.id, 10); 
+
+  if (doctorIdFromToken === doctorIdFromUrl || userRole === 'admin') {
+    return next(); 
+  }
+
+  return res.status(403).json({ message: 'Brak dostępu do tego zasobu' });
+};
 
