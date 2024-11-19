@@ -4,10 +4,8 @@ import {validatePesel, validateName, validatePhoneNumber, validateEmail, validat
 import {doctorDegrees, doctorSpecializations, weekDays, genders } from "../assets/strings";
 import React,{useState, useEffect} from "react";
 import LabelSelectParagraph from "../components/LabelSelectParagraph";
-import LabelRadiosParagraph from "../components/LabelRadioParagraph"; 
 import NavBar from "../components/NavBar";
 import { createHoursWithStep } from "../functions/timeFunctions";
-
 import WorkHoursPicker from "../components/WorkHoursPicker";
 import RangePicker from "../components/RangePicker";
 
@@ -58,9 +56,6 @@ function AddDoctorForm(){
     const [workDaysError, setWorkDaysError] = useState("");
     const [workDaysStatus, setWorkDaysStatus] = useState(false);
     
-    const [sex, setSex] = useState("");
-    const [sexError, setSexError] = useState("");
-    const [sexStatus, setSexStatus] = useState(false);
 
     const [workHours, setWorkHours] = useState({
         monday: { start: "", end: "" },
@@ -80,7 +75,7 @@ function AddDoctorForm(){
 
         event.preventDefault();
         console.log(name,surname,phoneNumber,email,pesel,pwz,sex,degree, specialization,workDays,workHours)
-        sendDoctorData(name,surname,phoneNumber,email,pesel,pwz,sex,degree, specialization,workDays,workHours)
+        sendDoctorData(name,surname,phoneNumber,email,pesel,pwz,degree, specialization,workDays,workHours)
         
 
     };
@@ -137,18 +132,7 @@ function AddDoctorForm(){
                     setStatusMethod={setPwzStatus}
                 />
 
-                <LabelRadiosParagraph   
-                    id = "sex"
-                    options = {genders}      
-                    labelText = "Płeć: "     
-                    paragraphText=""
-                    setValue={setSex}
-                    value = {sex}
-                    validateMethod={validateSex}
-                    setErrorMethod={setSexError}
-                    setValueMethod={setSexError}
-
-                />
+                
                 
                 <LabelInputParagraph    
                     id = "phoneNumber"   

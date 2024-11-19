@@ -1,23 +1,39 @@
-import { Link } from "react-router-dom";
-import './NavBarr.css'
+import { Link } from 'react-router-dom';
+import { AppBar, Toolbar, Typography, Button, Box } from '@mui/material'; // Importowanie MUI komponentów
 
+function NavBar() {
+  return (
+    <AppBar position="sticky" color="primary">
+      <Toolbar sx={{ justifyContent: 'space-between' }}>
+        {/* Logo */}
+        <Typography variant="h6" component="div">
+          <Link to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
+            MediClinic
+          </Link>
+        </Typography>
 
-function NavBar(){
-    return(
-        <nav>
-            <ul dir = "rtl">
-                <li>
-                    <Link to= "/login">Login</Link>
-                </li>
-                <li>
-                    <Link to= "/register">Register</Link>
-                </li>
-                <li className="homeLogo">
-                    <Link to= "/">MediClinic</Link>
-                </li>
-            </ul>
-        </nav>
-    );
+        {/* Linki nawigacyjne */}
+        <Box>
+          <Button
+            component={Link}
+            to="/login"
+            color="inherit"
+            sx={{ marginLeft: 2 }}
+          >
+            Login
+          </Button>
+          <Button
+            component={Link}
+            to="/register"
+            color="inherit"
+            sx={{ marginLeft: 2 }}
+          >
+            Register
+          </Button>
+        </Box>
+      </Toolbar>
+    </AppBar>
+  );
 }
 
 export default NavBar;
