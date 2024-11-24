@@ -1,14 +1,14 @@
 import axios from 'axios';
     
 export async function sendCheckRequest(data,type,setError,setStatus){
-    const checkEndpoint = 'http://localhost:5000/check-user'
+    const checkEndpoint = 'http://localhost:5000/auth/check-user'
     try{
         const response = await axios.post(checkEndpoint, {
             data,
             type,
         });
         if(!response.data.exists){
-            setError("Dane są poprawne")
+            setError("")
             setStatus(true);
         }else{
             setError("Użytkownik o takim peselu widnieje już w bazie danych!")
@@ -23,7 +23,7 @@ export async function sendCheckRequest(data,type,setError,setStatus){
 
 export async function sendRegistrationData(name,surname, phoneNumber, email, pesel, password){
 
-    const registrationEndpoint = 'http://localhost:5000/register'
+    const registrationEndpoint = 'http://localhost:5000/auth/register'
 
     event.preventDefault();
         try{
@@ -41,7 +41,7 @@ export async function sendRegistrationData(name,surname, phoneNumber, email, pes
             }
 }
 
-export async function sendDoctorData(name,surname,phoneNumber,email,pesel,pwz,sex,degree, specialization,workDays,workHours){
+export async function sendDoctorData(name,surname,phoneNumber,email,pesel,pwz,degree, specialization,workDays,workHours){
 
     const endpoint = 'http://localhost:5000/doctor/add'
 
@@ -54,7 +54,6 @@ export async function sendDoctorData(name,surname,phoneNumber,email,pesel,pwz,se
                 email,
                 phoneNumber,
                 pwz,
-                sex,
                 degree, 
                 specialization,
                 workDays,

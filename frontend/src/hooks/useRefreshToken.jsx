@@ -1,7 +1,7 @@
 import axios from '../axios/axios';
 import useAuth from './useAuth';
 
-useRefreshToken = () => {
+const useRefreshToken = () => {
     const {setAuth} = useAuth();
 
     const refresh = async () => {

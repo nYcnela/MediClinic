@@ -2,14 +2,17 @@ import React, { useState,useRef } from "react";
 import LabelInputParagraph from "../components/LabelInputParagraph";
 import NavBar from "../components/NavBar";
 import Button from "../components/Button";
-import axios from "axios";
+import axios from "../axios/axios"
 import { useNavigate } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
+import { jwtDecode } from "jwt-decode";
+import useUserData from "../hooks/useUserData";
+import { upperCaseFirstLetter } from "../functions/stringFunctions";
 
-const LOGIN_URL = "/login";
+const LOGIN_URL = "/auth/login";
 
 function Login() {
-  const [username, setUsername] = useState("");
+  const [user, setUser] = useState("");
   const [password, setPassword] = useState("");
   const userRef = useRef();
   const errRef = useRef();
@@ -17,8 +20,11 @@ function Login() {
   const [error, setError] = useState(false);
   const [success, setSuccess] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
-  const { setAuth } = useAuth();
+  const { auth, setAuth } = useAuth();
+  const {setData} = useUserData();
+
   const navigate = useNavigate();
+
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -26,18 +32,24 @@ function Login() {
     setError(null);
 
     try {
-      const response = await axios.post("http://localhost:5000/login", {
-        username,
+      const response = await axios.post(LOGIN_URL, {
+        username: user,
         password,
       });
       console.log(response);
-      console.log(response?.data?.token);
       const token = response?.data?.token;
-      const roles = [2001];
-      setAuth({username, password, roles, token});
-      setUsername("");
+      const {email, iat, name, surname, birthDay, role} = jwtDecode(token);
+      const roles = [role];
+      setAuth({id, user, roles, token,iat});
+      setData({name: upperCaseFirstLetter(name), surname: upperCaseFirstLetter(surname), email, birthDay});
+      setUser("");
       setPassword("");
-      navigate('/profile')
+      if(roles.find((role => role === 'admin'))){
+        navigate('/admin-home');
+      }else{
+        navigate('/');
+      }
+      
     } catch (err) {
       if (!err?.response) {
         setErrorMsg("No Server Response");
@@ -52,17 +64,18 @@ function Login() {
   }
 
   return (
-    <section>
+    
+      <section>
       <p ref={errRef} className={errorMsg ? "errmsg" : "offscreen"} aria-live="assertive">{errorMsg}</p>
       <NavBar />
       <form onSubmit={handleSubmit}>
         <LabelInputParagraph
           id="username"
           type="text"
-          value={username}
-          labelText="Nazwa użytkownika"
+          value={user}
+          labelText="Login"
           paragraphText=""
-          setValueMethod={setUsername}
+          setValueMethod={setUser}
         />
         <LabelInputParagraph
           id="password"
@@ -75,7 +88,8 @@ function Login() {
         <Button type="submit" text="Zaloguj się" />
       </form>
     </section>
-  );
+    )
+
 }
 
 export default Login;

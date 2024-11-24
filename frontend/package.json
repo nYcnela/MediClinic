@@ -10,11 +10,16 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@emotion/react": "^11.13.3",
+    "@emotion/styled": "^11.13.0",
     "@fullcalendar/daygrid": "^6.1.15",
     "@fullcalendar/interaction": "^6.1.15",
     "@fullcalendar/react": "^6.1.15",
     "@fullcalendar/timegrid": "^6.1.15",
+    "@mui/icons-material": "^6.1.7",
+    "@mui/material": "^6.1.7",
     "axios": "^1.7.4",
+    "jwt-decode": "^4.0.0",
     "rc-time-picker": "^3.7.3",
     "react": "^18.3.1",
     "react-datepicker": "^7.3.0",
