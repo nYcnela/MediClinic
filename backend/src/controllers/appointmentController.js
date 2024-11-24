@@ -6,9 +6,10 @@ import {
   fetchAppointmentById,
   deleteAppointmentById,
   fetchAppointmentByDate,
+  fetchUserAppointments,
 } from "../models/appointmentModel.js";
 import { fetchDoctor, fetchDoctorDegree } from "../models/doctorModel.js";
-import { fetchUser } from "../models/userModel.js";
+import { fetchUser, findUserById } from "../models/userModel.js";
 
 export const fetchAvailableAppointments = async (req, res) => {
   try {
@@ -33,8 +34,8 @@ export const fetchAvailableAppointments = async (req, res) => {
     const searchMinutes = date.getMinutes();
 
     const selectedDaySchedule = doctorSchedule.find((schedule) => schedule.work_day === daysOfWeek[day]);
-    if(selectedDaySchedule === undefined) return res.status(404).json({ message: "Wybrany specjalista nie pracuje w wybranym dniu" });
-    
+    if (selectedDaySchedule === undefined) return res.status(404).json({ message: "Wybrany specjalista nie pracuje w wybranym dniu" });
+
     const { start_time, end_time, appointment_interval } = selectedDaySchedule;
     const schedule = await generateWorkSchedule(
       doctorId,
@@ -64,7 +65,8 @@ export const fetchBookedAppointments = async (req, res) => {
     const { startDate, endDate } = req.body;
 
     const doctor = await fetchDoctor(doctorId);
-    if(Object.keys(doctor).length === 0 && doctor.constructor === Object) return res.status(404).json({message: "Nie znaleziono wybranego specjalisty!"})
+    if (Object.keys(doctor).length === 0 && doctor.constructor === Object)
+      return res.status(404).json({ message: "Nie znaleziono wybranego specjalisty!" });
     // console.log(startDate, endDate);
     // let date = new Date("Wed Oct 09 2024 08:16:54");
     // let date1 = "2024-10-09 08:00:00";
@@ -134,6 +136,50 @@ export const getAppointment = async (req, res) => {
   }
 };
 
+export const getUserAppointments = async (req, res) => {
+  const { id: userId } = req.params;
+  try {
+    const user = await findUserById(userId);
+    if (!user || user.role === "doctor" || user.role === "admin") {
+      return res.status(404).json({ message: "Nie wprowadzono poprawnego uzytkownika" });
+    }
+
+    const currentDate = new Date();
+
+    const pastAppointments = await fetchUserAppointments(currentDate, userId, "past");
+    const upcomingAppointments = await fetchUserAppointments(currentDate, userId, "future");
+
+    const formatAppointments = (appointments) => {
+      return appointments.map((appointment) => {
+        const { day, month, year, hour, minutes } = getFormattedDate(appointment.appointment_time);
+        return {
+          id: appointment.appointment_id,
+          doctor: {
+            id: appointment.doctor_user_id,
+            degree: appointment.doctor_degree,
+            name: appointment.doctor_name,
+            surname: appointment.doctor_surname,
+            pwz: appointment.doctor_pwz,
+          },
+          user: {
+            id: appointment.user_id,
+            name: appointment.user_name,
+            surname: appointment.user_surname,
+          },
+          appointment_time: `${year}-${month}-${day} ${hour}:${minutes}`,
+        };
+      });
+    };
+    return res.status(200).json({
+      upcomingAppointments: formatAppointments(upcomingAppointments),
+      pastAppointments: formatAppointments(pastAppointments),
+    });
+  } catch (error) {
+    console.error("Error selecting user appointments", error.message);
+    return res.status(500).json({ message: "Blad podczas pobierania wizyt uzytkownika" });
+  }
+};
+
 export const createNewAppointment = async (req, res) => {
   const { doctorId, userId, appointmentTime } = req.body;
   // const {doctorId, userId, appointmentTime} = req.body
@@ -142,7 +188,7 @@ export const createNewAppointment = async (req, res) => {
   //   appointmentTime = "2024-10-09 10:00:00";
   try {
     const appointment = await fetchAppointmentByDate(appointmentTime, doctorId);
-    if(appointment.length !== 0) return res.status(400).json({message: "Wybrany termin jest juz zajety"})
+    if (appointment.length !== 0) return res.status(400).json({ message: "Wybrany termin jest juz zajety" });
     const appointmentId = await createAppointmentTransaction(doctorId, userId, appointmentTime);
     // console.log(response); //appointment id
     return res.status(200).json({ message: "Wizyta została pomyslnie umowiona", appointmentId });
