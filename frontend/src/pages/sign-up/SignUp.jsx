@@ -1,27 +1,28 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import Checkbox from '@mui/material/Checkbox';
 import CssBaseline from '@mui/material/CssBaseline';
-import Divider from '@mui/material/Divider';
-import FormControlLabel from '@mui/material/FormControlLabel';
 import FormLabel from '@mui/material/FormLabel';
 import FormControl from '@mui/material/FormControl';
-import Link from '@mui/material/Link';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
 import MuiCard from '@mui/material/Card';
 import { styled } from '@mui/material/styles';
 import AppTheme from '../../shared-theme/AppTheme';
-import { GoogleIcon, FacebookIcon, SitemarkIcon } from './CustomIcons';
+import { SitemarkIcon } from './CustomIcons';
+import { sendRegistrationData } from '../../functions/requests';
 import ColorModeSelect from '../../shared-theme/ColorModeSelect';
+import { validateName, validatePassword, validateEmail, validatePesel, validatePhoneNumber } from '../../functions/validations';
+import NavBar from '../../components/NavBar';
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   alignSelf: 'center',
   width: '100%',
+  maxHeight: '90vh',
+  overflowY: 'auto',
   padding: theme.spacing(4),
   gap: theme.spacing(2),
   margin: 'auto',
@@ -37,8 +38,8 @@ const Card = styled(MuiCard)(({ theme }) => ({
 }));
 
 const SignUpContainer = styled(Stack)(({ theme }) => ({
-  height: 'calc((1 - var(--template-frame-height, 0)) * 100dvh)',
-  minHeight: '100%',
+  height: '100vh',
+  overflowY: 'auto',
   padding: theme.spacing(2),
   [theme.breakpoints.up('sm')]: {
     padding: theme.spacing(4),
@@ -60,68 +61,54 @@ const SignUpContainer = styled(Stack)(({ theme }) => ({
 }));
 
 export default function SignUp(props) {
-  const [emailError, setEmailError] = React.useState(false);
+  const [email, setEmail] = React.useState('');
+  const [emailOk, setEmailOk] = React.useState(false);
   const [emailErrorMessage, setEmailErrorMessage] = React.useState('');
-  const [passwordError, setPasswordError] = React.useState(false);
+  
+  const [password, setPassword] = React.useState('');
+  const [passwordOk, setPasswordOk] = React.useState(false);
   const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('');
-  const [nameError, setNameError] = React.useState(false);
+  
+  const [name, setName] = React.useState('');
+  const [nameOk, setNameOk] = React.useState(false);
   const [nameErrorMessage, setNameErrorMessage] = React.useState('');
+  
+  const [surname, setSurname] = React.useState('');
+  const [surnameOk, setSurnameOk] = React.useState(false);
+  const [surnameErrorMessage, setSurnameErrorMessage] = React.useState('');
+  
+  const [pesel, setPesel] = React.useState('');
+  const [peselOk, setPeselOk] = React.useState(false);
+  const [peselErrorMessage, setPeselErrorMessage] = React.useState('');
+  
+  const [phoneNumber, setPhoneNumber] = React.useState('');
+  const [phoneNumberOk, setPhoneNumberOk] = React.useState(false);
+  const [phoneNumberErrorMessage, setPhoneNumberErrorMessage] = React.useState('');
 
   const validateInputs = () => {
-    const email = document.getElementById('email');
-    const password = document.getElementById('password');
-    const name = document.getElementById('name');
-
-    let isValid = true;
-
-    if (!email.value || !/\S+@\S+\.\S+/.test(email.value)) {
-      setEmailError(true);
-      setEmailErrorMessage('Please enter a valid email address.');
-      isValid = false;
-    } else {
-      setEmailError(false);
-      setEmailErrorMessage('');
-    }
-
-    if (!password.value || password.value.length < 6) {
-      setPasswordError(true);
-      setPasswordErrorMessage('Password must be at least 6 characters long.');
-      isValid = false;
-    } else {
-      setPasswordError(false);
-      setPasswordErrorMessage('');
-    }
-
-    if (!name.value || name.value.length < 1) {
-      setNameError(true);
-      setNameErrorMessage('Name is required.');
-      isValid = false;
-    } else {
-      setNameError(false);
-      setNameErrorMessage('');
-    }
-
-    return isValid;
+    validatePhoneNumber(phoneNumber, setPhoneNumberErrorMessage, setPhoneNumberOk, setPhoneNumber);
+    validateEmail(email, setEmailErrorMessage, setEmailOk);
+    validatePassword(password, setPasswordErrorMessage, setPasswordOk);
+    validatePesel(pesel, setPeselErrorMessage, setPeselOk);
+    validateName(name, setNameErrorMessage, setNameOk);
+    validateName(surname, setSurnameErrorMessage, setSurnameOk);
   };
 
-  const handleSubmit = (event) => {
-    if (nameError || emailError || passwordError) {
-      event.preventDefault();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    validateInputs();
+    if (!(emailOk && passwordOk && nameOk && surnameOk && peselOk && phoneNumberOk)) {
+      console.log('Panowie coś jest nie tak');
       return;
     }
-    const data = new FormData(event.currentTarget);
-    console.log({
-      name: data.get('name'),
-      lastName: data.get('lastName'),
-      email: data.get('email'),
-      password: data.get('password'),
-    });
+    await sendRegistrationData(name, surname, phoneNumber, email, pesel, password);
   };
 
   return (
     <AppTheme {...props}>
       <CssBaseline enableColorScheme />
       <ColorModeSelect sx={{ position: 'fixed', top: '1rem', right: '1rem' }} />
+      <NavBar></NavBar>
       <SignUpContainer direction="column" justifyContent="space-between">
         <Card variant="outlined">
           <SitemarkIcon />
@@ -146,9 +133,12 @@ export default function SignUp(props) {
                 fullWidth
                 id="name"
                 placeholder="Jan"
-                error={nameError}
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                onBlur={() => validateName(name, setNameErrorMessage, setNameOk)}
+                error={!nameOk}
                 helperText={nameErrorMessage}
-                color={nameError ? 'error' : 'primary'}
+                color={nameOk ? 'primary' : 'error'}
               />
             </FormControl>
             <FormControl>
@@ -160,24 +150,63 @@ export default function SignUp(props) {
                 fullWidth
                 id="surname"
                 placeholder="Kowalski"
-                error={nameError}
-                helperText={nameErrorMessage}
-                color={nameError ? 'error' : 'primary'}
+                value={surname}
+                onChange={(e) => setSurname(e.target.value)}
+                onBlur={() => validateName(surname, setSurnameErrorMessage, setSurnameOk)}
+                error={!surnameOk}
+                helperText={surnameErrorMessage}
+                color={surnameOk ? 'primary' : 'error'}
               />
             </FormControl>
             <FormControl>
-              <FormLabel htmlFor="email">Email</FormLabel>
+              <FormLabel htmlFor="pesel">Pesel</FormLabel>
+              <TextField
+                required
+                fullWidth
+                id="pesel"
+                name="pesel"
+                autoComplete="pesel"
+                placeholder="XXXXXXXXXXX"
+                value={pesel}
+                onChange={(e) => setPesel(e.target.value)}
+                onBlur={() => validatePesel(pesel, setPeselErrorMessage, setPeselOk)}
+                error={!peselOk}
+                helperText={peselErrorMessage}
+                color={peselOk ? 'primary' : 'error'}
+              />
+            </FormControl>
+            <FormControl>
+              <FormLabel htmlFor="email">Adres email</FormLabel>
               <TextField
                 required
                 fullWidth
                 id="email"
                 placeholder="twoj@email.com"
                 name="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                onBlur={() => validateEmail(email, setEmailErrorMessage, setEmailOk)}
                 autoComplete="email"
-                variant="outlined"
-                error={emailError}
+                error={!emailOk}
                 helperText={emailErrorMessage}
-                color={passwordError ? 'error' : 'primary'}
+                color={emailOk ? 'primary' : 'error'}
+              />
+            </FormControl>
+            <FormControl>
+              <FormLabel htmlFor="phoneNumber">Numer telefonu</FormLabel>
+              <TextField
+                required
+                fullWidth
+                id="phoneNumber"
+                placeholder="XXX-XXX-XXX"
+                name="phoneNumber"
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                onBlur={() => validatePhoneNumber(phoneNumber, setPhoneNumberErrorMessage, setPhoneNumberOk,setPhoneNumber)}
+                autoComplete="phoneNumber"
+                error={!phoneNumberOk}
+                helperText={phoneNumberErrorMessage}
+                color={phoneNumberOk ? 'primary' : 'error'}
               />
             </FormControl>
             <FormControl>
@@ -191,23 +220,25 @@ export default function SignUp(props) {
                 id="password"
                 autoComplete="new-password"
                 variant="outlined"
-                error={passwordError}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                onBlur={() => validatePassword(password, setPasswordErrorMessage, setPasswordOk)}
+                error={!passwordOk}
                 helperText={passwordErrorMessage}
-                color={passwordError ? 'error' : 'primary'}
+                color={passwordOk ? 'primary' : 'error'}
               />
             </FormControl>
             <Button
               type="submit"
               fullWidth
               variant="contained"
-              onClick={validateInputs}
             >
               Zarejestruj się
             </Button>
           </Box>
-          
         </Card>
       </SignUpContainer>
     </AppTheme>
   );
 }
+

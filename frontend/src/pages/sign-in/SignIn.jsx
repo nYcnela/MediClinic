@@ -23,6 +23,7 @@ import useAuth from "../../hooks/useAuth";
 import { jwtDecode } from "jwt-decode";
 import useUserData from "../../hooks/useUserData";
 import { upperCaseFirstLetter } from "../../functions/stringFunctions";
+import NavBar from '../../components/NavBar';
 
 const LOGIN_URL = "/auth/login";
 
@@ -117,7 +118,7 @@ export default function SignIn(props) {
       console.log(response);
       const token = response?.data?.token;
       const {id,email, iat, name, surname, birthDay, role} = jwtDecode(token);
-      const roles = [role];
+      const roles = ['doctor','user'];
       setAuth({id, user: email, roles, token,iat});
       setData({name: upperCaseFirstLetter(name), surname: upperCaseFirstLetter(surname), email, birthDay});
       if(roles.find((role => role === 'admin'))){
@@ -172,8 +173,8 @@ export default function SignIn(props) {
   return (
     <>
       <CssBaseline enableColorScheme />
+      <NavBar />
       <SignInContainer direction="column" justifyContent="space-between">
-        <ColorModeSelect sx={{ position: 'fixed', top: '1rem', right: '1rem' }} />
         <Card variant="outlined">
           <SitemarkIcon />
           <Typography

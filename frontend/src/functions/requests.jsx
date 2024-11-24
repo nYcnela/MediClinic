@@ -8,7 +8,7 @@ export async function sendCheckRequest(data,type,setError,setStatus){
             type,
         });
         if(!response.data.exists){
-            setError("Dane są poprawne")
+            setError("")
             setStatus(true);
         }else{
             setError("Użytkownik o takim peselu widnieje już w bazie danych!")

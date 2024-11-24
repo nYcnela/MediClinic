@@ -12,10 +12,10 @@ const DoctorCallendar = () => {
   const [events, setEvents] = useState([
     {
       title: "Kutas kozła",
-      start: "2024-10-05 15:00",
-      end: "2024-10-05 15:15",
+      start: "2024-11-22 15:00",
+      end: "2024-11-22 15:15",
     },
-    { title: "Warsztat", date: "2024-10-08 13:45" },
+    { title: "Twoja stara", date: "2024-11-23 13:45" },
   ]);
 
   

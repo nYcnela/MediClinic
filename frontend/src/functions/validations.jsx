@@ -39,7 +39,7 @@ export function validateName(name, setError, setStatus, setValue){
         setStatus(false)
         return;
     }else if(!/^[a-zA-ZąćęłńóśźżĄĆĘŁŃÓŚŹŻ]+$/.test(name)){
-        setError("Pole może zawierać tylko litery")
+        setError("Pole może zawierać tylko litery(bez spacji)")
         setStatus(false)
         return;
     }else if(name.length < 2){
