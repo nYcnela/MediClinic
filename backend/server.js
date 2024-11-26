@@ -6,7 +6,7 @@ import authRoutes from "./src/routes/authRoutes.js"
 import doctorRoutes from "./src/routes/doctorRoutes.js"
 import userRoutes from "./src/routes/userRoutes.js"
 import appointmentRoutes from "./src/routes/appointmentRoutes.js"
-import { verifyAccessToken, verifyAdmin } from "./src/middleware/authMiddleware.js"
+// import { verifyAccessToken, verifyAdmin } from "./src/middleware/authMiddleware.js"
 
 const app = express()
 const port = 5000
@@ -14,6 +14,7 @@ const port = 5000
 app.use(
     cors({
       origin: "http://localhost:5173",
+      origin: "http://127.0.0.1:5173",
       credentials: true,
     })
 );
