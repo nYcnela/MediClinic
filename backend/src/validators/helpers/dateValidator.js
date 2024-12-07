@@ -13,8 +13,8 @@ const futureDateValidator = () => {
     .withMessage("Wprowadzona data musi byc z przyszlosci");
 };
 
-export const dateValidator = () => {
-  return check("date")
+export const dateValidator = (dateField = "date") => {
+  return check(dateField)
     .notEmpty()
     .withMessage("Nie podano daty wizyty")
     .custom((date) => {

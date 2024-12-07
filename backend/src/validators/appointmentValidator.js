@@ -1,8 +1,8 @@
 import { check, validationResult } from "express-validator";
 import { dateValidator } from "../validators/helpers/dateValidator.js";
 
-export const validateDate = [
-  dateValidator(),
+export const validateDate = (field = "date") => [
+  dateValidator(field),
 
   (req, res, next) => {
     const errors = validationResult(req);

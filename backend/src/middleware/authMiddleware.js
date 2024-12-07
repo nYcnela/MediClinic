@@ -36,10 +36,12 @@ export const authorizeAdmin = (req, res, next) => {
 
 export const authorizeUserOrAdmin = (req, res, next) => {
   const { id: userIdFromToken, role: userRole } = req.user; 
-  const userIdFromUrl = parseInt(req.params.id, 10); 
+  const userIdFromUrl = req.params.id ? parseInt(req.params.id, 10) : null;
+  const userIdFromBody = req.body.userId || null;
+  // const userIdFromBody = req.body.userId || req.body.id || null;
 
-  if (userIdFromToken === userIdFromUrl || userRole === 'admin') {
-    return next(); 
+  if (userIdFromToken === userIdFromUrl || userIdFromToken === userIdFromBody || userRole === 'admin') {
+    return next();
   }
 
   return res.status(403).json({ message: 'Brak dostępu do tego zasobu' });
