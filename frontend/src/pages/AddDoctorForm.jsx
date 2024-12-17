@@ -8,7 +8,7 @@ import NavBar from "../components/NavBar";
 import { createHoursWithStep } from "../functions/timeFunctions";
 import WorkHoursPicker from "../components/WorkHoursPicker";
 import RangePicker from "../components/RangePicker";
-
+import { sendDoctorData } from "../functions/requests";
 
 function AddDoctorForm(){
     
@@ -57,6 +57,7 @@ function AddDoctorForm(){
     const [workDaysStatus, setWorkDaysStatus] = useState(false);
     
 
+    
     const [workHours, setWorkHours] = useState({
         monday: { start: "", end: "" },
         tuesday: { start: "", end: "" },
@@ -70,12 +71,22 @@ function AddDoctorForm(){
     const [workHoursStatus, setWorkHoursStatus] = useState(false)
 
 
-    
+    const [specializationsToRequest, setSpecializationsToRequest] = useState({});
+    const [degreeToRequest, setDegreeToRequest] = useState("");
+
+    useEffect(() => {
+        if(degree){
+            
+        }
+    }, [specialization,degree])
+
+
     async function handleSubmit(event){
 
         event.preventDefault();
-        console.log(name,surname,phoneNumber,email,pesel,pwz,sex,degree, specialization,workDays,workHours)
-        sendDoctorData(name,surname,phoneNumber,email,pesel,pwz,degree, specialization,workDays,workHours)
+
+        console.log(name,surname,phoneNumber,email,pesel,pwz,degree, specialization,workDays,workHours)
+        sendDoctorData(name,surname,phoneNumber,email,pesel,pwz,3, specialization,workDays,workHours)
         
 
     };
@@ -211,7 +222,7 @@ function AddDoctorForm(){
                 
                 <Button
                     type = "submit"
-                    text = "Dodaj lekarzyne pedała"
+                    text = "Dodaj lekarzyne"
                 />
             </form>
         </div>

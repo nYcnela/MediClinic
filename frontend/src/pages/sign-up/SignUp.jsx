@@ -9,7 +9,7 @@ import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
 import MuiCard from '@mui/material/Card';
 import { styled } from '@mui/material/styles';
-import AppTheme from '../../shared-theme/AppTheme';
+import AppTheme from '../../shared-theme/AppTheme.jsx';
 import { SitemarkIcon } from './CustomIcons';
 import { sendRegistrationData } from '../../functions/requests';
 import ColorModeSelect from '../../shared-theme/ColorModeSelect';
@@ -41,6 +41,7 @@ const SignUpContainer = styled(Stack)(({ theme }) => ({
   height: '100vh',
   overflowY: 'auto',
   padding: theme.spacing(2),
+  position: 'relative', // Dodajemy pozycjonowanie względne
   [theme.breakpoints.up('sm')]: {
     padding: theme.spacing(4),
   },
@@ -53,6 +54,7 @@ const SignUpContainer = styled(Stack)(({ theme }) => ({
     backgroundImage:
       'radial-gradient(ellipse at 50% 50%, hsl(210, 100%, 97%), hsl(0, 0%, 100%))',
     backgroundRepeat: 'no-repeat',
+    backgroundSize: 'cover', // Upewniamy się, że gradient wypełnia cały kontener
     ...theme.applyStyles('dark', {
       backgroundImage:
         'radial-gradient(at 50% 50%, hsla(210, 100%, 16%, 0.5), hsl(220, 30%, 5%))',

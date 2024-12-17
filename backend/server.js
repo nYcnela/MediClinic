@@ -6,7 +6,7 @@ import authRoutes from "./src/routes/authRoutes.js"
 import doctorRoutes from "./src/routes/doctorRoutes.js"
 import userRoutes from "./src/routes/userRoutes.js"
 import appointmentRoutes from "./src/routes/appointmentRoutes.js"
-import { verifyAccessToken, verifyAdmin } from "./src/middleware/authMiddleware.js"
+//import { verifyAccessToken, verifyAdmin } from "./src/middleware/authMiddleware.js"
 
 const app = express()
 const port = 5000

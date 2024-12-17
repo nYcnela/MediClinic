@@ -1,7 +1,7 @@
-import FullCalendar from "@fullcalendar/react"; // Główna biblioteka kalendarza
-import dayGridPlugin from "@fullcalendar/daygrid"; // Widok kalendarza w siatce dni
-import timeGridPlugin from "@fullcalendar/timegrid"; // Widok kalendarza z osiami czasu
-import interactionPlugin from "@fullcalendar/interaction"; // Interakcje użytkownika (np. dodawanie, przeciąganie zdarzeń)
+import FullCalendar from "@fullcalendar/react"; 
+import dayGridPlugin from "@fullcalendar/daygrid"; 
+import timeGridPlugin from "@fullcalendar/timegrid"; 
+import interactionPlugin from "@fullcalendar/interaction"; 
 import { calendarViews } from "../assets/calendarSettings";
 import { useState } from "react";
 import DeleteAppointmentModal from "./DeleteAppointmentModal";
@@ -11,11 +11,11 @@ const DoctorCallendar = () => {
   const [isModalOpen,setIsModalOpen] = useState(false);
   const [events, setEvents] = useState([
     {
-      title: "Kutas kozła",
-      start: "2024-11-22 15:00",
-      end: "2024-11-22 15:15",
+      title: "Wizyta u lekarza",
+      start: "2024-11-27 15:00",
+      end: "2024-11-27 15:15",
     },
-    { title: "Twoja stara", date: "2024-11-23 13:45" },
+    { title: "Konsultacja", date: "2024-11-28 13:45" },
   ]);
 
   

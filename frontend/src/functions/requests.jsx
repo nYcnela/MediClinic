@@ -61,6 +61,7 @@ export async function sendDoctorData(name,surname,phoneNumber,email,pesel,pwz,de
             });
             console.log("odpowiedz z serwera: ", response.data);
         }catch (error){
+            console.log("UPS");
             console.log(error.message);
         }
 }

@@ -32,23 +32,23 @@ function NavBar() {
         </Typography>
         <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center' }}>
           {auth?.user ? (
-            <>
+            <Box>
               <Button component={Link} to="/profile" color="inherit" sx={{ mx: 1 }}>
                 Profile
               </Button>
               <Button onClick={logout} color="inherit" sx={{ mx: 1 }}>
                 Logout
               </Button>
-            </>
+            </Box>
           ) : (
-            <>
+            <Box>
               <Button component={Link} to="/login" color="inherit" sx={{ mx: 1 }}>
                 Login
               </Button>
               <Button component={Link} to="/register" color="inherit" sx={{ mx: 1 }}>
                 Register
               </Button>
-            </>
+            </Box>
           )}
           <ColorModeSelect sx={{ ml: 2 }} />
         </Box>
@@ -67,23 +67,23 @@ function NavBar() {
             onClose={handleMenuClose}
           >
             {auth?.user ? (
-              <>
+              <Box>
                 <MenuItem onClick={handleMenuClose} component={Link} to="/profile">
                   Profile
                 </MenuItem>
                 <MenuItem onClick={() => { handleMenuClose(); logout(); }}>
                   Logout
                 </MenuItem>
-              </>
+              </Box>
             ) : (
-              <>
+              <Box>
                 <MenuItem onClick={handleMenuClose} component={Link} to="/login">
                   Login
                 </MenuItem>
                 <MenuItem onClick={handleMenuClose} component={Link} to="/register">
                   Register
                 </MenuItem>
-              </>
+              </Box>
             )}
           </Menu>
           <ColorModeSelect sx={{ ml: 2 }} />

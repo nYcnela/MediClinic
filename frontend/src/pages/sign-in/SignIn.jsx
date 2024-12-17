@@ -32,24 +32,28 @@ const Card = styled(MuiCard)(({ theme }) => ({
   flexDirection: 'column',
   alignSelf: 'center',
   width: '100%',
+  maxHeight: '90vh',
+  overflowY: 'auto',
   padding: theme.spacing(4),
   gap: theme.spacing(2),
   margin: 'auto',
-  [theme.breakpoints.up('sm')]: {
-    maxWidth: '450px',
-  },
   boxShadow:
     'hsla(220, 30%, 5%, 0.05) 0px 5px 15px 0px, hsla(220, 25%, 10%, 0.05) 0px 15px 35px -5px',
+  [theme.breakpoints.up('sm')]: {
+    width: '450px',
+  },
   ...theme.applyStyles('dark', {
     boxShadow:
       'hsla(220, 30%, 5%, 0.5) 0px 5px 15px 0px, hsla(220, 25%, 10%, 0.08) 0px 15px 35px -5px',
   }),
 }));
 
-export const SignInContainer = styled(Stack)(({ theme }) => ({
+export const GradientContainer = styled(Stack)(({ theme }) => ({
   height: 'calc((1 - var(--template-frame-height, 0)) * 100dvh)',
   minHeight: '100%',
   padding: theme.spacing(2),
+  
+  position: 'relative', 
   [theme.breakpoints.up('sm')]: {
     padding: theme.spacing(4),
   },
@@ -62,6 +66,7 @@ export const SignInContainer = styled(Stack)(({ theme }) => ({
     backgroundImage:
       'radial-gradient(ellipse at 50% 50%, hsl(210, 100%, 97%), hsl(0, 0%, 100%))',
     backgroundRepeat: 'no-repeat',
+    backgroundSize: 'cover', 
     ...theme.applyStyles('dark', {
       backgroundImage:
         'radial-gradient(at 50% 50%, hsla(210, 100%, 16%, 0.5), hsl(220, 30%, 5%))',
@@ -100,13 +105,6 @@ export default function SignIn(props) {
     event.preventDefault();
     console.log("submituje")
     const data = new FormData(event.currentTarget);
-    {/**
-      console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
-      
-      */}
     
 
 
@@ -118,7 +116,7 @@ export default function SignIn(props) {
       console.log(response);
       const token = response?.data?.token;
       const {id,email, iat, name, surname, birthDay, role} = jwtDecode(token);
-      const roles = ['doctor','user'];
+      const roles = ["admin"] 
       setAuth({id, user: email, roles, token,iat});
       setData({name: upperCaseFirstLetter(name), surname: upperCaseFirstLetter(surname), email, birthDay});
       if(roles.find((role => role === 'admin'))){
@@ -171,10 +169,10 @@ export default function SignIn(props) {
   };
 
   return (
-    <>
+    <AppTheme {...props}>
       <CssBaseline enableColorScheme />
       <NavBar />
-      <SignInContainer direction="column" justifyContent="space-between">
+      <GradientContainer direction="column" justifyContent="space-between">
         <Card variant="outlined">
           <SitemarkIcon />
           <Typography
@@ -254,7 +252,7 @@ export default function SignIn(props) {
           </Box>
           
         </Card>
-      </SignInContainer>
-    </>
+      </GradientContainer>
+    </AppTheme>
   );
 }

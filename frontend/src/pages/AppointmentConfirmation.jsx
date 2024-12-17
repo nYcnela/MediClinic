@@ -13,9 +13,9 @@ function AppointmentConfirmation({}){
 
     const {id} = useParams();
     const object = {
-        doctor: "dr nauk chujowych andrzej macierewicz",
-		specialties: "endokrynolog, chujolog",
-		data: "09.02.2032 17:32"
+        doctor: "dr nauk andrzej macierewicz",
+		    specialties: "endokrynolog",
+		    data: "09.02.2032 17:32"
     }
     const pacjent = {
         id: "123456",

@@ -22,7 +22,6 @@ function DeleteAppointmentModal({isModalOpen,setIsModalOpen }){
     >
         <h2>Usuawnie wizyty</h2>
         <button onClick={closeModal}>close</button>
-        <div>I am Kasia i mam małą dupke</div>
         
     </Modal>
   );

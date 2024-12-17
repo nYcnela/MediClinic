@@ -5,8 +5,6 @@ import NavBar from '../components/NavBar';
 import {validatePesel, validateName, validatePhoneNumber, validateEmail, validatePassword } from "../functions/validations";
 import {sendRegistrationData } from "../functions/requests";
 
-import axios from 'axios';
-
 function RegisterForm(){
 
     const [name, setName] = useState("");
@@ -38,10 +36,10 @@ function RegisterForm(){
         event.preventDefault();
 
         if(nameStatus&&surnameStatus&&peselStatus&&emailStatus&&phoneNumberStatus&&passwordStatus){
-            console.log('wal sie na cycunieczki')
+            console.log('Rejestracja powiodła się');
             sendRegistrationData(name,surname,phoneNumber,email,pesel,password)
         }else{
-            console.log("wal sie na cyce")
+            console.log("Rejestarcja nie powiodła się")
         }
 
     };
