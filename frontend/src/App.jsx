@@ -13,6 +13,7 @@ import AdminHome from "./pages/AdminHome.jsx";
 import RequireAuth from "./components/RequireAuth.jsx";
 import SignIn from "./pages/sign-in/SignIn.jsx";
 import SignUp from "./pages/sign-up/SignUp.jsx"
+import RegistrationSuccess from "./pages/RegistrationSuccess.jsx"
 
 
 const ROLES = {
@@ -32,6 +33,7 @@ function App() {
         <Route path="/" element={<Home/>} />
         <Route path="unauthorized" element={<Unauthorized/>} />
         <Route path="/add-doctor" element={<AddDoctorForm />} />
+        <Route path="/registration-success" element={<RegistrationSuccess/>} />
         
 
         <Route element={<RequireAuth allowedRoles={[ROLES.User]} />}>

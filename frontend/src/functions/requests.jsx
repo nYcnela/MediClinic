@@ -38,7 +38,7 @@ export async function sendRegistrationData(name,surname, phoneNumber, email, pes
             console.log("odpowiedz z serwera: ", response.data);
         }   catch (error){
             console.log(error.message);
-            }
+        }
             
 }
 

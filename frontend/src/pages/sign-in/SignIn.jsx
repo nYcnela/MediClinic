@@ -95,9 +95,6 @@ export default function SignIn(props) {
   };
 
   async function handleSubmit(event){
-    
-
-
     if (emailError || passwordError) {
       event.preventDefault();
       return;
