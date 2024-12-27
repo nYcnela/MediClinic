@@ -116,7 +116,7 @@ export default function SignIn(props) {
       console.log(response);
       const token = response?.data?.token;
       const {id,email, iat, name, surname, birthDay, role} = jwtDecode(token);
-      const roles = ["admin"] 
+      const roles = ["user"] 
       setAuth({id, user: email, roles, token,iat});
       setData({name: upperCaseFirstLetter(name), surname: upperCaseFirstLetter(surname), email, birthDay});
       if(roles.find((role => role === 'admin'))){

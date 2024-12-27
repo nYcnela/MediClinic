@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Box } from '@mui/material';
 
 function EditPersonalDataModal({ isOpen, onClose }) {
   const [formData, setFormData] = useState({
@@ -19,43 +20,42 @@ function EditPersonalDataModal({ isOpen, onClose }) {
   };
 
   return (
-    <div className="modal">
-      <h2>Edytuj dane osobowe</h2>
-      <form onSubmit={handleSubmit}>
-        <label>
-          Imię i nazwisko:
-          <input
+    <Dialog open={isOpen} onClose={onClose} maxWidth="sm" fullWidth>
+      <DialogTitle>Edytuj dane osobowe</DialogTitle>
+      <DialogContent>
+        <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2, marginTop: 2 }}>
+          <TextField
+            label="Imię i nazwisko"
             type="text"
             name="name"
             value={formData.name}
             onChange={handleChange}
+            fullWidth
           />
-        </label>
-        <br />
-        <label>
-          Data urodzenia:
-          <input
+          <TextField
+            label="Data urodzenia"
             type="date"
             name="dob"
             value={formData.dob}
             onChange={handleChange}
+            fullWidth
+            InputLabelProps={{ shrink: true }}
           />
-        </label>
-        <br />
-        <label>
-          E-mail:
-          <input
+          <TextField
+            label="E-mail"
             type="email"
             name="email"
             value={formData.email}
             onChange={handleChange}
+            fullWidth
           />
-        </label>
-        <br />
-        <button type="submit">Zapisz</button>
-        <button onClick={onClose}>Anuluj</button>
-      </form>
-    </div>
+          <DialogActions>
+            <Button onClick={onClose} color="secondary">Anuluj</Button>
+            <Button type="submit" color="primary">Zapisz</Button>
+          </DialogActions>
+        </Box>
+      </DialogContent>
+    </Dialog>
   );
 }
 

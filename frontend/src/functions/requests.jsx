@@ -39,6 +39,7 @@ export async function sendRegistrationData(name,surname, phoneNumber, email, pes
         }   catch (error){
             console.log(error.message);
             }
+            
 }
 
 export async function sendDoctorData(name,surname,phoneNumber,email,pesel,pwz,degree, specialization,workDays,workHours){

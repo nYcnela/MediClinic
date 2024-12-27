@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Box } from '@mui/material';
 
 function EditPasswordModal({ isOpen, onClose }) {
   const [password, setPassword] = useState("");
@@ -12,33 +13,33 @@ function EditPasswordModal({ isOpen, onClose }) {
   };
 
   return (
-    <div className="modal">
-      <h2>Zmień hasło i e-mail</h2>
-      <form onSubmit={handleSubmit}>
-        <label>
-          Nowe hasło:
-          <input
+    <Dialog open={isOpen} onClose={onClose} maxWidth="sm" fullWidth>
+      <DialogTitle>Zmień hasło i e-mail</DialogTitle>
+      <DialogContent>
+        <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
+          <TextField
+            label="Nowe hasło"
             type="password"
             name="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            fullWidth
           />
-        </label>
-        <br />
-        <label>
-          E-mail:
-          <input
+          <TextField
+            label="E-mail"
             type="email"
             name="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            fullWidth
           />
-        </label>
-        <br />
-        <button type="submit">Zapisz</button>
-        <button onClick={onClose}>Anuluj</button>
-      </form>
-    </div>
+          <DialogActions>
+            <Button onClick={onClose} color="secondary">Anuluj</Button>
+            <Button type="submit" color="primary">Zapisz</Button>
+          </DialogActions>
+        </Box>
+      </DialogContent>
+    </Dialog>
   );
 }
 

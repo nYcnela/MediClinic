@@ -54,7 +54,7 @@ function PacientProfilePage() {
           <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
             Profil Pacjenta
           </Typography>
-          <section>
+          <section sx={{minWidth: '100%'}}>
             <PersonalData onEdit={handleEditPersonalData} />
             {isEditPersonalDataOpen && (
               <EditPersonalDataModal
