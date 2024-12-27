@@ -82,7 +82,7 @@ export const addDoctor = async (req, res) => {
 
     return res.status(200).json({
       message: "Konto zostało pomyślnie utworzone",
-      temporaryPassword: `Tymczasowe hasło do konta: ${password}`,
+      temporaryPassword: `Hasło do konta: ${password}`,
     });
   } catch (error) {
     console.log("Error", error.message);
