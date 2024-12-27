@@ -1,5 +1,5 @@
 import db from "../config/dbConnection.js";
-import { registerUserTransaction } from "./userModel.js";
+import { registerUserTransaction } from "./userRepository.js";
 
 /**
  * Creates a new doctor entry in the doctors table
@@ -215,7 +215,7 @@ export const fetchWorkDays = async (doctorId) => {
   }
 };
 
-export const fetchWorkHours = async(doctorId) => {
+export const fetchWorkHours = async (doctorId) => {
   const client = await db.connect();
   try {
     const query = "SELECT work_day, start_time, end_time FROM doctor_work_schedule WHERE doctor_id = $1";
@@ -227,7 +227,7 @@ export const fetchWorkHours = async(doctorId) => {
   } finally {
     client.release();
   }
-}
+};
 
 export const addWorkDay = async (doctorId, workDay, startTime, endTime, client = db) => {
   try {

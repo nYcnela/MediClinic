@@ -7,9 +7,9 @@ import {
   deleteAppointmentById,
   fetchAppointmentByDate,
   fetchUserAppointments,
-} from "../models/appointmentModel.js";
-import { fetchDoctor, fetchDoctorDegree } from "../models/doctorModel.js";
-import { fetchUser, findUserById } from "../models/userModel.js";
+} from "../Repositories/appointmentRepository.js";
+import { fetchDoctor, fetchDoctorDegree } from "../Repositories/doctorRepository.js";
+import { fetchUser, findUserById } from "../Repositories/userRepository.js";
 
 export const fetchAvailableAppointments = async (req, res) => {
   try {

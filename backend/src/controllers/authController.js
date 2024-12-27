@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import env from "dotenv";
-import { registerUserTransaction, findUserByEmail, findUserByPesel, findUserByPhoneNumber } from "../models/userModel.js";
+import { registerUserTransaction, findUserByEmail, findUserByPesel, findUserByPhoneNumber } from "../Repositories/userRepository.js";
 import bycrypt from "bcrypt";
 import { formatPhoneNumber } from "../utils/formatters.js";
 import { hashPassword } from "../utils/hashing.js";

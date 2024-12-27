@@ -1,5 +1,5 @@
 import { check } from "express-validator";
-import { fetchDoctorDegree } from "../../models/doctorModel.js";
+import { fetchDoctorDegree } from "../../Repositories/doctorRepository.js";
 
 const degreeValidator = (fieldName = "degree") => {
   return check(fieldName)

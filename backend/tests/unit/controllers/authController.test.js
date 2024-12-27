@@ -3,11 +3,11 @@ import sinon from "sinon";
 import esmock from "esmock";
 
 import { login, registerUser } from "../../../src/controllers/authController.js";
-import { findUserByPesel } from "../../../src/models/userModel.js";
+import { findUserByPesel } from "../../../src/Repositories/userRepository.js";
 import { getBirthDateFromPESEL, getGenderFromPESEL } from "../../../src/utils/peselUtils.js";
 import { formatPhoneNumber } from "../../../src/utils/formatters.js";
 import { hashPassword } from "../../../src/utils/hashing.js";
-import { registerUserTransaction } from "../../../src/models/userModel.js";
+import { registerUserTransaction } from "../../../src/Repositories/userRepository.js";
 
 import db from "../../../src/config/dbConnection.js";
 import bcrypt from "bcrypt";

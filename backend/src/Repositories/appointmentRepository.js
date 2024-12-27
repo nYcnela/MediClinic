@@ -4,8 +4,6 @@ export const createNewAppointment = async (client, doctorId, userId, appointment
   try {
     const query = "INSERT INTO appointments (doctor_id, user_id, appointment_time) VALUES ($1, $2, $3) RETURNING id";
     const response = await client.query(query, [doctorId, userId, appointmentTime]);
-    // console.log("1", response.rows[0]);
-    //1 { id: 16 }
     return response.rows[0];
   } catch (error) {
     console.log("Error creating new transaction ", error.message);
@@ -93,10 +91,10 @@ export const fetchAppointmentByDate = async (appointment_time, docotrId = null) 
       query = "SELECT id, doctor_id, user_id, appointment_time from appointments WHERE appointment_time = $1";
       response = await client.query(query, [appointment_time]);
     }
-    // console.log("z bazki: ", response.rows);
     return response.rows;
   } catch (error) {
     console.log("Error selecting appointment by appointment time");
+    throw error;
   } finally {
     client.release();
   }

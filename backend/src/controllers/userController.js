@@ -6,8 +6,8 @@ import {
   findUserByPhoneNumber,
   updateUserPassword,
   findUserById,
-} from "../models/userModel.js";
-import { formatPhoneNumber } from "../utils/formatters.js"
+} from "../Repositories/userRepository.js";
+import { formatPhoneNumber } from "../utils/formatters.js";
 import { hashPassword } from "../utils/hashing.js";
 
 export const fetchUserById = async (req, res) => {
@@ -29,7 +29,6 @@ export const fetchUserById = async (req, res) => {
   }
 };
 
-
 export const deleteUserById = async (req, res) => {
   const { id: userId } = req.params;
 
@@ -50,7 +49,7 @@ export const deleteUserById = async (req, res) => {
 
 export const updateProfile = async (req, res) => {
   const { id: userId } = req.params;
-  let { email, phoneNumber : fullPhoneNumber } = req.body;
+  let { email, phoneNumber: fullPhoneNumber } = req.body;
 
   const { dialingCode, phoneNumber } = await formatPhoneNumber(fullPhoneNumber);
   // console.log(dialingCode, " i ", phoneNumber);

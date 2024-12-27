@@ -10,14 +10,14 @@ import {
   updateWorkDay,
   deleteWorkDay,
   fetchWorkHours,
-} from "../models/doctorModel.js";
-import { findUserById } from "../models/userModel.js";
+} from "../Repositories/doctorRepository.js";
+import { findUserById } from "../Repositories/userRepository.js";
 import { formatPhoneNumber } from "../utils/formatters.js";
 import { generatePassword } from "../utils/generators.js";
 import { hashPassword } from "../utils/hashing.js";
 import { getBirthDateFromPESEL, getGenderFromPESEL } from "../utils/peselUtils.js";
 import { transformWorkDays, transformWorkHours } from "../utils/transformWorkDays.js";
-import { findUserByPesel } from "../models/userModel.js";
+import { findUserByPesel } from "../Repositories/userRepository.js";
 import chalk from "chalk";
 
 /**
@@ -47,13 +47,13 @@ export const addDoctor = async (req, res) => {
   const { name, surname, pesel, email, phoneNumber: fullPhoneNumber, pwz, degree, specialization, workDays, workHours } = req.body;
 
   const user = await findUserByPesel(pesel);
-  if(user !== undefined) return res.status(400).json({message: "Podany uzytkownik juz istnieje"})
+  if (user !== undefined) return res.status(400).json({ message: "Podany uzytkownik juz istnieje" });
 
   try {
     const { dialingCode, phoneNumber } = formatPhoneNumber(fullPhoneNumber);
 
     const birthDay = getBirthDateFromPESEL(pesel);
-    const sex = getGenderFromPESEL(pesel)
+    const sex = getGenderFromPESEL(pesel);
 
     const password = generatePassword();
     const hashedPassword = await hashPassword(password);
@@ -167,9 +167,9 @@ export const fetchDoctorById = async (req, res) => {
   try {
     const fetchSpecializations = req.query.specializations ? true : false;
     const allDegrees = await fetchDoctorDegree();
-    
+
     const { id, degree_id, name, surname, specializations } = await fetchDoctor(doctorId, fetchSpecializations);
-    if(id === undefined) return res.status(404).json({message: "Specjalista z takim id nie istnieje!"})
+    if (id === undefined) return res.status(404).json({ message: "Specjalista z takim id nie istnieje!" });
 
     let doctorData = { value: id, label: allDegrees.find((degree) => degree.id === degree_id).value + " " + name + " " + surname };
     if (!!specializations) doctorData = { ...doctorData, specializations: specializations };
@@ -237,14 +237,14 @@ export const updateWorkHours = async (req, res) => {
 
 export const getDoctorWorkHours = async (req, res) => {
   const { id: doctorId } = req.params;
-  try{
+  try {
     const workDays = await fetchWorkDays(doctorId);
-    const formattedWorkDays = transformWorkDays(workDays)
-    let daysHours = await fetchWorkHours(doctorId)
-    daysHours = transformWorkHours(daysHours)
-    return res.status(200).json({workDays: formattedWorkDays, workHours: daysHours})
-  }catch(error){
+    const formattedWorkDays = transformWorkDays(workDays);
+    let daysHours = await fetchWorkHours(doctorId);
+    daysHours = transformWorkHours(daysHours);
+    return res.status(200).json({ workDays: formattedWorkDays, workHours: daysHours });
+  } catch (error) {
     console.log("Error getting doctor's work hours", error.message);
     return res.status(500).json({ message: "Blad podczas pobierania godzin pracy doktora" });
   }
-}
+};

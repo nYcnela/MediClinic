@@ -126,14 +126,14 @@ CREATE TABLE doctor_work_schedule (
     CONSTRAINT unique_employee_workday UNIQUE (doctor_id, work_day)  
 );
 
-CREATE TABLE work_days_exceptions (
-    id SERIAL PRIMARY KEY,
-    schedule_id INT REFERENCES doctor_work_schedule(id) ON DELETE CASCADE, 
-    exception_date DATE NOT NULL,
-    start_time TIME,  
-    end_time TIME,  
-    CONSTRAINT unique_schedule_exception UNIQUE (schedule_id, exception_date)
-);
+-- CREATE TABLE work_days_exceptions (
+--     id SERIAL PRIMARY KEY,
+--     schedule_id INT REFERENCES doctor_work_schedule(id) ON DELETE CASCADE, 
+--     exception_date DATE NOT NULL,
+--     start_time TIME,  
+--     end_time TIME,  
+--     CONSTRAINT unique_schedule_exception UNIQUE (schedule_id, exception_date)
+-- );
 
 --tutaj jeszcze nalozyc ogarniczenie ze doctor_id i user_id sa unikanle bo doktor ma id w bazie user zeby sam nie do siebie na wizyte nie mgol umowuc
 CREATE TABLE appointments (
@@ -147,11 +147,17 @@ CREATE TABLE appointments (
 
 CREATE INDEX idx_appointment_time ON appointments(appointment_time);
 
+CREATE INDEX idx_appointment_time_patient
+ON appointments (user_id, appointment_time);
+
+
+
 
 SELECT u.id, d.degree AS label, u.name, u.surname
 FROM users as u 
 JOIN doctors as d ON u.id = d.user_id
 WHERE u.role = 'doctor';
+
 
 SELECT d.degree, u.name, u.surname FROM users AS u
 JOIN doctors AS d ON u.id = d.user_id
