@@ -113,10 +113,12 @@ export default function SignIn(props) {
       console.log(response);
       const token = response?.data?.token;
       const {id,email, iat, name, surname, birthDay, role} = jwtDecode(token);
-      const roles = ["user"] 
+      const roles = [role] 
       setAuth({id, user: email, roles, token,iat});
       setData({name: upperCaseFirstLetter(name), surname: upperCaseFirstLetter(surname), email, birthDay});
-      if(roles.find((role => role === 'admin'))){
+
+      console.log(role)
+      if(role === 'admin'){
         navigate('/admin-home');
       }else{
         navigate('/');

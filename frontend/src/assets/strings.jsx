@@ -14,11 +14,11 @@ export const sexErrorText = "Należy wybrać płec."
 
 
 export const doctorDegrees = [
-    { value: "dr n. med.", label: "Doktor nauk medycznych" },
-    { value: "dr hab. n. med.", label: "Doktor habilitowany nauk medycznych" },
-    { value: "prof. dr hab. n. med.", label: "Profesor doktor habilitowany nauk medycznych" },
-    { value: "lek.", label: "Lekarz" },
-    { value: "lek. dent.", label: "Lekarz dentysta" },
+    { value: 6, label: "Doktor nauk medycznych" },
+    { value: 3, label: "Doktor habilitowany nauk medycznych" },
+    { value: 4, label: "Profesor doktor habilitowany nauk medycznych" },
+    { value: 2, label: "Lekarz" },
+    { value: 1, label: "Lekarz dentysta" },
   ];
   
 export const weekDays = [
