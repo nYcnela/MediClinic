@@ -12,33 +12,32 @@ import DoctorProfilePage from "./pages/DoctorProfilePage.jsx";
 import AdminHome from "./pages/AdminHome.jsx";
 import RequireAuth from "./components/RequireAuth.jsx";
 import SignIn from "./pages/sign-in/SignIn.jsx";
-import SignUp from "./pages/sign-up/SignUp.jsx"
-import RegistrationSuccess from "./pages/RegistrationSuccess.jsx"
-
+import SignUp from "./pages/sign-up/SignUp.jsx";
+import RegistrationSuccess from "./pages/RegistrationSuccess.jsx";
 
 const ROLES = {
-  User: 'user',
-  Doctor: 'doctor',
-  Admin: 'admin',
+  User: "user",
+  Doctor: "doctor",
+  Admin: "admin",
 };
-
 
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<Layout />} >
+      <Route path="/" element={<Layout />}>
         {/* public routes */}
         <Route path="login" element={<SignIn></SignIn>} />
         <Route path="register" element={<SignUp></SignUp>} />
-        <Route path="/" element={<Home/>} />
-        <Route path="unauthorized" element={<Unauthorized/>} />
-        <Route path="/add-doctor" element={<AddDoctorForm />} />
-        <Route path="/registration-success" element={<RegistrationSuccess/>} />
-        
+        <Route path="/" element={<Home />} />
+        <Route path="unauthorized" element={<Unauthorized />} />
+        <Route path="/registration-success" element={<RegistrationSuccess />} />
 
         <Route element={<RequireAuth allowedRoles={[ROLES.User]} />}>
           <Route path="/profile" element={<PacientProfilePage />} />
-          <Route path="/confirm-appointment/:id" element={<AppointmentConfirmation />} />
+          <Route
+            path="/confirm-appointment/:id"
+            element={<AppointmentConfirmation />}
+          />
           <Route path="/make-appointment" element={<AppointmentForm />} />
         </Route>
 
@@ -47,9 +46,9 @@ function App() {
         </Route>
 
         <Route element={<RequireAuth allowedRoles={[ROLES.Admin]} />}>
-          
-          <Route path='/admin-home' element={<AdminHome />} />
-        </Route> 
+          <Route path="/add-doctor" element={<AddDoctorForm />} />
+          <Route path="/admin-home" element={<AdminHome />} />
+        </Route>
       </Route>
     </Routes>
   );

@@ -36,31 +36,7 @@ export const genders = [
   { value: "woman", label: "Kobieta" }
 ]
 
-export const doctorSpecializations = [
-    { label: "Kardiolog", value: "kardiolog" },
-    { label: "Pediatra", value: "pediatra" },
-    { label: "Dermatolog", value: "dermatolog" },
-    { label: "Endokrynolog", value: "endokrynolog" },
-    { label: "Neurolog", value: "neurolog" },
-    { label: "Psychiatra", value: "psychiatra" },
-    { label: "Chirurg", value: "chirurg" },
-    { label: "Ortopeda", value: "ortopeda" },
-    { label: "Onkolog", value: "onkolog" },
-    { label: "Laryngolog", value: "laryngolog" },
-    { label: "Okulista", value: "okulista" },
-    { label: "Ginekolog", value: "ginekolog" },
-    { label: "Urolog", value: "urolog" },
-    { label: "Pulmonolog", value: "pulmonolog" },
-    { label: "Gastrolog", value: "gastrolog" },
-    { label: "Alergolog", value: "alergolog" },
-    { label: "Diabetolog", value: "diabetolog" },
-    { label: "Reumatolog", value: "reumatolog" },
-    { label: "Radiolog", value: "radiolog" },
-    { label: "Anestezjolog", value: "anestezjolog" },
-    { label: "Hematolog", value: "hematolog" },
-    { label: "Lekarz rodzinny", value: "rodzinny" },
-    { label: "Nefrolog", value: "nefrolog" },
-  ];
+
 
 
   export const doctors = [

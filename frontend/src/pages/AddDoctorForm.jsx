@@ -18,7 +18,7 @@ import ColorModeSelect from '../shared-theme/ColorModeSelect';
 import NavBar from '../components/NavBar';
 import { GradientContainer } from './sign-in/SignIn';
 import { sendDoctorData } from '../functions/requests';
-import { doctorDegrees, doctorSpecializations, weekDays } from '../assets/strings';
+import { doctorDegrees, weekDays } from '../assets/strings';
 
 import {
   validateName,
@@ -28,7 +28,6 @@ import {
   validatePesel,
   validatePhoneNumber,
 } from '../functions/validations';
-
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
@@ -97,6 +96,26 @@ export default function AddDoctorForm() {
     sunday: { start: '', end: '' },
   });
 
+
+  const [doctorSpecializations, setDoctorSpecializations] = useState([]);
+
+  useEffect(() => {
+    const fetchDoctorSpecializations = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/doctor/specializations');
+        if (!response.ok) {
+          throw new Error('Błąd sieci');
+        }
+        const data = await response.json();
+        setDoctorSpecializations(data.specializations);
+        console.log(data.specializations);
+      } catch (error) {
+        console.error('Błąd:', error);
+      }
+    };
+
+    fetchDoctorSpecializations();
+  }, []); 
   const availableTimes = [
     '08:00', '08:15', '08:30', '08:45',
     '09:00', '09:15', '09:30', '09:45',
@@ -161,14 +180,31 @@ export default function AddDoctorForm() {
     });
   };
 
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    
+    const specs = specialization.map(spec => ({"value": spec}));
+    const wdays = workDays.map(day => ({"value": day}));
     if(!nameOk || !surnameOk || !phoneNumberOk || !emailOk || !peselOk || !pwzOk || !degreeOk || !specializationOk || !workDaysOk) {
+        console.log("Błąd walidacji");
         return;
     }
 
-    await sendDoctorData({ name, surname, phoneNumber, email, pesel, pwz, degree, specialization, workDays, workHours });
+    console.log("name", name);
+    console.log("surname", surname);
+    console.log("phoneNumber", phoneNumber);
+    console.log("email", email);
+    console.log("pesel", pesel);
+    console.log("pwz", pwz);
+    console.log("degree", degree);
+    console.log("specialization", specs);
+    console.log("workDays", wdays);
+    console.log("workHours", workHours);
+    
+
+
+    await sendDoctorData({ name, surname, phoneNumber, email, pesel, pwz, degree, specialization : specs, workDays : wdays, workHours });
   };
 
   return (
@@ -343,6 +379,7 @@ export default function AddDoctorForm() {
                   );
                   setSpecializationErrorMessage('');
                   setSpecializationOk(true);
+                  console.log(specialization);
                 }}
                 onBlur={() => {
                   if (specialization.length === 0) {
@@ -488,7 +525,9 @@ export default function AddDoctorForm() {
             <Button
               variant="outlined"
               sx={{ mt: 1 }}
-              onClick={() => console.log('name:', name, 'surname:', surname, 'phoneNumber:', phoneNumber, 'email:', email, 'pesel:', pesel, 'pwz:', pwz, 'degree:', degree, 'specialization:', specialization, 'workDays:', workDays, 'workHours:', workHours)}
+              onClick={() => {
+
+              }}
             >
               Lognij se byku
             </Button>
