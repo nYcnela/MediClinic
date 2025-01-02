@@ -188,7 +188,7 @@ export const fetchDoctorById = async (req, res) => {
 export const getDoctorDegree = async (req, res) => {
   try {
     const degrees = await fetchDoctorDegree();
-    return res.status(200).json({ degrees: degrees });
+    return res.status(200).json({ degrees: degrees.map(degree => ({value: degree.id, label: degree.label})) });
   } catch {
     console.log("Error getting doctors' degree");
     return res.status(500).json({ message: "Blad podczas pobierania tytulow doktorow" });
