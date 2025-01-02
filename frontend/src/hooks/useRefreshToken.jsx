@@ -1,21 +1,41 @@
-import {axiosPrivate} from '../axios/axios';
+
+
 import useAuth from './useAuth';
 
 const useRefreshToken = () => {
-    const {setAuth} = useAuth();
+    const { setAuth } = useAuth();
 
     const refresh = async () => {
-        const response = await axiosPrivate.post('/auth/refresh-token',{}, {withCredentials: true});
-        console.log("XD",response);
-        setAuth(prev => {
-            console.log(JSON.stringify(prev));
-            console.log(response.data.token);
-            return {...prev, token: response.data.token}
-        })
-        return response.data.token;
-    }
+        try {
+            const response = await fetch('http://localhost:5000/auth/refresh-token', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include', // To pozwala na dołączenie ciasteczek
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to refresh token');
+            }
+
+            const data = await response.json();
+            console.log("XD", data);
+
+            setAuth(prev => {
+                console.log(JSON.stringify(prev));
+                console.log(data.token);
+                return { ...prev, token: data.token };
+            });
+
+            return data.token;
+        } catch (error) {
+            console.error("Error refreshing token:", error);
+            throw error;
+        }
+    };
 
     return refresh;
-}
+};
 
 export default useRefreshToken;
