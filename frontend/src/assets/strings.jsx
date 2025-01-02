@@ -13,14 +13,6 @@ export const pwzErrorText = "Numer PWZ nie jest poprawny.Numer PWZ sklada się z
 export const sexErrorText = "Należy wybrać płec."
 
 
-export const doctorDegrees = [
-    { value: 6, label: "Doktor nauk medycznych" },
-    { value: 3, label: "Doktor habilitowany nauk medycznych" },
-    { value: 4, label: "Profesor doktor habilitowany nauk medycznych" },
-    { value: 2, label: "Lekarz" },
-    { value: 1, label: "Lekarz dentysta" },
-  ];
-  
 export const weekDays = [
   { value: "monday", label: "Poniedziałek" },
   { value: "tuesday", label: "Wtorek" },

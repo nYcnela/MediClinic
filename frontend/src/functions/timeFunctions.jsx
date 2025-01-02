@@ -9,15 +9,15 @@ export function calculateHour(start_h, start_min, offset){
 function convertNumsToHour(hour,mins){
     if(hour<10){
         if(mins < 10){
-            return {label: `${"0"+hour+":0"+mins}`,value: `${"0"+hour+":0"+mins}`}
+            return "0"+hour+":0"+mins
         }else{
-            return {label:`${"0"+hour+":"+mins}` ,value:`${"0"+hour+":"+mins}`} 
+            return "0"+hour+":"+mins
         }
     }else{
         if(mins < 10){
-            return  {label:`${hour+":0"+mins}` ,value:`${hour+":0"+mins}`}
+            return hour+":0"+mins
         }else{
-            return {label:`${hour+":"+mins}` ,value:`${hour+":"+mins}`}
+            return hour+":"+mins
         }
     }
 }
@@ -41,6 +41,8 @@ export function createHoursWithStep(h1_hour, h1_min, h2_hour,h2_min, step){
     return hours;
    
 }
+
+
 
 
 export function validateHoursRange(firtsHour,secondHour,setStatus, setError){
