@@ -127,7 +127,22 @@ export const fetchDoctorBySpecializations = async (specialization) => {
     const response = await client.query(query, [specialization]);
     return response.rows;
   } catch (error) {
-    console.log("Errror selecting doctor by specialization", error);
+    console.log("Errror selecting doctor by specialization name", error);
+    throw error;
+  } finally {
+    client.release();
+  }
+};
+
+export const fetchDoctorBySpecializationId = async (id) => {
+  const client = await db.connect();
+  try {
+    const query =
+      "SELECT u.id, d.degree_id, u.name, u.surname FROM users AS u JOIN doctors AS d ON u.id = d.user_id JOIN doctor_specializations AS ds ON ds.doctor_id = d.user_id JOIN specializations AS sp ON sp.id = ds.specialization_id WHERE sp.id = $1";
+    const response = await client.query(query, [id]);
+    return response.rows;
+  } catch (error) {
+    console.log("Errror selecting doctor by specialization id", error);
     throw error;
   } finally {
     client.release();

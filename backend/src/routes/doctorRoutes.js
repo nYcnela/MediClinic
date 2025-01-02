@@ -3,6 +3,7 @@ import {
   addDoctor,
   fetchSpecializations,
   getDoctorBySpecializations,
+  getDoctorBySpecializationId,
   fetchDoctors,
   fetchDoctorById,
   getDoctorDegree,
@@ -29,7 +30,7 @@ const router = express.Router();
 router.get("/work-hours/:id", verifyAccessToken, authorizeDoctorOrAdmin, getDoctorWorkHours)
 router.get("/degree", verifyAccessToken, authorizeAdmin, getDoctorDegree);
 router.get("/specializations", fetchSpecializations);
-router.get("/specializations/:specializationName", getDoctorBySpecializations);
+router.get("/specializations/:id", getDoctorBySpecializationId);
 router.get("/list", fetchDoctors);
 router.get("/:id", verifyAccessToken, authorizeUserOrAdmin, fetchDoctorById);
 router.post("/add", verifyAccessToken, authorizeAdmin, validateDoctorForm, addDoctor);

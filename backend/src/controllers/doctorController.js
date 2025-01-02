@@ -2,6 +2,7 @@ import {
   registerDoctorTransaction,
   fetchDoctorSpecializations,
   fetchDoctorBySpecializations,
+  fetchDoctorBySpecializationId,
   fetchAllDoctors,
   fetchDoctor,
   fetchDoctorDegree,
@@ -131,6 +132,24 @@ export const getDoctorBySpecializations = async (req, res) => {
     return res.status(500).json({ message: "Blad podczas pobierania doktorow wyszukujac po specjalizacji" });
   }
 };
+
+export const getDoctorBySpecializationId = async (req, res) => {
+  try {
+    const { id: specializationid } = req.params;
+    const allDegrees = await fetchDoctorDegree();
+    const doctors = (await fetchDoctorBySpecializationId(specializationid)).map((doctor) => ({
+      value: doctor.id,
+      label: allDegrees.find((degree) => degree.id === doctor.degree_id).value + " " + doctor.name + " " + doctor.surname,
+    }));
+    if (doctors.length === 0) {
+      return res.status(404).json({ message: "Doktorzy z podana specjalizacja nie istnieja" });
+    }
+    return res.status(200).json({ doctors: doctors });
+  } catch (error) {
+    return res.status(500).json({ message: "Blad podczas pobierania doktorow wyszukujac po specjalizacji" });
+  }
+};
+
 
 /**
  * Handles the request to fetch all doctors
