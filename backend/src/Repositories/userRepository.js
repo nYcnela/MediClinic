@@ -87,6 +87,20 @@ export const fetchUser = async (userId) => {
   }
 };
 
+export const fetchAllUsers = async () => {
+  const client = await db.connect();
+  try {
+    const query = "SELECT name, surname, id, role FROM users";
+    const users = await client.query(query);
+    return users.rows;
+  } catch (error) {
+    console.log("Error fetching all users: ", error);
+    throw error;
+  } finally {
+    client.release();
+  }
+};
+
 /**
  *
  * @param {string} email - user's email adress

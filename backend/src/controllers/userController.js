@@ -6,9 +6,21 @@ import {
   findUserByPhoneNumber,
   updateUserPassword,
   findUserById,
+  fetchAllUsers,
 } from "../Repositories/userRepository.js";
 import { formatPhoneNumber } from "../utils/formatters.js";
 import { hashPassword } from "../utils/hashing.js";
+
+export const getAllUsers = async (req, res) => {
+  try {
+    const users = await fetchAllUsers(); 
+
+    res.status(200).json({ users: users });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ message: "Blad podczas pobierania uzytkownikow" });
+  }
+}
 
 export const fetchUserById = async (req, res) => {
   const { id: userId } = req.params;
