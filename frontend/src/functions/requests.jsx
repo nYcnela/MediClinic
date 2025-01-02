@@ -1,5 +1,4 @@
-import axios from 'axios';
-    
+import axios from "../axios/axios.js";
 export async function sendCheckRequest(data,type,setError,setStatus){
     const checkEndpoint = 'http://localhost:5000/auth/check-user'
     try{
@@ -42,30 +41,7 @@ export async function sendRegistrationData(name,surname, phoneNumber, email, pes
             
 }
 
-export async function sendDoctorData(name,surname,phoneNumber,email,pesel,pwz,degree, specialization,workDays,workHours){
 
-    const endpoint = 'http://localhost:5000/doctor/add'
-
-    event.preventDefault();
-        try{
-            const response = await axios.post(endpoint, {
-                name,
-                surname,
-                pesel,
-                email,
-                phoneNumber,
-                pwz,
-                degree, 
-                specialization,
-                workDays,
-                workHours
-            });
-            console.log("odpowiedz z serwera: ", response.data);
-        }catch (error){
-            console.log("UPS");
-            console.log(error);
-        }
-}
 
 export async function filterItemsByCategory(category){
     const endpoint = 'endpoint'

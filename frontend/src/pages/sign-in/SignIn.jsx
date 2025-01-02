@@ -116,7 +116,7 @@ export default function SignIn(props) {
       const roles = [role] 
       setAuth({id, user: email, roles, token,iat});
       setData({name: upperCaseFirstLetter(name), surname: upperCaseFirstLetter(surname), email, birthDay});
-
+      console.log(token);
       console.log(role)
       if(role === 'admin'){
         navigate('/admin-home');

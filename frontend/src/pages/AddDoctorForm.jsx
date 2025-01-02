@@ -16,9 +16,9 @@ import { styled } from '@mui/material/styles';
 import AppTheme from '../shared-theme/AppTheme';
 import ColorModeSelect from '../shared-theme/ColorModeSelect';
 import NavBar from '../components/NavBar';
+import useRefreshToken from '../hooks/useRefreshToken';
 import { GradientContainer } from './sign-in/SignIn';
-import { sendDoctorData } from '../functions/requests';
-import { doctorDegrees, weekDays } from '../assets/strings';
+import { weekDays } from '../assets/strings';
 
 import {
   validateName,
@@ -28,6 +28,7 @@ import {
   validatePesel,
   validatePhoneNumber,
 } from '../functions/validations';
+import useAxiosPrivate from '../hooks/useAxiosPrivate';
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
@@ -50,6 +51,7 @@ const Card = styled(MuiCard)(({ theme }) => ({
 }));
 
 export default function AddDoctorForm() {
+  const axiosPrivate = useAxiosPrivate();
   const [name, setName] = useState('');
   const [nameOk, setNameOk] = useState(false);
   const [nameErrorMessage, setNameErrorMessage] = useState('');
@@ -98,7 +100,21 @@ export default function AddDoctorForm() {
 
 
   const [doctorSpecializations, setDoctorSpecializations] = useState([]);
+  const [doctorDegrees, setDoctorDegrees] = useState([]);
+  
+  const ADD_DOCTOR_URL = '/doctor/add'
 
+  
+  const fetchDoctorDegrees = async () => {
+    try {
+      const response = await axiosPrivate.get('/doctor/degree');
+      const data = response.data.degrees.map((degree) => ({ value: degree.id, label: degree.label }));
+      setDoctorDegrees(data);
+      console.log(data);
+    } catch (error) {
+      console.error('Błąd:', error);
+    }
+  };
   useEffect(() => {
     const fetchDoctorSpecializations = async () => {
       try {
@@ -114,7 +130,13 @@ export default function AddDoctorForm() {
       }
     };
 
+    
+
+    
+    
+
     fetchDoctorSpecializations();
+    fetchDoctorDegrees();
   }, []); 
   const availableTimes = [
     '08:00', '08:15', '08:30', '08:45',
@@ -142,6 +164,7 @@ export default function AddDoctorForm() {
   });
   // useEffect, który zeruje godziny dla dni niewybranych w workDays,
   // ale NIE usuwa całkowicie klucza z obiektu workHours.
+  const XD = useRefreshToken();
   useEffect(() => {
     setWorkHours((prev) => {
       const updatedWorkHours = { ...prev };
@@ -180,6 +203,8 @@ export default function AddDoctorForm() {
     });
   };
 
+  
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -201,10 +226,40 @@ export default function AddDoctorForm() {
     console.log("specialization", specs);
     console.log("workDays", wdays);
     console.log("workHours", workHours);
-    
+
+    console.log({
+      name,
+      surname,
+      pesel,
+      email,
+      phoneNumber,
+      pwz,
+      degree, 
+      specialization: specs,
+      workDays: wdays,
+      workHours
+  })
+        try{
+            const response = await axiosPrivate.post(ADD_DOCTOR_URL, {
+                name,
+                surname,
+                pesel,
+                email,
+                phoneNumber,
+                pwz,
+                degree, 
+                specialization: specs,
+                workDays: wdays,
+                workHours
+            });
+            console.log("odpowiedz z serwera: ", response.data);
+        }catch (error){
+            console.log("UPS");
+            console.log(error);
+        }
 
 
-    await sendDoctorData({ name, surname, phoneNumber, email, pesel, pwz, degree, specialization : specs, workDays : wdays, workHours });
+    //await sendDoctorData({ name, surname, phoneNumber, email, pesel, pwz, degree, specialization : specs, workDays : wdays, workHours });
   };
 
   return (
@@ -526,7 +581,7 @@ export default function AddDoctorForm() {
               variant="outlined"
               sx={{ mt: 1 }}
               onClick={() => {
-
+                XD();
               }}
             >
               Lognij se byku
