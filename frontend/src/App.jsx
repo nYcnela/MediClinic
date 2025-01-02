@@ -14,6 +14,8 @@ import RequireAuth from "./components/RequireAuth.jsx";
 import SignIn from "./pages/sign-in/SignIn.jsx";
 import SignUp from "./pages/sign-up/SignUp.jsx";
 import RegistrationSuccess from "./pages/RegistrationSuccess.jsx";
+import DoctorCreated from "./pages/DoctorCreated.jsx";
+import DeleteUsers from "./pages/DeleteUsers.jsx";
 
 const ROLES = {
   User: "user",
@@ -26,11 +28,14 @@ function App() {
     <Routes>
       <Route path="/" element={<Layout />}>
         {/* public routes */}
+        <Route path="delete-users" element={<DeleteUsers />} />
         <Route path="login" element={<SignIn></SignIn>} />
         <Route path="register" element={<SignUp></SignUp>} />
         <Route path="/" element={<Home />} />
         <Route path="unauthorized" element={<Unauthorized />} />
         <Route path="/registration-success" element={<RegistrationSuccess />} />
+        
+        <Route path="/doctor-created" element={<DoctorCreated />} />
 
         <Route element={<RequireAuth allowedRoles={[ROLES.User]} />}>
           <Route path="/profile" element={<PacientProfilePage />} />
