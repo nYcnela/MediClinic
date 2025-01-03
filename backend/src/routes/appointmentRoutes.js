@@ -22,8 +22,8 @@ const router = express.Router();
 
 
 router.post("/create", verifyAccessToken, authorizeUserOrAdmin, validateNewAppointment, createNewAppointment);
-router.get("/schedule/:id",  verifyAccessToken, validateDate(), fetchAvailableAppointments); //todo bkad jest
-router.get("/booked/:id", verifyAccessToken, validateDate("startDate"), validateDate("endDate"), fetchBookedAppointments);
+router.post("/schedule/:id",  verifyAccessToken, validateDate(), fetchAvailableAppointments);
+router.post("/booked/:id", verifyAccessToken, validateDate("startDate"), validateDate("endDate"), fetchBookedAppointments);
 router.get("/user-appointments/:id", getUserAppointments);
 router.get("/user-appointments/:id", verifyAccessToken, authorizeUserOrAdmin, getUserAppointments);
 router.get("/:id", verifyAccessToken, getAppointment);
