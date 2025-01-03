@@ -10,8 +10,10 @@ import ItemCategorySearchBar from "./ItemCategorySearchBar";
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import { format } from 'date-fns';
+import { format, set } from 'date-fns';
 import AppointmentCard from "../components/AppointmentCard";
+import useAxiosPrivate from "../hooks/useAxiosPrivate";
+import { use } from "react";
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -37,31 +39,46 @@ const Card = styled(MuiCard)(({ theme }) => ({
 
 function AppointmentForm(props) {
   const [selectedDoctor, setSelectedDoctor] = useState(null);
+  const [selectedDoctorLabel, setSelectedDoctorLabel] = useState(null);
   const [selectedSpecialization, setSelectedSpecialization] = useState(null);
+  const [selectedSpecializationLabel, setSelectedSpecializationLabel] = useState(null);
   const [isSearchButtonDisabled, setIsSearchButtonDisabled] = useState(true);
   const [availableTerms, setAvailableTerms] = useState([]);
   const [selectedDate, setSelectedDate] = useState(null);
   const [formattedDate, setFormattedDate] = useState("");
-
+  const [buttonClicked, setButtonClicked] = useState(false);
+  const axiosPrivate = useAxiosPrivate();
   useEffect(() => {
-    if (selectedDoctor === null && selectedSpecialization === null) {
+    if (selectedDoctor === null || selectedDate === null) {
       setIsSearchButtonDisabled(true);
     } else {
       setIsSearchButtonDisabled(false);
     }
-  }, [selectedDoctor, selectedSpecialization]);
+    
+  }, [selectedDoctor, selectedDate]);
+
+ 
+
 
   const handleDateChange = (date) => {
-    const formattedDate = format(date, 'dd/MM/yyyy HH:mm');
-    console.log(date);
-    console.log(formattedDate);
+    const formattedDate = format(date, 'yyyy-MM-dd HH:mm:ss');
     setFormattedDate(formattedDate);
     setSelectedDate(date);
   };
 
-  const handleSearchClick = () => {
-    const appointments = selectedDoctor === null ? getAppointmentsBySpecAndDate() : " XDDDDDDDD";
-    console.log(appointments);
+
+   const handleSearchClick =  async () => {
+    setButtonClicked(true);
+    try {
+      const response = await axiosPrivate.post(`/appointment/schedule/${selectedDoctor}`, {  date: formattedDate });
+      if(response.data.availableAppointments.length > 0) {
+        setAvailableTerms(response.data.availableAppointments);
+      }else{
+        setAvailableTerms([]);
+      }
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
@@ -81,13 +98,13 @@ function AppointmentForm(props) {
             <ItemCategorySearchBar
               getItemsLink='http://localhost:5000/doctor/list'
               getCategoriesLink='http://localhost:5000/doctor/specializations'
-              getItemsByCategoryIdLink=''
-              getItemCategoriesByItemIdLink=''
+              getItemsByCategoryLink='http://localhost:5000/doctor/specializations'
               itemsField='doctors'
               categoriesField='specializations'
               setItem={setSelectedDoctor}
               setCategory={setSelectedSpecialization}
-              
+              setItemLabel={setSelectedDoctorLabel}
+              setCategoryLabel={setSelectedSpecializationLabel}
             />
             <Typography variant="h6" component="h3" sx={{ mt: 2 }}>
               Wyszukaj wolny termin:
@@ -102,7 +119,7 @@ function AppointmentForm(props) {
               />
             </LocalizationProvider>
             <Button
-              
+              onClick={handleSearchClick}
               variant="outlined"
               color="primary"
               sx={{ width: "80%", marginTop : "2%"}}
@@ -111,15 +128,24 @@ function AppointmentForm(props) {
               Szukaj
             </Button>
             {/* Renderowanie dostępnych terminów */}
-            {availableTerms.length >= 0 && (
+            {availableTerms.length > 0 && (
               <Box sx={{ mt: 2, width: '80%' }}>
                 <Typography variant="h6">Dostępne terminy:</Typography>
                 {/* Renderowanie dostępnych terminów */}
-                <AppointmentCard
-                  title="lek. Katarzyna Lachowska"
-                  specialties="Pediatra"
-                  data="09.08.2024 17:00"
-                />
+                {availableTerms.map((term,index) => (
+                  <AppointmentCard
+                    key={index}
+                    title={selectedDoctorLabel}
+                    id={selectedDoctor}
+                    specialties={selectedSpecializationLabel}
+                    date={term}
+                  />
+                ))}
+              </Box>
+            )}
+            {(availableTerms.length === 0 && buttonClicked)  && (
+              <Box sx={{ mt: 2, width: '80%', textAlign: 'center', color: 'red' }}> 
+                <Typography variant="h6" >Brak dostępnych terminów tego dnia</Typography>
               </Box>
             )}
           </Box>

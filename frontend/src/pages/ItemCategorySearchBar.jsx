@@ -1,6 +1,16 @@
-import React, { useEffect, useState } from 'react';
-import { Box, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
-import axios from 'axios';
+import React, { useEffect, useState } from "react";
+import {
+  Box,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Typography,
+} from "@mui/material";
+import axios from "axios";
+import useAxiosPrivate from "../hooks/useAxiosPrivate";
+import { set } from "date-fns";
+import { axiosPrivate } from "../axios/axios";
 
 function ItemCategorySearchBar({
   getItemsLink,
@@ -10,87 +20,100 @@ function ItemCategorySearchBar({
   categoriesField,
   setItem,
   setCategory,
+  setItemLabel,
+  setCategoryLabel,
 }) {
   const [items, setItems] = useState([]);
   const [categories, setCategories] = useState([]);
-
-  const [selectedItem, setSelectedItem] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('');
-
+  const [selectedItem, setSelectedItem] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
   const [isCategoryDisabled, setIsCategoryDisabled] = useState(false);
 
-  /**
-   * Funkcja pomocnicza do pobierania danych z API
-   */
   const fetchData = async (link, field, setter) => {
     try {
       const response = await axios.get(link);
       setter(response.data[field] || []);
     } catch (error) {
-      console.error('Błąd podczas pobierania danych:', error);
+      if (error.response.status === 404) {
+        console.log("Brak wyników dla wybranych kryteriów");
+        setItems([]);
+      }
+      console.error("Błąd podczas pobierania danych:", error);
     }
   };
 
   useEffect(() => {
-    if (selectedCategory && !selectedItem) {
-      // Gdy wybrano kategorię, ale nie wybrano itemu:
-      fetchData(getItemsByCategoryLink, itemsField, setItems);
-      setIsCategoryDisabled(false);
-    } else if (!selectedCategory && selectedItem) {
-      // Gdy wybrano item, ale nie wybrano kategorii:
+    if (selectedItem) {
       setIsCategoryDisabled(true);
+      
+    } else if (selectedCategory) {
+      fetchData(
+        getItemsByCategoryLink + "/" + selectedCategory,
+        itemsField,
+        setItems
+      );
+      setIsCategoryDisabled(false);
     } else {
-      // Stan początkowy lub wyczyszczone filtry:
       fetchData(getItemsLink, itemsField, setItems);
       fetchData(getCategoriesLink, categoriesField, setCategories);
       setIsCategoryDisabled(false);
     }
-  }, [
-    selectedCategory,
-    selectedItem,
-    getItemsByCategoryLink,
-    itemsField,
-    getItemsLink,
-    getCategoriesLink,
-    categoriesField,
-  ]);
+  }, [selectedCategory, selectedItem]);
 
   /**
    * Obsługa zmiany w polu "Item" (np. lekarz)
    */
-  const handleItemChange = (event) => {
+  const handleItemChange = async (event) => {
     const newValue = event.target.value;
 
-    // Jeśli chcemy „wyczyścić”, ustawiamy pusty string i nullujemy w propsach
-    if (newValue === '') {
-      setSelectedItem('');
+    if (newValue === "") {
+      setSelectedItem("");
       setItem(null);
     } else {
       setSelectedItem(newValue);
       setItem(newValue);
     }
+
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].value === event.target.value) {
+        setItemLabel(items[i].label);
+      }
+    }
+
+    if(newValue !==""){
+      try{
+        const response = await axiosPrivate.get(`http://localhost:5000/doctor/${newValue}?specializations=true`); 
+        const { doctor } = response.data;
+        const specializationsNames = doctor?.specializations?.map((item) => item.name) || [];       
+        const specializationNamesString = specializationsNames.join(', ');
+        setCategoryLabel(specializationNamesString);
+      }
+      catch(error){
+        console.error(error);
+      }
+    }
+    
   };
 
-  /**
-   * Obsługa zmiany w polu "Category" (np. specjalizacja)
-   */
   const handleCategoryChange = (event) => {
     const newValue = event.target.value;
 
     // Jeśli chcemy „wyczyścić”, ustawiamy pusty string i nullujemy w propsach
-    if (newValue === '') {
-      setSelectedCategory('');
+    if (newValue === "") {
+      setSelectedCategory("");
       setCategory(null);
     } else {
       setSelectedCategory(newValue);
       setCategory(newValue);
     }
+
+    
   };
 
   return (
-    <Box sx={{ display: 'flex', gap: 2, width: '80%', flexWrap: 'wrap' }}>
+    <Box sx={{ display: "flex", gap: 2, width: "80%", flexWrap: "wrap" }}>
       {/* Wybór itemu (np. lekarza) */}
-      <FormControl fullWidth sx={{ minWidth: { xs: '100%', sm: '300px' } }}>
+      <FormControl fullWidth sx={{ minWidth: { xs: "100%", sm: "300px" } }}>
         <InputLabel id="select-item-label">Wybierz lekarza</InputLabel>
         <Select
           labelId="select-item-label"
@@ -111,9 +134,19 @@ function ItemCategorySearchBar({
         </Select>
       </FormControl>
 
+      {items.length === 0 && (
+        <Box sx={{ width: "100%", textAlign: "center", color: "red" }}>
+          <Typography variant="h9">
+            Brak dostępnych wyników dla danych kryteriów
+          </Typography>
+        </Box>
+      )}
+
       {/* Wybór kategorii (np. specjalizacji) */}
-      <FormControl fullWidth sx={{ minWidth: { xs: '100%', sm: '300px' } }}>
-        <InputLabel id="select-category-label">Wybierz specjalizację</InputLabel>
+      <FormControl fullWidth sx={{ minWidth: { xs: "100%", sm: "300px" } }}>
+        <InputLabel id="select-category-label">
+          Wybierz specjalizację
+        </InputLabel>
         <Select
           labelId="select-category-label"
           value={selectedCategory}

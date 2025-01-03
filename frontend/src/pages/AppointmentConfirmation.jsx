@@ -5,6 +5,9 @@ import { styled } from '@mui/material/styles';
 import NavBar from '../components/NavBar';
 import AppTheme from '../shared-theme/AppTheme';
 import ColorModeSelect from '../shared-theme/ColorModeSelect';
+import useUserData from '../hooks/useUserData';
+import useAuth from '../hooks/useAuth';
+import useAxiosPrivate from '../hooks/useAxiosPrivate';
 
 const ConfirmationCard = styled(Card)(({ theme }) => ({
   maxWidth: 600,
@@ -24,22 +27,37 @@ const ConfirmationCard = styled(Card)(({ theme }) => ({
 
 function AppointmentConfirmation() {
   const navigate = useNavigate();
-  const { id } = useParams();
   const [confirmed, setConfirmed] = useState(false);
-
+  const { data, setData } = useUserData();
+  const { auth } = useAuth();
+  const axiosPrivate = useAxiosPrivate();
   const object = {
-    doctor: 'dr nauk andrzej macierewicz',
-    specialties: 'endokrynolog',
-    data: '09.02.2032 17:32',
+    doctor: data.appointment_title,
+    specialties: data.appointment_specialties,
+    data: data.appointment_date,
+    id: data.appointment_id
   };
+  const CREATE_APPOINTMENT_ENDPOINT = "/appointment/create";
 
   const pacjent = {
-    id: '123456',
-    name: 'Jan Kowalski',
-    pesel: '03351232094',
+    id: auth.id,
+    name: data.name + ' ' + data.surname,
   };
 
-  const handleClick = () => {
+  const handleClick = async () => {
+    try { 
+          const response = await axiosPrivate.post(CREATE_APPOINTMENT_ENDPOINT, {
+            doctorId:object.id,
+            userId:pacjent.id,
+            appointmentTime: object.data
+          });
+          if(response.status === 201){
+            navigate("/registration-success");
+          }
+      } catch (error) {
+          console.log(error.message);
+      }
+
     setConfirmed((prev) => !prev);
   };
 
@@ -60,7 +78,6 @@ function AppointmentConfirmation() {
                 <Typography variant="body1">Specjalizacja: {object.specialties}</Typography>
                 <Typography variant="body1">Data: {object.data}</Typography>
                 <Typography variant="body1">Pacjent: {pacjent.name}</Typography>
-                <Typography variant="body1">PESEL: {pacjent.pesel}</Typography>
               </CardContent>
               <CardActions sx={{ justifyContent: 'flex-end' }}>
                 <Button variant="contained" onClick={handleClick}>

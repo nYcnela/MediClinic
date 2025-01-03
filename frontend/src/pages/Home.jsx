@@ -97,19 +97,9 @@ function Home(props) {
                     variant="outlined"
                     color="primary"
                     sx={{ width: "100%" }}
+                    disabled = {true}
                   >
                     Chcę zobaczyć profile lekarzy
-                  </Button>
-                </ListItem>
-                <ListItem sx={{ width: "100%" }}>
-                  <Button
-                    component={Link}
-                    to="/team"
-                    variant="outlined"
-                    color="primary"
-                    sx={{ width: "100%" }}
-                  >
-                    Chcę poznać zespół MediClinic
                   </Button>
                 </ListItem>
           </List>

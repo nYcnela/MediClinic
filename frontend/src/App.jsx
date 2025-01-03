@@ -28,19 +28,17 @@ function App() {
     <Routes>
       <Route path="/" element={<Layout />}>
         {/* public routes */}
-        <Route path="delete-users" element={<DeleteUsers />} />
+        
         <Route path="login" element={<SignIn></SignIn>} />
         <Route path="register" element={<SignUp></SignUp>} />
         <Route path="/" element={<Home />} />
-        <Route path="unauthorized" element={<Unauthorized />} />
+        <Route path="/unauthorized" element={<Unauthorized />} />
         <Route path="/registration-success" element={<RegistrationSuccess />} />
-        
-        <Route path="/doctor-created" element={<DoctorCreated />} />
 
         <Route element={<RequireAuth allowedRoles={[ROLES.User]} />}>
           <Route path="/profile" element={<PacientProfilePage />} />
           <Route
-            path="/confirm-appointment/:id"
+            path="/confirm-appointment"
             element={<AppointmentConfirmation />}
           />
           <Route path="/make-appointment" element={<AppointmentForm />} />
@@ -53,6 +51,8 @@ function App() {
         <Route element={<RequireAuth allowedRoles={[ROLES.Admin]} />}>
           <Route path="/add-doctor" element={<AddDoctorForm />} />
           <Route path="/admin-home" element={<AdminHome />} />
+          <Route path="/delete-users" element={<DeleteUsers />} />
+        <Route path="/doctor-created" element={<DoctorCreated />} />
         </Route>
       </Route>
     </Routes>

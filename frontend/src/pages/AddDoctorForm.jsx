@@ -115,9 +115,7 @@ export default function AddDoctorForm() {
     const fetchDoctorDegrees = async () => {
       try {
         const response = await axiosPrivate.get('/doctor/degree');
-        const data = response.data.degrees.map((degree) => ({ value: degree.id, label: degree.label }));
-        setDoctorDegrees(data);
-        console.log(data);
+        setDoctorDegrees(response.data.degrees);
       } catch (error) {
         console.error('Błąd:', error);
       }

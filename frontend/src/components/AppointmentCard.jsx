@@ -1,13 +1,29 @@
 import React from 'react';
 import { Card, CardContent, CardActions, Typography, Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-
-function AppointmentCard({ title, specialties, data, id }) {
+import useUserData from '../hooks/useUserData';
+import { format, set } from 'date-fns';
+import parseISO from 'date-fns/parseISO';
+function AppointmentCard({ title, id, specialties, date }) {
   const navigate = useNavigate();
+  const {data, setData} = useUserData();
   const handleClick = () => {
-    const wizytaId = id; 
-    navigate(`/confirm-appointment/${wizytaId}`);
+    navigate(`/confirm-appointment`);
+    setAppointmentData();
   };
+
+  
+  const setAppointmentData = () => {
+    const dateObject = parseISO(date)
+    setData((prev) => ({
+      ...prev,
+        appointment_id: id,
+        appointment_date: format(dateObject, 'yyyy-MM-dd HH:mm:ss'),
+        appointment_title: title,
+        appointment_specialties: specialties,
+    })
+    )
+  }
 
   return (
     <Card
@@ -23,14 +39,14 @@ function AppointmentCard({ title, specialties, data, id }) {
       variant="outlined"
     >
       <CardContent>
-        <Typography variant="h5" component="div">
+      <Typography variant="h5" component="div">
           {title}
         </Typography>
         <Typography variant="body2" sx={{ mb: 1 }}>
           {specialties}
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          Data wizyty: {data}
+          Data wizyty: {date}
         </Typography>
       </CardContent>
       <CardActions>
