@@ -32,7 +32,7 @@ router.get("/degree", verifyAccessToken, authorizeAdmin, getDoctorDegree);
 router.get("/specializations", fetchSpecializations);
 router.get("/specializations/:id", getDoctorBySpecializationId);
 router.get("/list", fetchDoctors);
-router.get("/:id", verifyAccessToken, authorizeUserOrAdmin, fetchDoctorById);
+router.get("/:id", verifyAccessToken, fetchDoctorById);
 router.post("/add", verifyAccessToken, authorizeAdmin, validateDoctorForm, addDoctor);
 router.patch("/update/work-hours/:id", verifyAccessToken, authorizeAdmin, validateWorkHours, updateWorkHours);
 
