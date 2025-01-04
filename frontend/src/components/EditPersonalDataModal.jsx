@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Box } from '@mui/material';
-
+import useUserData from "../hooks/useUserData";
 function EditPersonalDataModal({ isOpen, onClose }) {
+  const { data } = useUserData();
   const [formData, setFormData] = useState({
-    name: "Jan Kowalski",
-    dob: "1980-05-12",
-    email: "jan.kowalski@example.com",
+    name: data.name + " " + data.surname,
+    dob: data.birthDay,
+    email: data.email,
   });
 
   const handleChange = (e) => {
@@ -24,23 +25,7 @@ function EditPersonalDataModal({ isOpen, onClose }) {
       <DialogTitle>Edytuj dane osobowe</DialogTitle>
       <DialogContent>
         <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2, marginTop: 2 }}>
-          <TextField
-            label="Imię i nazwisko"
-            type="text"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            fullWidth
-          />
-          <TextField
-            label="Data urodzenia"
-            type="date"
-            name="dob"
-            value={formData.dob}
-            onChange={handleChange}
-            fullWidth
-            InputLabelProps={{ shrink: true }}
-          />
+          
           <TextField
             label="E-mail"
             type="email"
