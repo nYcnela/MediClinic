@@ -1,20 +1,45 @@
 import React, { useState } from "react";
 import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Box } from '@mui/material';
+import useAuth from "../hooks/useAuth";
+import useAxiosPrivate from "../hooks/useAxiosPrivate";
+import {validatePassword}  from "../functions/validations";
+
 
 function EditPasswordModal({ isOpen, onClose }) {
   const [password, setPassword] = useState("");
-  const [email, setEmail] = useState("jan.kowalski@example.com");
-
+  const [passwordOk, setPasswordOk] = useState(true);
+  const [passwordError, setPasswordError] = useState("");
+  const [passwordConfirmation, setPasswordConfirmation] = useState("");
+  const { auth } = useAuth();
+  const id = auth.id;
+  const axiosPrivate = useAxiosPrivate();
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Implementacja zmiany hasła i e-maila
-    console.log({ password, email });
-    onClose(); // Zamknięcie po zapisaniu
+
+    if(password !== passwordConfirmation) {
+      setPasswordError("Hasła nie są takie same");
+      setPasswordOk(false);
+      return;
+    }
+
+    try {
+      axiosPrivate.patch(`/user/update/password/${id}`, 
+        { password }
+      ).then((response) => {
+        console.log(response.data);
+      });
+      window.alert("Hasło zostało zmienione");
+      onClose(); // Zamknięcie po zapisaniu
+    }
+    catch (error) {
+      console.error(error);
+    }
+    
   };
 
   return (
     <Dialog open={isOpen} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>Zmień hasło i e-mail</DialogTitle>
+      <DialogTitle>Zmień hasło</DialogTitle>
       <DialogContent>
         <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
           <TextField
@@ -23,15 +48,23 @@ function EditPasswordModal({ isOpen, onClose }) {
             name="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            onBlur={(e)=>validatePassword(e.target.value, setPasswordError, setPasswordOk)}
             fullWidth
+            helperText={passwordError}
+            color={passwordOk ? "primary" : "error"}
+            error={!passwordOk}
           />
+
           <TextField
-            label="E-mail"
-            type="email"
-            name="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            label="Potwierdź hasło"
+            type="password"
+            name="passwordConfirmation"
+            value={passwordConfirmation}
+            helperText={passwordError}
+            onChange={(e) => setPasswordConfirmation(e.target.value)}
+            color={passwordOk ? "primary" : "error"}
             fullWidth
+            error={!passwordOk}
           />
           <DialogActions>
             <Button onClick={onClose} color="secondary">Anuluj</Button>

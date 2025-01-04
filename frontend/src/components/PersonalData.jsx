@@ -45,9 +45,6 @@ function PersonalData({ onEdit }) {
       <Typography variant="body1">
         E-mail: {data.email}
       </Typography>
-      <Button variant="outlined" color="primary" onClick={onEdit}>
-        Edytuj dane osobowe
-      </Button>
     </Card>
   );
 }

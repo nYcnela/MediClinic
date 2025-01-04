@@ -109,6 +109,7 @@ export default function SignIn(props) {
         jwtDecode(token);
       const roles = [role];
       setAuth({ id, user: email, roles, token, iat });
+      console.log(token);
       setData({
         name: upperCaseFirstLetter(name),
         surname: upperCaseFirstLetter(surname),
