@@ -52,7 +52,7 @@ function Home(props) {
       >
         <Card variant="outlined">
           <Typography variant="h4" component="h1" sx={{ mb: 2 }}>
-            Witaj w MediClinic{name && auth ? `, ${name}` : ""}!
+            Witaj w panelu lekarza MediClinic{name && auth ? `, ${name}` : ""}!
           </Typography>
           <Typography variant="h5" component="h3" sx={{ mb: 4 }}>
             Czego szukasz?
@@ -65,22 +65,11 @@ function Home(props) {
               gap: 2,
             }}
           >
-            <ListItem sx={{ width: "100%" }}>
-              <Button
-                component={Link}
-                to="/make-appointment"
-                variant="contained"
-                color="primary"
-                sx={{ width: "100%" }}
-              >
-                Chcę umówić wizytę
-              </Button>
-            </ListItem>
             {auth?.roles  && (
                 <ListItem sx={{ width: "100%" }}>
                   <Button
                     component={Link}
-                    to={"/profile"}
+                    to={"/doctor-profile"}
                     variant="outlined"
                     color="primary"
                     sx={{ width: "100%" }}
@@ -89,18 +78,6 @@ function Home(props) {
                   </Button>
                 </ListItem>
                 )}
-                <ListItem sx={{ width: "100%" }}>
-                  <Button
-                    component={Link}
-                    to="/doctor-profile"
-                    variant="outlined"
-                    color="primary"
-                    sx={{ width: "100%" }}
-                    disabled = {true}
-                  >
-                    Chcę zobaczyć profile lekarzy
-                  </Button>
-                </ListItem>
           </List>
         </Card>
       </GradientContainer>

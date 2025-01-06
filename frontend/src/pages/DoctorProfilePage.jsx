@@ -1,14 +1,18 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Typography, CssBaseline, Box, Divider } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import MuiCard from '@mui/material/Card';
 import SwitchSelector from "react-switch-selector";
-import UpcomingAppointmentsList from "../components/UpcomingAppointmentsList";
+import DoctorUpcomingAppointmentsList from "../components/DoctorUpcomingAppointmentsList";
 import DoctorCallendar from "../components/DoctorCallendar";
 import NavBar from "../components/NavBar";
 import AppTheme from "../shared-theme/AppTheme";
 import ColorModeSelect from '../shared-theme/ColorModeSelect';
 import { GradientContainer } from './sign-in/SignIn';
+import useUserData from "../hooks/useUserData";
+import useAxiosPrivate from "../hooks/useAxiosPrivate";
+import useAuth from "../hooks/useAuth"; 
+import { format } from "date-fns";
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -45,14 +49,61 @@ function DoctorProfilePage() {
       selectedBackgroundColor: "#fbc531"
     }
   ];
+  
+  const axiosPrivate = useAxiosPrivate();
+  const { data } = useUserData();
+  const { auth } = useAuth();
+  const [upcomingAppointments, setUpcomingAppointments] = useState([]);
+  const [doctorSpecializations, setDoctorSpecializations] = useState([]);
+  const [doctorDegree, setDoctorDegree] = useState("");
+  {/*}
   const data = {
-    name: "Jan",
-    surname: "Żołnowski",
+    name: "Dzon",
+    surname: "Doe",
     degree: "dr. n. med",
     specializations: ["Ortopedia"],
     phoneNumber: "+48 730 560 543",
     email: "dzon@gmail.com"
   };
+  */}
+  useEffect(() => { 
+    try {
+      axiosPrivate.get(`/doctor/${auth.id}?specializations=true`).then((response) => {
+        console.log(response.data);
+        setDoctorDegree(response.data.doctor.label.split(' ')
+        .slice(0, -2)
+        .join(' '));
+        setDoctorSpecializations(response.data.doctor.specializations);
+        console.log("XD",doctorSpecializations);
+        console.log("ZSS",doctorDegree);
+
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  }, []);
+  
+  useEffect(() => {
+    try {
+      const startDateObj = new Date();
+      startDateObj.setMonth(startDateObj.getMonth() - 2);
+      const endDateObj = new Date();
+      endDateObj.setMonth(endDateObj.getMonth() + 2);
+  
+      axiosPrivate
+        .post(`/appointment/booked/${auth.id}`, {
+          startDate: format(startDateObj, "yyyy-MM-dd HH:mm:ss"),
+          endDate: format(endDateObj, "yyyy-MM-dd HH:mm:ss")
+        })
+        .then((response) => {
+          console.log(response.data.appointments);
+          setUpcomingAppointments(response.data.appointments);
+        });
+    } catch (error) {
+      console.error(error);
+    }
+  }, []);
+
 
   const onChange = (newValue) => {
     setIsListViewChoosen(!isListViewChoosen);
@@ -74,9 +125,11 @@ function DoctorProfilePage() {
             </Typography>
             <Typography variant="body1"><strong>Imię:</strong> {data.name}</Typography>
             <Typography variant="body1"><strong>Nazwisko:</strong> {data.surname}</Typography>
-            <Typography variant="body1"><strong>Stopień naukowy:</strong> {data.degree}</Typography>
+            <Typography variant="body1"><strong>Stopień naukowy:</strong> {doctorDegree}</Typography>
+            <Typography variant="body1"><strong>Specjalizacje:</strong> {doctorSpecializations.map((e)=>e.name).join(", ")}</Typography>
+            <Typography variant="body1"><strong>Data urodzin:</strong> {data.birthDay}</Typography>
             <Typography variant="body1">
-              <strong>{data.specializations.length === 1 ? "Specjalizacja:" : "Specjalizacje:"}</strong> {data.specializations.join(", ")}
+            
             </Typography>
           </Box>
           <Divider sx={{ my: 2 }} />
@@ -101,7 +154,14 @@ function DoctorProfilePage() {
             />
           </Box>
           <Box sx={{ width: '100%', flexGrow: 1 }}>
-            {isListViewChoosen ? <UpcomingAppointmentsList /> : <DoctorCallendar />}
+            {isListViewChoosen ? 
+            <DoctorUpcomingAppointmentsList 
+              upcomingAppointmentsList={upcomingAppointments} 
+            /> 
+            : 
+            <DoctorCallendar
+              upcomingAppointmentsList={upcomingAppointments}
+            />}
           </Box>
         </Card>
       </GradientContainer>

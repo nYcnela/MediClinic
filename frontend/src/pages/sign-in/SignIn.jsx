@@ -105,8 +105,9 @@ export default function SignIn(props) {
         password: data.get("password"),
       });
       const token = response?.data?.token;
-      const { id, email, iat, name, surname, birthDay, role } =
+      const { id, email, iat, name, surname, birthDay, role,phoneNumber, dialingCode } =
         jwtDecode(token);
+        console.log(jwtDecode(token));
       const roles = [role];
       setAuth({ id, user: email, roles, token, iat });
       console.log(token);
@@ -115,11 +116,14 @@ export default function SignIn(props) {
         surname: upperCaseFirstLetter(surname),
         email,
         birthDay,
+        phoneNumber: dialingCode + phoneNumber,
       });
       if (role === "admin") {
         navigate("/admin-home");
+      } else if (role === "doctor") {
+        navigate("/doctor-home");
       } else {
-        navigate("/");
+        navigate("/")
       }
     } catch (err) {
       if (!err?.response) {

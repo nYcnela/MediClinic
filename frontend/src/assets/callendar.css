@@ -1,0 +1,52 @@
+/* Cały kontener kalendarza */
+.calendar-container .fc {
+    background-color: #1F1F1F; /* ciemne tło */
+    color: #ffffff;           /* jasne litery */
+  }
+  
+  /* Nagłówek z przyciskami (poprzedni, następny, tytuł) */
+  .calendar-container .fc-toolbar {
+    background-color: #2E2E2E;
+    color: #ffffff;
+  }
+  
+  /* Linie oddzielające godziny i dni */
+  .calendar-container .fc .fc-timegrid-slot {
+    border-color: #444444; /* przyciemnione linie */
+  }
+  
+  /* Godziny po lewej */
+  .calendar-container .fc-timegrid-axis {
+    background-color: #333333;
+    color: #ffffff;
+  }
+  
+  /* Podświetlenie eventów */
+  .calendar-container .fc-event {
+    background-color: #3B82F6; /* np. niebieskie */
+    color: #ffffff;
+    border: none;
+  }
+  
+  /* Nadpisanie wyglądu nagłówków tabeli wewnątrz FullCalendar (widok dayGrid) */
+/* Zmiana wyglądu nagłówków dni w widoku timeGrid (np. timeGridDay, timeGridWeek) */
+.calendar-container .fc .fc-col-header-cell {
+    background-color: #333333;  /* ciemniejsze tło */
+    color: #ffffff;            /* jasny kolor tekstu */
+    font-weight: 500;          /* nieco pogrubiony */
+    text-align: center;        /* wyśrodkowanie tekstu */
+    border-right: 1px solid #444444; /* linia pionowa między komórkami */
+  }
+  
+  /* Jeśli chcesz dodać styl tylko do dni przyszłych, 
+     możesz użyć selektora z klasą .fc-day-future */
+  .calendar-container .fc .fc-col-header-cell.fc-day-future {
+    background-color: #2e2e2e;
+  }
+  
+  /* Natomiast ten selektor zadziała na konkretny dzień tygodnia (np. wtorek) */
+  .calendar-container .fc .fc-col-header-cell.fc-day-tue {
+    color: #ffcc00; /* np. żółty kolor tekstu tylko dla wtorku */
+  }
+  
+  
