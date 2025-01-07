@@ -151,7 +151,7 @@ describe("AuthController - Register", () => {
     };
 
     const testEsmock = await esmock("../../../src/controllers/authController.js", {
-      "../../../src/models/userModel.js": mockedUtils,
+      "../../../src/Repositories/userRepository.js": mockedUtils,
     });
 
     registerUser = testEsmock.registerUser;
