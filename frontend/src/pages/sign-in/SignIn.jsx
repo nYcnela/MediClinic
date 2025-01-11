@@ -77,20 +77,9 @@ export default function SignIn(props) {
   const [emailErrorMessage, setEmailErrorMessage] = React.useState("");
   const [passwordError, setPasswordError] = React.useState(false);
   const [passwordErrorMessage, setPasswordErrorMessage] = React.useState("");
-  const [open, setOpen] = React.useState(false);
-  const [email, setEmail] = React.useState("");
-  const [password, setPassword] = React.useState("");
   const navigate = useNavigate();
   const { auth, setAuth } = useAuth();
   const { setData } = useUserData();
-
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-  };
 
   async function handleSubmit(event) {
     if (emailError || passwordError) {
@@ -224,11 +213,6 @@ export default function SignIn(props) {
                 color={passwordError ? "error" : "primary"}
               />
             </FormControl>
-            <FormControlLabel
-              control={<Checkbox value="remember" color="primary" />}
-              label="Zapamiętaj mnie"
-            />
-            <ForgotPassword open={open} handleClose={handleClose} />
             <Button
               type="submit"
               fullWidth
@@ -237,15 +221,6 @@ export default function SignIn(props) {
             >
               Zaloguj się
             </Button>
-            <Link
-              component="button"
-              type="button"
-              onClick={handleClickOpen}
-              variant="body2"
-              sx={{ alignSelf: "center" }}
-            >
-              Zapomniałeś hasła?
-            </Link>
           </Box>
         </Card>
       </GradientContainer>

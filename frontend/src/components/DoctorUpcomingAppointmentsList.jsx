@@ -29,6 +29,7 @@ const Card = styled(MuiCard)(({ theme }) => ({
       "hsla(220, 30%, 5%, 0.5) 0px 5px 15px 0px, hsla(220, 25%, 10%, 0.08) 0px 15px 35px -5px",
   }),
 }));
+
 function DoctorUpcomingAppointmentsList({ upcomingAppointmentsList }) {
   const axiosPrivate = useAxiosPrivate();
   const [upcomingAppointments, setUpcomingAppointments] = useState([]);
@@ -36,13 +37,11 @@ function DoctorUpcomingAppointmentsList({ upcomingAppointmentsList }) {
   useEffect(() => {
     const sortedAppointments = upcomingAppointmentsList
       .slice()
-      .sort((a, b) => new Date(a.appointmentTime) - new Date(b.appointmentTime));
+      .sort(
+        (a, b) => new Date(a.appointmentTime) - new Date(b.appointmentTime)
+      );
     setUpcomingAppointments(sortedAppointments);
   }, [upcomingAppointmentsList]);
-
-
-  
-  
 
   return (
     <Card>
@@ -54,10 +53,9 @@ function DoctorUpcomingAppointmentsList({ upcomingAppointmentsList }) {
       )}
       <List>
         {upcomingAppointments.map((appointment, index) => (
-          <ListItem
-           key={index}>
+          <ListItem key={index}>
             <Typography variant="body1">
-              Pacjent - {appointment.user.label}  <br></br>
+              Pacjent - {appointment.user.label} <br></br>
               Data - {appointment.appointmentTime}
             </Typography>
           </ListItem>

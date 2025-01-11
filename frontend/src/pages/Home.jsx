@@ -92,13 +92,12 @@ function Home(props) {
                 <ListItem sx={{ width: "100%" }}>
                   <Button
                     component={Link}
-                    to="/doctor-profile"
+                    to="/doctors-list"
                     variant="outlined"
                     color="primary"
                     sx={{ width: "100%" }}
-                    disabled = {true}
                   >
-                    Chcę zobaczyć profile lekarzy
+                    Chcę zobaczyć listę lekarzy
                   </Button>
                 </ListItem>
           </List>

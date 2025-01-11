@@ -37,7 +37,7 @@ function NavBar() {
                 Dodaj lekarza
               </Button>
               <Button component={Link} to="/delete-users" color="inherit" sx={{ mx: 1 }}>
-                Wyjeb użytkownika
+                Usuń użytkownika
               </Button>
               <Button onClick={logout} color="inherit" sx={{ mx: 1 }}>
                 Logout
@@ -72,7 +72,7 @@ function NavBar() {
             {auth?.user ? (
               <Box>
                 <MenuItem onClick={handleMenuClose} component={Link} to="/delete-users">
-                  Wyjeb uzytkownika
+                  Usuń uzytkownika
                 </MenuItem>
                 <MenuItem onClick={handleMenuClose} component={Link} to="/add-doctor">
                   Dodaj lekarza

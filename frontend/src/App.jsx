@@ -17,6 +17,8 @@ import RegistrationSuccess from "./pages/RegistrationSuccess.jsx";
 import DoctorCreated from "./pages/DoctorCreated.jsx";
 import DeleteUsers from "./pages/DeleteUsers.jsx";
 import DoctorHome from "./pages/DoctorHome.jsx";
+import DoctorsList from "./pages/DoctorsList.jsx";
+import DoctorDetails from "./pages/DoctorDetails.jsx";
 
 const ROLES = {
   User: "user",
@@ -36,6 +38,7 @@ function App() {
         <Route path="/unauthorized" element={<Unauthorized />} />
         <Route path="/registration-success" element={<RegistrationSuccess />} />
         <Route path="/doctor-profile" element={<DoctorProfilePage />} />
+        <Route path="/doctors-list" element={<DoctorsList />} />
 
         <Route element={<RequireAuth allowedRoles={[ROLES.User]} />}>
           <Route path="/profile" element={<PacientProfilePage />} />
@@ -43,6 +46,7 @@ function App() {
             path="/confirm-appointment"
             element={<AppointmentConfirmation />}
           />
+          <Route path="/doctor/:id" element={<DoctorDetails />} />
           <Route path="/make-appointment" element={<AppointmentForm />} />
         </Route>
 

@@ -55,9 +55,12 @@ function AdminHome() {
             <ListItem button component={Link} to="/add-doctor">
               <ListItemText primary="Dodawanie lekarza" />
             </ListItem>
+            {/*
+            
             <ListItem button component={Link} to="/">
               <ListItemText primary="Odwoływanie wizyty" />
             </ListItem>
+            */}
             <ListItem button component={Link} to="/delete-users">
               <ListItemText primary="Usuwanie użytkowników" />
             </ListItem>
