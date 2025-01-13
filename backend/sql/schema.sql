@@ -24,14 +24,12 @@ CREATE TABLE users (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- 'admins' table with the following fields:
--- - 'id': A unique identifier for each admin (primary key), automatically incremented
--- - 'user_id': A reference to the user associated with this admin (foreign key from 'users'), which will cascade on delete
--- - 'must_change_password': A boolean indicating if the admin must change their password upon first login, defaults to 'true'
-CREATE TABLE admins (
+
+
+CREATE TABLE doctor_degree(
 	id SERIAL PRIMARY KEY,
-	user_id INT REFERENCES users(id) ON DELETE CASCADE,
-	must_change_password BOOLEAN NOT NULL DEFAULT 'true'
+	value VARCHAR(70) UNIQUE NOT NULL,
+	label VARCHAR (100) UNIQUE NOT NULL
 );
 
 -- 'doctors' table with the following fields:
@@ -52,11 +50,6 @@ CREATE TABLE doctors (
 );
 
 
-CREATE TABLE doctor_degree(
-	id SERIAL PRIMARY KEY,
-	value VARCHAR(70) UNIQUE NOT NULL,
-	label VARCHAR (100) UNIQUE NOT NULL
-);
 
 INSERT INTO doctor_degree (value, label) VALUES 
 	('dr n. med.', 'Doktor nauk medycznych'),
@@ -152,15 +145,3 @@ ON appointments (user_id, appointment_time);
 
 
 
-
-SELECT u.id, d.degree AS label, u.name, u.surname
-FROM users as u 
-JOIN doctors as d ON u.id = d.user_id
-WHERE u.role = 'doctor';
-
-
-SELECT d.degree, u.name, u.surname FROM users AS u
-JOIN doctors AS d ON u.id = d.user_id
-JOIN doctor_specializations AS ds ON ds.doctor_id = d.user_id
-JOIN specializations AS sp ON sp.id = ds.specialization_id
-WHERE sp.name = 'Chirurg';

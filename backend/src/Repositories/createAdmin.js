@@ -1,8 +1,9 @@
 import db from "../config/dbConnection.js";
 import bcrypt from "bcrypt";
-import { registerUserTransaction } from "./userModel.js";
+import { registerUserTransaction } from "./userRepository.js";
 import { generatePassword } from "../utils/generators.js";
 import { hashPassword } from "../utils/hashing.js";
+import { getBirthDateFromPESEL, getGenderFromPESEL } from "../utils/peselUtils.js";
 import chalk from "chalk";
 
 /**
@@ -21,7 +22,7 @@ import chalk from "chalk";
  * @returns {void} This function does not return a value. It logs the result to the console and exits the process
  * 
  * @example
- * // Running the script from the /backend/src/models folder
+ * // Running the script from the /backend/src/repositories folder
  * // Command to create an admin:
  * node createAdmin.js "Name" "Lastname" "12345678901" "+48" "111222333" "admin.test@gmail.com"
  * 
@@ -46,6 +47,9 @@ const createAdmin = async (
     const password = generatePassword();
     const hashedPassword = await hashPassword(password);
 
+    const birthDay = getBirthDateFromPESEL(pesel);
+    const sex = getGenderFromPESEL(pesel);
+
     const data = {
       name,
       surname,
@@ -53,6 +57,8 @@ const createAdmin = async (
       dialingCode,
       phoneNumber,
       email,
+      sex,
+      birthDay,
       password: hashedPassword,
     };
     const userId = await registerUserTransaction(data, "admin", client);
@@ -61,10 +67,6 @@ const createAdmin = async (
     if(userId === -1){
       throw new error("error creating user(admin) in the users table")
     }
-
-    const query = `INSERT INTO admins (user_id, must_change_password) 
-                        VALUES($1, $2)`;
-    await client.query(query, [userId, true]);
 
     await client.query("COMMIT")    
     console.log(`Admin sucessfully created, password: ${chalk.yellow(password)}`);

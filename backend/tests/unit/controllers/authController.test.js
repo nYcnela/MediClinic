@@ -208,9 +208,6 @@ describe("AuthController - Register", () => {
         message: "Użytkownik został pomyślnie zarejestrowany. id: 1",
       })
     ).to.be.true;
-
-    // expect(mockedClient.query.calledWith("BEGIN")).to.be.true;
-    // expect(mockedClient.query.calledWith("COMMIT")).to.be.true;
   });
 
   it("should rollback transaction if an error occurs", async () => {
@@ -231,7 +228,5 @@ describe("AuthController - Register", () => {
 
     expect(res.status.calledWith(409)).to.be.true;
     expect(res.json.calledWith({ message: "Błąd podczas dodawania użytkownika" })).to.be.true;
-
-    // expect(mockedClient.query.calledWith("ROLLBACK")).to.be.true;
   });
 });

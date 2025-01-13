@@ -1,18 +1,26 @@
 import jwt from "jsonwebtoken";
 
-/**
- * Generates a random password with provided length
- *
- * @param {number} passwordLength - the length of the password, set to 10 by default if not provided
- * @returns {string}  password generated of specified characters
- */
+
 export const generatePassword = (passwordLength = 10) => {
-  const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+";
+  const uppercaseCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  const specialCharacters = "!@#$%^&*()_+";
+  const lowercaseCharacters = "abcdefghijklmnopqrstuvwxyz";
+  const digits = "0123456789";
+
+  const allCharacters = uppercaseCharacters + lowercaseCharacters + digits + specialCharacters;
+
   let password = "";
-  for (let i = 0; i < passwordLength; i++) {
-    const randomIndex = Math.floor(Math.random() * characters.length);
-    password += characters[randomIndex];
+  password += uppercaseCharacters[Math.floor(Math.random() * uppercaseCharacters.length)];
+  password += specialCharacters[Math.floor(Math.random() * specialCharacters.length)];
+  password += digits[Math.floor(Math.random() * digits.length)];
+
+  for (let i = 3; i < passwordLength; i++) {
+    const randomIndex = Math.floor(Math.random() * allCharacters.length);
+    password += allCharacters[randomIndex];
   }
+
+  password = password.split('').sort(() => Math.random() - 0.5).join('');
+
   return password;
 };
 
