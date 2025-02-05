@@ -37,7 +37,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/unauthorized" element={<Unauthorized />} />
         <Route path="/registration-success" element={<RegistrationSuccess />} />
-        <Route path="/doctor-profile" element={<DoctorProfilePage />} />
+        
         <Route path="/doctors-list" element={<DoctorsList />} />
 
         <Route element={<RequireAuth allowedRoles={[ROLES.User]} />}>
@@ -51,7 +51,7 @@ function App() {
         </Route>
 
         <Route element={<RequireAuth allowedRoles={[ROLES.Doctor]} />}>
-          
+          <Route path="/doctor-profile" element={<DoctorProfilePage />} />
           <Route path="/doctor-home" element={<DoctorHome />} />
         </Route>
 
